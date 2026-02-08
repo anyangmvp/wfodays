@@ -1,48 +1,37 @@
 package me.anyang.wfodays.ui.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BeachAccess
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import me.anyang.wfodays.data.entity.AttendanceRecord
 import me.anyang.wfodays.data.entity.WorkMode
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.SuccessGreen
+import me.anyang.wfodays.ui.theme.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -57,59 +46,72 @@ fun CalendarView(
     onNextMonth: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(yearMonth) {
+        isVisible = false
+        delay(50)
+        isVisible = true
+    }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.95f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "calendar_scale"
+    )
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.5f,
+        animationSpec = tween(300),
+        label = "calendar_alpha"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .alpha(animatedAlpha)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .padding(20.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // 月份选择器
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onPreviousMonth) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "上个月"
-                    )
-                }
-                
-                Text(
-                    text = "${yearMonth.year}年${yearMonth.monthValue}月",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                IconButton(onClick = onNextMonth) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "下个月"
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
+        Column {
             // 星期标题
             Row(modifier = Modifier.fillMaxWidth()) {
                 val daysOfWeek = listOf("日", "一", "二", "三", "四", "五", "六")
                 daysOfWeek.forEachIndexed { index, day ->
                     val isWeekend = index == 0 || index == 6
-                    Text(
-                        text = day,
+                    Box(
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = if (isWeekend) HSBCRed else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = day,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isWeekend) WarningYellow else PrimaryBlueDark
+                        )
+                    }
                 }
             }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 分隔线
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(PrimaryBlue.copy(alpha = 0.1f))
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             // 日历网格
             val days = generateCalendarDays(yearMonth)
             LazyVerticalGrid(
@@ -118,10 +120,10 @@ fun CalendarView(
             ) {
                 items(days) { dayDate ->
                     if (dayDate != null) {
-                        val record = records.find { 
+                        val record = records.find {
                             java.time.Instant.ofEpochMilli(it.date)
                                 .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDate() == dayDate 
+                                .toLocalDate() == dayDate
                         }
                         val isWeekend = dayDate.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
                         CalendarDayCell(
@@ -150,73 +152,143 @@ private fun CalendarDayCell(
     onClick: () -> Unit,
     onLongPress: () -> Unit
 ) {
-    val (backgroundColor, icon, iconColor) = when (record?.workMode) {
-        WorkMode.WFO -> Triple(HSBCRed, Icons.Default.Home, Color.White)
-        WorkMode.WFH -> Triple(SuccessGreen, Icons.Default.LocationOn, Color.White)
-        WorkMode.LEAVE -> Triple(Color(0xFFFFB800), Icons.Default.BeachAccess, Color.White)
-        else -> Triple(Color.Transparent, null, Color.Transparent)
+    val cellState = when (record?.workMode) {
+        WorkMode.WFO -> CellState(
+            backgroundColor = PrimaryBlue,
+            icon = Icons.Default.Business,
+            iconColor = Color.White,
+            showBorder = false
+        )
+        WorkMode.WFH -> CellState(
+            backgroundColor = SuccessGreen,
+            icon = Icons.Default.HomeWork,
+            iconColor = Color.White,
+            showBorder = false
+        )
+        WorkMode.LEAVE -> CellState(
+            backgroundColor = WarningYellow,
+            icon = Icons.Default.BeachAccess,
+            iconColor = Color.White,
+            showBorder = false
+        )
+        else -> CellState(
+            backgroundColor = Color.Transparent,
+            icon = null,
+            iconColor = Color.Transparent,
+            showBorder = isToday
+        )
     }
-    
+
     val textColor = when {
         record != null -> Color.White
-        isWeekend -> HSBCRed
-        isToday -> HSBCRed
-        else -> MaterialTheme.colorScheme.onSurface
+        isToday -> PrimaryBlue
+        isWeekend -> WarningYellow.copy(alpha = 0.8f)
+        else -> PrimaryBlueDark
     }
-    
+
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.9f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "day_scale"
+    )
+
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .padding(4.dp)
+            .padding(2.dp)
+            .scale(scale)
             .clip(CircleShape)
-            .background(backgroundColor)
+            .background(cellState.backgroundColor)
+            .then(
+                if (cellState.showBorder) {
+                    Modifier.background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                PrimaryBlue.copy(alpha = 0.1f),
+                                Color.Transparent
+                            )
+                        ),
+                        shape = CircleShape
+                    )
+                } else Modifier
+            )
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { onClick() },
-                    onLongPress = { onLongPress() }
+                    onTap = {
+                        isPressed = true
+                        onClick()
+                    },
+                    onLongPress = {
+                        isPressed = true
+                        onLongPress()
+                    }
                 )
             },
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // 日期数字
             Text(
                 text = date.dayOfMonth.toString(),
                 color = textColor,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = if (isToday || record != null) FontWeight.Bold else FontWeight.Normal
             )
-            
-            if (icon != null) {
+
+            // 状态图标
+            if (cellState.icon != null) {
                 Icon(
-                    imageVector = icon,
+                    imageVector = cellState.icon,
                     contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(12.dp)
+                    tint = cellState.iconColor,
+                    modifier = Modifier.size(14.dp)
                 )
             } else if (isWeekend && !isToday) {
+                // 周末标记点
                 Box(
                     modifier = Modifier
-                        .size(3.dp)
-                        .background(HSBCRed.copy(alpha = 0.5f), CircleShape)
+                        .padding(top = 2.dp)
+                        .size(4.dp)
+                        .background(WarningYellow.copy(alpha = 0.5f), CircleShape)
+                )
+            } else if (isToday) {
+                // 今天标记点
+                Box(
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .size(4.dp)
+                        .background(PrimaryBlue, CircleShape)
                 )
             }
         }
     }
 }
 
+// 辅助数据类用于日历单元格状态
+private data class CellState(
+    val backgroundColor: Color,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    val iconColor: Color,
+    val showBorder: Boolean
+)
+
 private fun generateCalendarDays(yearMonth: YearMonth): List<LocalDate?> {
     val days = mutableListOf<LocalDate?>()
     val firstDayOfMonth = yearMonth.atDay(1)
     val lastDayOfMonth = yearMonth.atEndOfMonth()
-    
+
     val dayOfWeekValue = firstDayOfMonth.dayOfWeek.value % 7
     repeat(dayOfWeekValue) {
         days.add(null)
     }
-    
+
     for (day in 1..lastDayOfMonth.dayOfMonth) {
         days.add(yearMonth.atDay(day))
     }
-    
+
     return days
 }

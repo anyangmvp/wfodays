@@ -1,52 +1,31 @@
 package me.anyang.wfodays.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.BeachAccess
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.ui.components.CalendarView
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.SuccessGreen
+import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.CalendarViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -63,11 +42,14 @@ fun CalendarScreen(
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var longPressedDate by remember { mutableStateOf<LocalDate?>(null) }
     var showWeekendConfirm by remember { mutableStateOf(false) }
-    
+    var isVisible by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.loadMonthData(YearMonth.now())
+        delay(100)
+        isVisible = true
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -75,210 +57,344 @@ fun CalendarScreen(
                     Text(
                         text = "日历记录",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "返回"
+                            contentDescription = "返回",
+                            tint = Color.White
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = PrimaryBlue,
+                    titleContentColor = Color.White
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            PrimaryBlue.copy(alpha = 0.05f),
+                            Color.White
+                        )
+                    )
+                )
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // 日历视图
-            CalendarView(
-                yearMonth = uiState.currentMonth,
-                records = uiState.monthRecords,
-                onDateClick = { date ->
-                    if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-                        // 周六日不允许普通点击
-                    } else {
-                        selectedDate = date
-                    }
-                },
-                onDateLongPress = { date ->
-                    longPressedDate = date
-                    if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-                        showWeekendConfirm = true
-                    } else {
-                        selectedDate = date
-                    }
-                },
-                onPreviousMonth = { viewModel.previousMonth() },
-                onNextMonth = { viewModel.nextMonth() },
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // 图例说明
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+            // 月份导航卡片 - 带渐变背景
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(400)) + slideInVertically(
+                    initialOffsetY = { -50 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "图例说明",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LegendItem(Icons.Default.Home, HSBCRed, "WFO - 在公司办公")
-                    LegendItem(Icons.Default.LocationOn, SuccessGreen, "WFH - 在家办公")
-                    LegendItem(Icons.Default.BeachAccess, Color(0xFFFFB800), "休假")
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "* 周六日需长按才能记录",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                MonthNavigationCard(
+                    yearMonth = uiState.currentMonth,
+                    onPreviousMonth = { viewModel.previousMonth() },
+                    onNextMonth = { viewModel.nextMonth() }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 日历视图 - 带入场动画
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(600)) + slideInVertically(
+                    initialOffsetY = { 30 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                CalendarView(
+                    yearMonth = uiState.currentMonth,
+                    records = uiState.monthRecords,
+                    onDateClick = { date ->
+                        if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                            // 周六日不允许普通点击
+                        } else {
+                            selectedDate = date
+                        }
+                    },
+                    onDateLongPress = { date ->
+                        longPressedDate = date
+                        if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                            showWeekendConfirm = true
+                        } else {
+                            selectedDate = date
+                        }
+                    },
+                    onPreviousMonth = { viewModel.previousMonth() },
+                    onNextMonth = { viewModel.nextMonth() },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 图例说明 - 商务风格卡片
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(800)) + slideInVertically(
+                    initialOffsetY = { 50 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                LegendCard()
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 本月统计概览
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(900)) + slideInVertically(
+                    initialOffsetY = { 50 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                MonthSummaryCard(uiState = uiState)
             }
         }
-        
+
         // 周末确认对话框
         if (showWeekendConfirm && longPressedDate != null) {
-            AlertDialog(
-                onDismissRequest = { 
+            WeekendConfirmDialog(
+                date = longPressedDate!!,
+                onConfirm = {
+                    selectedDate = longPressedDate
+                    showWeekendConfirm = false
+                },
+                onDismiss = {
                     showWeekendConfirm = false
                     longPressedDate = null
-                },
-                title = { Text("周末确认") },
-                text = { 
-                    Text("您选择的是周末（${longPressedDate!!.dayOfWeek}），确定要记录这一天吗？") 
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            selectedDate = longPressedDate
-                            showWeekendConfirm = false
-                        }
-                    ) {
-                        Text("确定")
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = {
-                            showWeekendConfirm = false
-                            longPressedDate = null
-                        }
-                    ) {
-                        Text("取消")
-                    }
                 }
             )
         }
-        
+
         // 日期操作对话框
         selectedDate?.let { date ->
-            val record = uiState.monthRecords.find { 
-                java.time.Instant.ofEpochMilli(it.date)
-                    .atZone(java.time.ZoneId.systemDefault())
-                    .toLocalDate() == date 
-            }
-            
-            AlertDialog(
-                onDismissRequest = { selectedDate = null },
-                title = {
-                    Text(
-                        text = date.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")),
-                        style = MaterialTheme.typography.titleLarge
-                    )
+            DateActionDialog(
+                date = date,
+                record = uiState.monthRecords.find {
+                    java.time.Instant.ofEpochMilli(it.date)
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDate() == date
                 },
-                text = {
-                    Column {
-                        if (record != null) {
-                            val (label, color) = when (record.workMode) {
-                                WorkMode.WFO -> "WFO" to HSBCRed
-                                WorkMode.WFH -> "WFH" to SuccessGreen
-                                WorkMode.LEAVE -> "休假" to Color(0xFFFFB800)
-                            }
-                            Text(
-                                text = "当前状态: $label",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = color,
-                                fontWeight = FontWeight.Bold
-                            )
-                            record.note?.let {
-                                Text(
-                                    text = "备注: $it",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = "当前状态: 未记录",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
+                onDismiss = { selectedDate = null },
+                onMarkWFO = {
+                    viewModel.markWorkMode(date, WorkMode.WFO)
+                    selectedDate = null
                 },
-                confirmButton = {
-                    if (record == null) {
-                        Column {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = {
-                                        viewModel.markWorkMode(date, WorkMode.WFO)
-                                        selectedDate = null
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = HSBCRed)
-                                ) {
-                                    Text("WFO")
-                                }
-                                Button(
-                                    onClick = {
-                                        viewModel.markWorkMode(date, WorkMode.WFH)
-                                        selectedDate = null
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
-                                ) {
-                                    Text("WFH")
-                                }
-                                Button(
-                                    onClick = {
-                                        viewModel.markWorkMode(date, WorkMode.LEAVE)
-                                        selectedDate = null
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB800))
-                                ) {
-                                    Text("休假")
-                                }
-                            }
-                        }
-                    } else {
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.deleteRecord(date)
-                                selectedDate = null
-                            }
-                        ) {
-                            Text("删除记录", color = MaterialTheme.colorScheme.error)
-                        }
-                    }
+                onMarkWFH = {
+                    viewModel.markWorkMode(date, WorkMode.WFH)
+                    selectedDate = null
                 },
-                dismissButton = {
-                    OutlinedButton(onClick = { selectedDate = null }) {
-                        Text("取消")
-                    }
+                onMarkLeave = {
+                    viewModel.markWorkMode(date, WorkMode.LEAVE)
+                    selectedDate = null
+                },
+                onDelete = {
+                    viewModel.deleteRecord(date)
+                    selectedDate = null
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun MonthNavigationCard(
+    yearMonth: YearMonth,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit
+) {
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(yearMonth) {
+        isVisible = false
+        delay(50)
+        isVisible = true
+    }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.95f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "month_scale"
+    )
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.5f,
+        animationSpec = tween(300),
+        label = "month_alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .alpha(animatedAlpha)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.3f)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
+                )
+            )
+            .padding(20.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onPreviousMonth,
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "上月",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${yearMonth.year}年",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+                Text(
+                    text = "${yearMonth.monthValue}月",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            IconButton(
+                onClick = onNextMonth,
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "下月",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendCard() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .padding(20.dp)
+    ) {
+        Column {
+            // 标题
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
+                )
+                Text(
+                    text = "图例说明",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
+                )
+            }
+
+            // 图例项
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                LegendItem(
+                    icon = Icons.Default.Business,
+                    color = PrimaryBlue,
+                    text = "WFO",
+                    subtext = "公司办公"
+                )
+                LegendItem(
+                    icon = Icons.Default.HomeWork,
+                    color = SuccessGreen,
+                    text = "WFH",
+                    subtext = "居家办公"
+                )
+                LegendItem(
+                    icon = Icons.Default.BeachAccess,
+                    color = WarningYellow,
+                    text = "休假",
+                    subtext = "享受假期"
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 提示文字
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(PrimaryBlue.copy(alpha = 0.05f))
+                    .padding(12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = PrimaryBlue.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = "长按日期可记录，周末需长按确认",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PrimaryBlue.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -287,22 +403,439 @@ fun CalendarScreen(
 private fun LegendItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     color: Color,
-    text: String
+    text: String,
+    subtext: String
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 2.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .shadow(
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    spotColor = color.copy(alpha = 0.4f)
+                )
+                .clip(RoundedCornerShape(12.dp))
+                .background(color.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = color
+        )
+        Text(
+            text = subtext,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiState) {
+    val wfoCount = uiState.monthRecords.count { it.workMode == WorkMode.WFO }
+    val wfhCount = uiState.monthRecords.count { it.workMode == WorkMode.WFH }
+    val leaveCount = uiState.monthRecords.count { it.workMode == WorkMode.LEAVE }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .padding(20.dp)
+    ) {
+        Column {
+            // 标题
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
+                )
+                Text(
+                    text = "本月概览",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
+                )
+            }
+
+            // 统计数据
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SummaryStatItem(
+                    count = wfoCount,
+                    label = "WFO",
+                    color = PrimaryBlue,
+                    icon = Icons.Default.Business
+                )
+                SummaryStatItem(
+                    count = wfhCount,
+                    label = "WFH",
+                    color = SuccessGreen,
+                    icon = Icons.Default.HomeWork
+                )
+                SummaryStatItem(
+                    count = leaveCount,
+                    label = "休假",
+                    color = WarningYellow,
+                    icon = Icons.Default.BeachAccess
+                )
+                SummaryStatItem(
+                    count = uiState.monthRecords.size,
+                    label = "总计",
+                    color = Color.Gray,
+                    icon = Icons.Default.CalendarMonth
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryStatItem(
+    count: Int,
+    label: String,
+    color: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(color.copy(alpha = 0.1f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+private fun WeekendConfirmDialog(
+    date: LocalDate,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(WarningYellow.copy(alpha = 0.1f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = WarningYellow
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "周末确认",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlueDark
+                )
+            }
+        },
+        text = {
+            Text(
+                text = "您选择的是 ${date.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"))}（${getWeekdayName(date.dayOfWeek)}），确定要记录这一天吗？",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryBlue
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("确定")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("取消")
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@Composable
+private fun DateActionDialog(
+    date: LocalDate,
+    record: me.anyang.wfodays.data.entity.AttendanceRecord?,
+    onDismiss: () -> Unit,
+    onMarkWFO: () -> Unit,
+    onMarkWFH: () -> Unit,
+    onMarkLeave: () -> Unit,
+    onDelete: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Column {
+                Text(
+                    text = date.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlueDark
+                )
+                if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                    Text(
+                        text = "周末",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = WarningYellow,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+        },
+        text = {
+            Column {
+                if (record != null) {
+                    val (label, color, icon) = when (record.workMode) {
+                        WorkMode.WFO -> Triple("WFO", PrimaryBlue, Icons.Default.Business)
+                        WorkMode.WFH -> Triple("WFH", SuccessGreen, Icons.Default.HomeWork)
+                        WorkMode.LEAVE -> Triple("休假", WarningYellow, Icons.Default.BeachAccess)
+                        else -> Triple("未知", Color.Gray, Icons.Default.Help)
+                    }
+
+                    // 当前状态卡片
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color.copy(alpha = 0.1f))
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(color.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    tint = color,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.padding(start = 16.dp)
+                            ) {
+                                Text(
+                                    text = "当前状态",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Gray
+                                )
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = color
+                                )
+                            }
+                        }
+                    }
+
+                    record.note?.let {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "备注: $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    // 未记录状态
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color(0xFFF1F5F9))
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.EditCalendar,
+                                contentDescription = null,
+                                tint = Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "当前状态: 未记录",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (record == null) {
+                Column {
+                    Text(
+                        text = "选择状态",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ActionButton(
+                            text = "WFO",
+                            color = PrimaryBlue,
+                            icon = Icons.Default.Business,
+                            onClick = onMarkWFO
+                        )
+                        ActionButton(
+                            text = "WFH",
+                            color = SuccessGreen,
+                            icon = Icons.Default.HomeWork,
+                            onClick = onMarkWFH
+                        )
+                        ActionButton(
+                            text = "休假",
+                            color = WarningYellow,
+                            icon = Icons.Default.BeachAccess,
+                            onClick = onMarkLeave
+                        )
+                    }
+                }
+            } else {
+                Button(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("删除记录")
+                }
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("取消")
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@Composable
+private fun ActionButton(
+    text: String,
+    color: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "button_scale"
+    )
+
+    Button(
+        onClick = {
+            isPressed = true
+            onClick()
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        modifier = Modifier.scale(scale),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = color,
             modifier = Modifier.size(16.dp)
         )
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 8.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
+        Spacer(modifier = Modifier.size(4.dp))
+        Text(text)
+    }
+}
+
+private fun getWeekdayName(dayOfWeek: DayOfWeek): String {
+    return when (dayOfWeek) {
+        DayOfWeek.MONDAY -> "周一"
+        DayOfWeek.TUESDAY -> "周二"
+        DayOfWeek.WEDNESDAY -> "周三"
+        DayOfWeek.THURSDAY -> "周四"
+        DayOfWeek.FRIDAY -> "周五"
+        DayOfWeek.SATURDAY -> "周六"
+        DayOfWeek.SUNDAY -> "周日"
     }
 }
