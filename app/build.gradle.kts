@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 plugins {
@@ -14,8 +15,8 @@ android {
     namespace = "me.anyang.wfodays"
     compileSdk = 34
 
-    // 生成基于日期的版本号: yyyyMMdd
-    val dateVersion = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    // 生成基于日期的版本号: yyyyMMdd (北京时间)
+    val dateVersion = LocalDate.now(ZoneId.of("Asia/Shanghai")).format(DateTimeFormatter.ofPattern("yyyyMMdd"))
     val versionCodeNumber = dateVersion.toInt()
 
     defaultConfig {
@@ -41,10 +42,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(localProperties.getProperty("KEYSTORE_FILE", ""))
-            storePassword = localProperties.getProperty("KEYSTORE_PASSWORD", "")
-            keyAlias = localProperties.getProperty("KEY_ALIAS", "")
-            keyPassword = localProperties.getProperty("KEY_PASSWORD", "")
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: localProperties.getProperty("KEYSTORE_FILE", ""))
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: localProperties.getProperty("KEYSTORE_PASSWORD", "")
+            keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS", "")
+            keyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("KEY_PASSWORD", "")
         }
     }
 
