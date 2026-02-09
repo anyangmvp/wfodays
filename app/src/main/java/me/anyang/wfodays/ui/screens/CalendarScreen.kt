@@ -3,6 +3,7 @@ package me.anyang.wfodays.ui.screens
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -705,66 +706,47 @@ private fun DateActionDialog(
                         )
                     }
                 } else {
-                    // 未记录状态
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFFF1F5F9))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.EditCalendar,
-                                contentDescription = null,
-                                tint = Color.Gray,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "当前状态: 未记录",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            if (record == null) {
-                Column {
+                    // 未记录状态 - 显示选择按钮
                     Text(
                         text = "选择状态",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                    // 使用垂直布局显示三个选项
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        ActionButton(
-                            text = "WFO",
+                        // WFO 按钮
+                        StatusOptionButton(
+                            text = "公司办公 (WFO)",
                             color = PrimaryBlue,
                             icon = Icons.Default.Business,
                             onClick = onMarkWFO
                         )
-                        ActionButton(
-                            text = "WFH",
+
+                        // WFH 按钮
+                        StatusOptionButton(
+                            text = "居家办公 (WFH)",
                             color = SuccessGreen,
                             icon = Icons.Default.HomeWork,
                             onClick = onMarkWFH
                         )
-                        ActionButton(
-                            text = "休假",
+
+                        // 休假按钮
+                        StatusOptionButton(
+                            text = "休假 (Leave)",
                             color = WarningYellow,
                             icon = Icons.Default.BeachAccess,
                             onClick = onMarkLeave
                         )
                     }
                 }
-            } else {
+            }
+        },
+        confirmButton = {
+            if (record != null) {
                 Button(
                     onClick = onDelete,
                     colors = ButtonDefaults.buttonColors(
@@ -780,6 +762,9 @@ private fun DateActionDialog(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("删除记录")
                 }
+            } else {
+                // 未记录时不显示确认按钮
+                Box {}
             }
         },
         dismissButton = {
@@ -793,6 +778,60 @@ private fun DateActionDialog(
         containerColor = Color.White,
         shape = RoundedCornerShape(20.dp)
     )
+}
+
+@Composable
+private fun StatusOptionButton(
+    text: String,
+    color: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "button_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.1f))
+            .clickable {
+                isPressed = true
+                onClick()
+            }
+            .padding(12.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = color
+            )
+        }
+    }
 }
 
 @Composable

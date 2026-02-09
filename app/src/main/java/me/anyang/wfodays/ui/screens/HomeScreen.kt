@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.HomeViewModel
+import me.anyang.wfodays.utils.GreetingHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,6 +146,11 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
+
+            // 问候语
+            GreetingSection()
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 今日状态卡片 - 渐变背景
             TodayStatusCard(
@@ -335,12 +341,7 @@ private fun TodayStatusCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "长按切换状态",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
+
             }
 
             // 图标动画
@@ -369,6 +370,107 @@ private fun TodayStatusCard(
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(36.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GreetingSection() {
+    var greeting by remember { mutableStateOf(GreetingHelper.getGreeting()) }
+    val timePeriod = GreetingHelper.getTimePeriod()
+
+    // 每次重新组合时更新问候语（如果需要）
+    LaunchedEffect(Unit) {
+        greeting = GreetingHelper.getGreeting()
+    }
+
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        isVisible = true
+    }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.95f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "greeting_scale"
+    )
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(500),
+        label = "greeting_alpha"
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .alpha(animatedAlpha)
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 时间段图标
+            val timeIcon = when (timePeriod) {
+                "上午" -> Icons.Default.WbSunny
+                "中午" -> Icons.Default.BrightnessHigh
+                "下午" -> Icons.Default.Brightness5
+                "晚上" -> Icons.Default.NightsStay
+                "凌晨" -> Icons.Default.Bedtime
+                "周末" -> Icons.Default.Weekend
+                else -> Icons.Default.WbSunny
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(
+                        Brush.linearGradient(
+                            listOf(PrimaryBlue.copy(alpha = 0.2f), PrimaryBlueLight.copy(alpha = 0.1f))
+                        ),
+                        RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = timeIcon,
+                    contentDescription = null,
+                    tint = PrimaryBlue,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column {
+                Text(
+                    text = timePeriod,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = PrimaryBlue,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = greeting,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color(0xFF1E293B),
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
