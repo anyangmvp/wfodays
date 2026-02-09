@@ -5,10 +5,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
+import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,19 +67,22 @@ class GeofenceManager @Inject constructor(
                 
                 // Only auto-record if no record exists or not already WFO
                 if (existingRecord == null || existingRecord.workMode != WorkMode.WFO) {
+                    // 获取配置好语言的 Context，确保通知显示正确的语言
+                    val localizedContext = LanguageManager.getLocalizedContext(context)
+                    
                     repository.recordAttendance(
                         date = today,
                         isPresent = true,
                         workMode = WorkMode.WFO,
                         type = RecordType.AUTO,
-                        note = "GPS定位：距离${OFFICE_NAME} ${distance.toInt()} 米"
+                        note = localizedContext.getString(R.string.gps_location_format, OFFICE_NAME, distance.toInt())
                     )
                     
                     NotificationHelper.showAttendanceNotification(
-                        context,
+                        localizedContext,
                         today,
-                        "自动记录 WFO",
-                        "检测到您已到达${OFFICE_NAME}附近，已自动记录今日WFO"
+                        localizedContext.getString(R.string.notification_title_auto_record_wfo),
+                        localizedContext.getString(R.string.notification_message_auto_record_wfo, OFFICE_NAME)
                     )
                 }
             }

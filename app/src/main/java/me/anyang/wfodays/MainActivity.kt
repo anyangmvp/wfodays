@@ -1,5 +1,6 @@
 package me.anyang.wfodays
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +24,7 @@ import me.anyang.wfodays.ui.screens.OnboardingScreen
 import me.anyang.wfodays.ui.screens.SettingsScreen
 import me.anyang.wfodays.ui.screens.StatsScreen
 import me.anyang.wfodays.ui.theme.WFODaysTheme
+import me.anyang.wfodays.utils.LanguageManager
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,6 +35,16 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var locationManager: NativeLocationManager
+
+    override fun attachBaseContext(newBase: Context?) {
+        // 应用保存的语言设置
+        val context = newBase?.let {
+            val language = LanguageManager.getCurrentLanguage(it)
+            LanguageManager.setLanguage(it, language)
+            it
+        }
+        super.attachBaseContext(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

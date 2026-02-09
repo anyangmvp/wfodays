@@ -16,21 +16,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.HomeViewModel
 import me.anyang.wfodays.utils.GreetingHelper
+import me.anyang.wfodays.utils.LanguageManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,17 +96,40 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    // 语言切换图标
+                    val context = LocalContext.current
+                    
+                    IconButton(onClick = {
+                        LanguageManager.toggleLanguage(context)
+                        // 重启Activity以应用语言更改 - 使用Intent方式避免生命周期异常
+                        val activity = context as? android.app.Activity
+                        activity?.let {
+                            val intent = it.intent
+                            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            it.finish()
+                            it.startActivity(intent)
+                            // 禁用动画使切换更平滑
+                            it.overridePendingTransition(0, 0)
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = "Switch Language",
+                            tint = PrimaryBlue
+                        )
+                    }
+                    
                     IconButton(onClick = onNavigateToStats) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ShowChart,
-                            contentDescription = "统计",
+                            contentDescription = stringResource(R.string.statistics),
                             tint = PrimaryBlue
                         )
                     }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "设置",
+                            contentDescription = stringResource(R.string.settings),
                             tint = PrimaryBlue
                         )
                     }
@@ -131,7 +158,7 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = "日历",
+                    contentDescription = stringResource(R.string.title_calendar),
                     tint = Color.White
                 )
             }
@@ -173,7 +200,7 @@ fun HomeScreen(
             val stats = uiState.currentMonthStats
             if (stats != null) {
                 BusinessInfoCard(
-                    title = "本月出勤目标",
+                    title = stringResource(R.string.monthly_attendance_goal),
                     icon = Icons.Default.Flag,
                     delayMillis = 200
                 ) {
@@ -195,19 +222,19 @@ fun HomeScreen(
                     ) {
                         BusinessStatItem(
                             value = stats.wfoDays,
-                            label = "已WFO",
+                            label = stringResource(R.string.wfo_completed),
                             icon = Icons.Default.CheckCircle,
                             delayMillis = 300
                         )
                         BusinessStatItem(
                             value = stats.remainingDays,
-                            label = "还需",
+                            label = stringResource(R.string.wfo_needed),
                             icon = Icons.Default.TrendingUp,
                             delayMillis = 400
                         )
                         BusinessStatItem(
                             value = stats.remainingDays,
-                            label = "剩余天数",
+                            label = stringResource(R.string.remaining_workdays),
                             icon = Icons.Default.CalendarToday,
                             delayMillis = 500
                         )
@@ -272,26 +299,26 @@ private fun TodayStatusCard(
         WorkMode.WFO -> Quad(
             Brush.linearGradient(listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)),
             Icons.Default.Business,
-            "今日办公",
-            "办公室 (WFO)"
+            stringResource(R.string.today_work),
+            stringResource(R.string.office_wfo)
         )
         WorkMode.WFH -> Quad(
             Brush.linearGradient(listOf(SuccessGreen, SuccessGreen.copy(green = 0.7f))),
             Icons.Default.HomeWork,
-            "今日办公",
-            "居家办公 (WFH)"
+            stringResource(R.string.today_work),
+            stringResource(R.string.home_wfh)
         )
         WorkMode.LEAVE -> Quad(
             Brush.linearGradient(listOf(WarningYellow, WarningYellow.copy(red = 0.9f))),
             Icons.Default.BeachAccess,
-            "今日休假",
-            "享受假期"
+            stringResource(R.string.today_leave),
+            stringResource(R.string.enjoy_holiday)
         )
         null -> Quad(
             Brush.linearGradient(listOf(Color(0xFF64748B), Color(0xFF94A3B8))),
             Icons.Default.Help,
-            "今日未记录",
-            "点击设置状态"
+            stringResource(R.string.today_not_recorded),
+            stringResource(R.string.click_to_set_status)
         )
     }
 
@@ -379,7 +406,8 @@ private fun TodayStatusCard(
 @Composable
 private fun GreetingSection() {
     var greeting by remember { mutableStateOf(GreetingHelper.getGreeting()) }
-    val timePeriod = GreetingHelper.getTimePeriod()
+    val timePeriodKey = GreetingHelper.getTimePeriod()
+    val timePeriod = GreetingHelper.getLocalizedTimePeriod()
 
     // 每次重新组合时更新问候语（如果需要）
     LaunchedEffect(Unit) {
@@ -427,13 +455,13 @@ private fun GreetingSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 时间段图标
-            val timeIcon = when (timePeriod) {
-                "上午" -> Icons.Default.WbSunny
-                "中午" -> Icons.Default.BrightnessHigh
-                "下午" -> Icons.Default.Brightness5
-                "晚上" -> Icons.Default.NightsStay
-                "凌晨" -> Icons.Default.Bedtime
-                "周末" -> Icons.Default.Weekend
+            val timeIcon = when (timePeriodKey) {
+                "morning" -> Icons.Default.WbSunny
+                "noon" -> Icons.Default.BrightnessHigh
+                "afternoon" -> Icons.Default.Brightness5
+                "evening" -> Icons.Default.NightsStay
+                "midnight" -> Icons.Default.Bedtime
+                "weekend" -> Icons.Default.Weekend
                 else -> Icons.Default.WbSunny
             }
 
@@ -699,7 +727,7 @@ private fun QuickActionsSection(
             .alpha(animatedAlpha)
     ) {
         Text(
-            text = "快捷记录",
+            text = stringResource(R.string.quick_record),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1E293B)
@@ -728,7 +756,7 @@ private fun QuickActionsSection(
                 delayMillis = 800
             )
             QuickActionButton(
-                text = "休假",
+                text = stringResource(R.string.leave),
                 icon = Icons.Default.BeachAccess,
                 color = WarningYellow,
                 onClick = onLeaveClick,
@@ -877,7 +905,7 @@ private fun SuccessOverlay(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "记录成功！",
+                    text = stringResource(R.string.record_success),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1E293B)

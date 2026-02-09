@@ -29,6 +29,9 @@ import kotlinx.coroutines.delay
 import me.anyang.wfodays.data.repository.MonthlyStatistics
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.StatsViewModel
+import androidx.compose.ui.res.stringResource
+import me.anyang.wfodays.R
+import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +53,7 @@ fun StatsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "出勤统计",
+                        text = stringResource(R.string.attendance_statistics),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -60,7 +63,7 @@ fun StatsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "返回",
+                            contentDescription = stringResource(R.string.back),
                             tint = Color.White
                         )
                     }
@@ -128,12 +131,12 @@ fun StatsScreen(
                         )
                     }
                     Text(
-                        text = "历史统计",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 12.dp),
-                        color = PrimaryBlueDark
-                    )
+                    text = stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
+                )
                 }
             }
 
@@ -226,14 +229,18 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
             ) {
                 Column {
                     Text(
-                        text = "本月 WFO 统计",
+                        text = stringResource(R.string.monthly_wfo_statistics),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "${stats.yearMonth.year}年${stats.yearMonth.monthValue}月",
+                        text = buildString {
+                            append(stats.yearMonth.year)
+                            append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+                            append(getMonthName(stats.yearMonth.monthValue))
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -272,7 +279,12 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
 
             // 计算公式
             Text(
-                text = "目标: (总工作日 ${stats.totalWorkdays} - 休假 ${stats.leaveDays}) × 60% = 需WFO ${stats.requiredDays} 天",
+                text = stringResource(
+                    R.string.goal_formula,
+                    stats.totalWorkdays,
+                    stats.leaveDays,
+                    stats.requiredDays
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
             )
@@ -301,7 +313,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                         color = Color.White
                     )
                     Text(
-                        text = "/ ${stats.requiredDays} 天",
+                        text = "/ ${stats.requiredDays} ${stringResource(R.string.days_unit)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -323,25 +335,25 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
             ) {
                 StatsGridItem(
                     value = stats.totalWorkdays.toString(),
-                    label = "总工作日",
+                    label = stringResource(R.string.total_workdays_label),
                     icon = Icons.Default.CalendarToday,
                     delayMillis = 300
                 )
                 StatsGridItem(
                     value = stats.leaveDays.toString(),
-                    label = "休假",
+                    label = stringResource(R.string.leave_days_label),
                     icon = Icons.Default.BeachAccess,
                     delayMillis = 400
                 )
                 StatsGridItem(
                     value = stats.effectiveWorkdays.toString(),
-                    label = "有效工作日",
+                    label = stringResource(R.string.effective_workdays),
                     icon = Icons.Default.Work,
                     delayMillis = 500
                 )
                 StatsGridItem(
-                    value = if (stats.remainingDays > 0) "${stats.remainingDays}" else "已完成",
-                    label = if (stats.remainingDays > 0) "还需天数" else "状态",
+                    value = if (stats.remainingDays > 0) "${stats.remainingDays}" else stringResource(R.string.completed),
+                    label = if (stats.remainingDays > 0) stringResource(R.string.remaining_days_label) else stringResource(R.string.status),
                     icon = if (stats.remainingDays > 0) Icons.Default.TrendingUp else Icons.Default.CheckCircle,
                     delayMillis = 600,
                     isSuccess = isGoalReached
@@ -368,7 +380,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                             tint = Color.White
                         )
                         Text(
-                            text = "恭喜！本月已满足 60% WFO 要求",
+                            text = stringResource(R.string.congrats_goal_reached),
                             modifier = Modifier.padding(start = 8.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
@@ -464,17 +476,21 @@ private fun EmptyHistoryCard() {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "暂无历史数据",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray
-            )
+                    text = stringResource(R.string.no_history_data),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
         }
     }
 }
 
 @Composable
 private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
-    val monthStr = "${stats.yearMonth.year}年${stats.yearMonth.monthValue}月"
+    val monthStr = buildString {
+        append(stats.yearMonth.year)
+        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+        append(getMonthName(stats.yearMonth.monthValue))
+    }
     val progress = stats.wfoDays.toFloat() / stats.effectiveWorkdays.coerceAtLeast(1)
     val isGoalReached = stats.remainingDays <= 0
 
@@ -548,7 +564,7 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "WFO: ${stats.wfoDays}/${stats.effectiveWorkdays}天 (${(progress * 100).toInt()}%)",
+                        text = stringResource(R.string.wfo_stats_format, stats.wfoDays, stats.effectiveWorkdays, (progress * 100).toInt()),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -578,7 +594,7 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "还需${stats.remainingDays}天",
+                        text = stringResource(R.string.days_remaining_format, stats.remainingDays),
                         style = MaterialTheme.typography.bodyMedium,
                         color = WarningYellow,
                         fontWeight = FontWeight.Medium
@@ -591,3 +607,22 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
 
 // 缓动函数
 private val EaseInOutSine = CubicBezierEasing(0.37f, 0f, 0.63f, 1f)
+
+@Composable
+private fun getMonthName(monthValue: Int): String {
+    return when (monthValue) {
+        1 -> stringResource(R.string.month_abbr_jan)
+        2 -> stringResource(R.string.month_abbr_feb)
+        3 -> stringResource(R.string.month_abbr_mar)
+        4 -> stringResource(R.string.month_abbr_apr)
+        5 -> stringResource(R.string.month_abbr_may)
+        6 -> stringResource(R.string.month_abbr_jun)
+        7 -> stringResource(R.string.month_abbr_jul)
+        8 -> stringResource(R.string.month_abbr_aug)
+        9 -> stringResource(R.string.month_abbr_sep)
+        10 -> stringResource(R.string.month_abbr_oct)
+        11 -> stringResource(R.string.month_abbr_nov)
+        12 -> stringResource(R.string.month_abbr_dec)
+        else -> monthValue.toString()
+    }
+}

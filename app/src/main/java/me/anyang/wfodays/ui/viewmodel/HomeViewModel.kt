@@ -169,7 +169,7 @@ class HomeViewModel @Inject constructor(
                 repository.markWorkMode(
                     date = LocalDate.now(),
                     workMode = WorkMode.WFO,
-                    note = "手动标记WFO"
+                    note = context.getString(R.string.manual_mark_wfo)
                 )
                 loadData()
             } catch (e: Exception) {
@@ -184,7 +184,7 @@ class HomeViewModel @Inject constructor(
                 repository.markWorkMode(
                     date = LocalDate.now(),
                     workMode = WorkMode.LEAVE,
-                    note = "标记为休假"
+                    note = context.getString(R.string.manual_mark_leave)
                 )
                 loadData()
             } catch (e: Exception) {
@@ -199,7 +199,7 @@ class HomeViewModel @Inject constructor(
                 repository.markWorkMode(
                     date = LocalDate.now(),
                     workMode = WorkMode.WFH,
-                    note = "标记为WFH"
+                    note = context.getString(R.string.manual_mark_wfh)
                 )
                 loadData()
             } catch (e: Exception) {
@@ -226,9 +226,9 @@ class HomeViewModel @Inject constructor(
                 }
 
                 val note = when (nextMode) {
-                    WorkMode.WFO -> "手动切换为WFO"
-                    WorkMode.WFH -> "手动切换为WFH"
-                    WorkMode.LEAVE -> "手动切换为休假"
+                    WorkMode.WFO -> context.getString(R.string.manual_switch_wfo)
+                    WorkMode.WFH -> context.getString(R.string.manual_switch_wfh)
+                    WorkMode.LEAVE -> context.getString(R.string.manual_switch_leave)
                 }
 
                 repository.markWorkMode(

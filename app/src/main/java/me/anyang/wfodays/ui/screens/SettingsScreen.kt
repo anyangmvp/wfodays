@@ -36,8 +36,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -78,6 +76,8 @@ import me.anyang.wfodays.ui.theme.PrimaryBlue
 import me.anyang.wfodays.ui.theme.PrimaryBlueDark
 import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 import me.anyang.wfodays.ui.theme.SuccessGreen
+import me.anyang.wfodays.utils.BatteryOptimizationHelper
+import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -136,7 +136,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "设置",
+                        text = stringResource(R.string.setting),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -146,7 +146,7 @@ fun SettingsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "返回",
+                            contentDescription = stringResource(R.string.back),
                             tint = Color.White
                         )
                     }
@@ -205,7 +205,7 @@ fun SettingsScreen(
             ) {
                 SectionTitle(
                     icon = Icons.Default.Settings,
-                    title = "权限设置"
+                    title = stringResource(R.string.permissions_setting_title)
                 )
             }
 
@@ -220,8 +220,8 @@ fun SettingsScreen(
                 )
             ) {
                 PermissionGuideCard(
-                    title = "位置权限",
-                    description = "用于检测您是否在公司附近",
+                    title = stringResource(R.string.location_permission_title),
+                    description = stringResource(R.string.location_permission_desc),
                     isGranted = locationPermissionState.status.isGranted,
                     onRequest = { locationPermissionState.launchPermissionRequest() }
                 )
@@ -240,8 +240,8 @@ fun SettingsScreen(
                 ) {
                     backgroundLocationState?.let { state ->
                         PermissionGuideCard(
-                            title = "后台位置权限",
-                            description = "即使App关闭也能检测到公司",
+                            title = stringResource(R.string.background_location_permission_title),
+                            description = stringResource(R.string.background_location_permission_desc),
                             isGranted = state.status.isGranted,
                             onRequest = { state.launchPermissionRequest() }
                         )
@@ -261,14 +261,43 @@ fun SettingsScreen(
                 ) {
                     notificationPermissionState?.let { state ->
                         PermissionGuideCard(
-                            title = "通知权限",
-                            description = "用于每日位置记录提醒",
+                            title = stringResource(R.string.notification_permission_title),
+                            description = stringResource(R.string.notification_permission_desc),
                             isGranted = state.status.isGranted,
                             onRequest = { state.launchPermissionRequest() }
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 电池优化设置标题
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(850)) + slideInVertically(
+                    initialOffsetY = { 30 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                SectionTitle(
+                    icon = Icons.Default.Settings,
+                    title = stringResource(R.string.battery_optimization_setting_title)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 电池优化设置
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(900)) + slideInVertically(
+                    initialOffsetY = { 30 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                BatteryOptimizationCard()
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -300,7 +329,7 @@ fun SettingsScreen(
             ) {
                 SectionTitle(
                     icon = Icons.Default.Info,
-                    title = "关于"
+                    title = stringResource(R.string.about_title)
                 )
             }
 
@@ -401,7 +430,7 @@ private fun LocationTestCard(
                         )
                     }
                     Text(
-                        text = "位置测试",
+                        text = stringResource(R.string.location_test_card_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 12.dp),
@@ -415,7 +444,7 @@ private fun LocationTestCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "刷新位置",
+                        contentDescription = stringResource(R.string.refresh_location_content_desc),
                         tint = if (isLoading) Color.Gray else PrimaryBlue
                     )
                 }
@@ -471,7 +500,7 @@ private fun LoadingState() {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "正在获取位置...",
+                text = stringResource(R.string.getting_location_text),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -490,16 +519,16 @@ private fun LocationInfo(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         LocationInfoItem(
-            label = "纬度",
+            label = stringResource(R.string.latitude_label),
             value = "${String.format("%.6f", lat)}°N"
         )
         LocationInfoItem(
-            label = "经度",
+            label = stringResource(R.string.longitude_label),
             value = "${String.format("%.6f", lon)}°E"
         )
         LocationInfoItem(
-            label = "精度",
-            value = "±${accuracy.toInt()}m"
+            label = stringResource(R.string.accuracy_label),
+            value = stringResource(R.string.accuracy_format_string, String.format("%.0f", accuracy))
         )
     }
 }
@@ -561,18 +590,18 @@ private fun DistanceCard(
                 modifier = Modifier.padding(start = 16.dp)
             ) {
                 Text(
-                    text = "距离${NativeLocationManager.OFFICE_NAME}",
+                    text = stringResource(R.string.distance_to_office, NativeLocationManager.OFFICE_NAME),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
                 Text(
-                    text = "${distance.toInt()} 米",
+                    text = stringResource(R.string.distance_format_string, distance.toInt()),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = cardColor
                 )
                 Text(
-                    text = if (isInRange) "✓ 在范围内，将自动记录WFO" else "超出800米范围",
+                    text = if (isInRange) stringResource(R.string.distance_in_range_message) else stringResource(R.string.distance_out_of_range_message),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isInRange) SuccessGreen else Color.Gray
                 )
@@ -594,7 +623,9 @@ private fun TargetLocationInfo() {
             modifier = Modifier.size(14.dp)
         )
         Text(
-            text = "目标: ${NativeLocationManager.OFFICE_LATITUDE}°N, ${NativeLocationManager.OFFICE_LONGITUDE}°E (800米范围)",
+            text = stringResource(R.string.target_location_with_radius, 
+                NativeLocationManager.OFFICE_LATITUDE.toString(), 
+                NativeLocationManager.OFFICE_LONGITUDE.toString()),
             style = MaterialTheme.typography.bodySmall,
             color = Color.Gray,
             modifier = Modifier.padding(start = 4.dp)
@@ -622,7 +653,7 @@ private fun EmptyLocationState(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = if (hasPermission) "点击刷新获取位置" else "需要位置权限",
+                text = if (hasPermission) stringResource(R.string.click_to_refresh_location) else stringResource(R.string.need_location_permission),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -633,7 +664,7 @@ private fun EmptyLocationState(
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("授权位置权限")
+                    Text(stringResource(R.string.grant_location_permission_button))
                 }
             }
         }
@@ -704,6 +735,9 @@ private fun NotificationTestCard(
             Button(
                 onClick = {
                     isPressed = true
+                    // 获取配置好语言的 Context，确保通知显示正确的语言
+                    val localizedContext = LanguageManager.getLocalizedContext(context)
+                    
                     // 根据当前位置判断是在公司还是家里
                     val isInOffice = if (currentLat != 0.0 && currentLon != 0.0) {
                         locationManager.isWithinOfficeRadius(currentLat, currentLon)
@@ -711,19 +745,35 @@ private fun NotificationTestCard(
                         true
                     }
 
-                    val notificationTitle = context.getString(R.string.notification_title_location_updated)
-                    val notificationMessage = if (isInOffice) {
-                        context.getString(R.string.notification_message_wfo_updated)
-                    } else {
-                        context.getString(R.string.notification_message_wfh_updated)
-                    }
+                    val distance = if (currentLat != 0.0 && currentLon != 0.0) {
+                         locationManager.calculateDistanceToOffice(currentLat, currentLon)
+                     } else {
+                         100f // 默认距离
+                     }
+                     
+                     // 距离显示逻辑（参考DailyLocationCheckWorker中的实现）
+                     val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
+                         val roundedDistance = ((distance / 100).toInt()) * 100
+                         localizedContext.getString(R.string.distance_format_string, roundedDistance)
+                     } else {
+                         localizedContext.getString(R.string.distance_kilometer_format, distance / 1000)
+                     }
 
-                    NotificationHelper.showAttendanceNotification(
-                        context,
-                        LocalDate.now(),
-                        notificationTitle,
-                        notificationMessage
-                    )
+                     if (isInOffice) {
+                         NotificationHelper.showAttendanceNotification(
+                             localizedContext,
+                             LocalDate.now(),
+                             localizedContext.getString(R.string.notification_title_wfo_success),
+                             localizedContext.getString(R.string.notification_message_office_distance, distanceDisplay)
+                         )
+                     } else {
+                         NotificationHelper.showAttendanceNotification(
+                             localizedContext,
+                             LocalDate.now(),
+                             localizedContext.getString(R.string.notification_title_wfh_recorded),
+                             localizedContext.getString(R.string.notification_message_home_distance, distanceDisplay)
+                         )
+                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -738,6 +788,143 @@ private fun NotificationTestCard(
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(stringResource(R.string.send_test_notification))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BatteryOptimizationCard() {
+    val context = LocalContext.current
+    var isIgnoringBatteryOptimizations by remember {
+        mutableStateOf(BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context))
+    }
+
+    // 每次显示时刷新状态
+    LaunchedEffect(Unit) {
+        isIgnoringBatteryOptimizations = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(24.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+            )
+            .clip(RoundedCornerShape(24.dp))
+            .background(Color.White)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            // 标题栏
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (isIgnoringBatteryOptimizations)
+                                    SuccessGreen.copy(alpha = 0.1f)
+                                else
+                                    PrimaryBlue.copy(alpha = 0.1f)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isIgnoringBatteryOptimizations)
+                                Icons.Default.CheckCircle
+                            else
+                                Icons.Default.Notifications,
+                            contentDescription = null,
+                            tint = if (isIgnoringBatteryOptimizations) SuccessGreen else PrimaryBlue,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.battery_optimization_whitelist),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 12.dp),
+                        color = PrimaryBlueDark
+                    )
+                }
+
+                // 状态标签
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            if (isIgnoringBatteryOptimizations)
+                                SuccessGreen.copy(alpha = 0.1f)
+                            else
+                                PrimaryBlue.copy(alpha = 0.1f)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = if (isIgnoringBatteryOptimizations) stringResource(R.string.already_set) else stringResource(R.string.not_set),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isIgnoringBatteryOptimizations) SuccessGreen else PrimaryBlue,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 说明文字
+            Text(
+                text = stringResource(R.string.battery_optimization_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 品牌特定指南
+            Text(
+                text = BatteryOptimizationHelper.getBrandSpecificGuide(context),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (!isIgnoringBatteryOptimizations) {
+                Button(
+                    onClick = {
+                        val intent = BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(context)
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(stringResource(R.string.add_to_whitelist))
+                }
+            } else {
+                OutlinedButton(
+                    onClick = {
+                        val intent = BatteryOptimizationHelper.openBatteryOptimizationSettings(context)
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(stringResource(R.string.view_battery_settings))
+                }
             }
         }
     }
@@ -792,7 +979,7 @@ private fun AboutCard() {
                         color = Color.White
                     )
                     Text(
-                        text = "版本 ${context.packageManager.getPackageInfo(context.packageName, 0).versionName}",
+                        text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -813,7 +1000,7 @@ private fun AboutCard() {
 
             // 描述
             Text(
-                text = "办公位置自动识别和记录助手",
+                text = stringResource(R.string.app_description_short),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.9f)
             )
@@ -829,7 +1016,7 @@ private fun AboutCard() {
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "作者: Stephen An",
+                    text = stringResource(R.string.author_info),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.8f),
                     modifier = Modifier.padding(start = 4.dp)
@@ -847,7 +1034,9 @@ private fun AboutCard() {
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "目标: ${NativeLocationManager.OFFICE_LATITUDE}°N, ${NativeLocationManager.OFFICE_LONGITUDE}°E",
+                    text = stringResource(R.string.target_location_format_new, 
+                        NativeLocationManager.OFFICE_LATITUDE.toString(), 
+                        NativeLocationManager.OFFICE_LONGITUDE.toString()),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.8f),
                     modifier = Modifier.padding(start = 4.dp)

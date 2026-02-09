@@ -1,6 +1,8 @@
 package me.anyang.wfodays.data.repository
 
+import android.content.Context
 import kotlinx.coroutines.flow.Flow
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.database.AttendanceDao
 import me.anyang.wfodays.data.entity.AttendanceRecord
 import me.anyang.wfodays.data.entity.RecordType
@@ -14,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AttendanceRepository @Inject constructor(
-    private val attendanceDao: AttendanceDao
+    private val attendanceDao: AttendanceDao,
+    private val context: Context
 ) {
 
     suspend fun recordAttendance(
@@ -29,7 +32,7 @@ class AttendanceRepository @Inject constructor(
             isPresent = isPresent,
             workMode = workMode,
             recordType = type,
-            location = if (type == RecordType.AUTO) "GPS自动定位" else null,
+            location = if (type == RecordType.AUTO) context.getString(R.string.gps_auto_location) else null,
             note = note
         )
         attendanceDao.insertRecord(record)
@@ -37,10 +40,13 @@ class AttendanceRepository @Inject constructor(
 
     suspend fun markWorkMode(date: LocalDate, workMode: WorkMode, note: String? = null) {
         val existing = attendanceDao.getRecordByDate(DateUtils.toEpochMillis(date))
+        // isPresent 为 true 表示这一天有记录（WFO 或 LEAVE 或 WFH）
+        // 这样 LEAVE 记录也能被统计查询到
+        val isPresent = workMode == WorkMode.WFO || workMode == WorkMode.LEAVE || workMode == WorkMode.WFH
         if (existing != null) {
             val updated = existing.copy(
                 workMode = workMode,
-                isPresent = workMode == WorkMode.WFO,
+                isPresent = isPresent,
                 recordType = RecordType.MANUAL,
                 note = note,
                 updatedAt = System.currentTimeMillis()
@@ -49,7 +55,7 @@ class AttendanceRepository @Inject constructor(
         } else {
             recordAttendance(
                 date = date,
-                isPresent = workMode == WorkMode.WFO,
+                isPresent = isPresent,
                 workMode = workMode,
                 type = RecordType.MANUAL,
                 note = note

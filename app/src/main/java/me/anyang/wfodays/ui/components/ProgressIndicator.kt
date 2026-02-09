@@ -20,8 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.anyang.wfodays.R
 import me.anyang.wfodays.ui.theme.HSBCRed
 import me.anyang.wfodays.ui.theme.HSBCRedLight
 
@@ -92,7 +95,7 @@ fun TargetProgressCard(
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "本月出勤进度",
+            text = stringResource(R.string.monthly_attendance_progress),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
         )

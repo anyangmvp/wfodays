@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WFODays</string>
+    
+    <!-- Common -->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Work Modes -->
+    <string name="wfo">WFO</string>
+    <string name="wfh">WFH</string>
+    <string name="leave">Leave</string>
+    <string name="work_from_office">Work From Office</string>
+    <string name="work_from_home">Work From Home</string>
+    <string name="on_leave">On Leave</string>
+    
+    <!-- Record Types -->
+    <string name="auto_detect">Auto Detect</string>
+    <string name="manual">Manual</string>
+    <string name="manual_record">Manual Record</string>
+    
+    <!-- Navigation -->
+    <string name="title_home">Home</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="title_stats">Statistics</string>
+    
+    <!-- Home Screen -->
+    <string name="today_status">Today\'s Status</string>
+    <string name="today_wfo">Today WFO</string>
+    <string name="today_wfh">Today WFH</string>
+    <string name="today_leave">Today Leave</string>
+    <string name="today_not_recorded">Not Recorded Today</string>
+    <string name="please_select_work_mode">Please Select Work Mode</string>
+    <string name="mark_as_wfo">Mark as WFO</string>
+    <string name="mark_as_wfh">Mark as WFH</string>
+    <string name="mark_as_leave">Mark as Leave</string>
+    <string name="monthly_progress">Monthly Attendance Progress</string>
+    <string name="progress_format">%1$d / %2$d days (%3$d%%)</string>
+    <string name="required_days_remaining">Need to go to office %1$d more days to meet target (excluding %2$d leave days)</string>
+    <string name="goal_reached">Congratulations! You\'ve met the 60%% WFO requirement this month</string>
+    <string name="recent_records">Recent Records</string>
+    <string name="no_records">No Records</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Attendance Statistics</string>
+    <string name="current_month">Current Month</string>
+    <string name="history">History</string>
+    <string name="total_workdays">Total</string>
+    <string name="effective_workdays">Effective</string>
+    <string name="leave_days">Leave</string>
+    <string name="wfo_days">WFO Days</string>
+    <string name="wfh_days">WFH Days</string>
+    <string name="required_days">Required Days</string>
+    <string name="remaining_days">Remaining</string>
+    <string name="calculation_formula">Calculation: (Total workdays %1$d - Leave %2$d) × 60%% = Required WFO %3$d days</string>
+    <string name="days_remaining_format">%d days remaining</string>
+    
+    <!-- Calendar -->
+    <string name="calendar">Calendar</string>
+    <string name="calendar_title">Calendar Records</string>
+    <string name="legend">Legend</string>
+    <string name="legend_wfo">WFO - Working From Office</string>
+    <string name="legend_wfh">WFH - Working From Home</string>
+    <string name="legend_leave">Leave</string>
+    <string name="weekend_hint">* Weekend days require long press to record</string>
+    <string name="weekend_confirm_title">Weekend Confirmation</string>
+    <string name="current_status">Current Status</string>
+    <string name="status_not_recorded">Not Recorded</string>
+    <string name="delete_record">Delete Record</string>
+    <string name="mark_wfo">Mark as WFO</string>
+    <string name="mark_wfh">Mark as WFH</string>
+    <string name="mark_leave">Mark as Leave</string>
+    
+    <!-- Onboarding -->
+    <string name="welcome_title">Welcome to WFODays</string>
+    <string name="welcome_subtitle">%s Office Location Tracker</string>
+    <string name="main_features">Main Features</string>
+    <string name="feature_auto_detect">Auto Detection: Automatically record WFO when entering %s 800m radius</string>
+    <string name="feature_manual">Manual Recording: Support manual entry for any date (WFO/WFH/Leave)</string>
+    <string name="feature_reminder">Daily Reminder: Auto-detect and record location at 10:30 AM</string>
+    <string name="permissions_needed">Permissions Needed</string>
+    <string name="grant_permission">Grant</string>
+    <string name="start_using">Start Using</string>
+    <string name="location_permission_required">Please grant location permission first</string>
+    
+    <!-- Permissions -->
+    <string name="permission_location_title">Location Permission</string>
+    <string name="permission_location_desc">Used to detect if you are near the office</string>
+    <string name="permission_background_location_title">Background Location Permission</string>
+    <string name="permission_background_location_desc">Detect office location even when app is closed</string>
+    <string name="permission_notification_title">Notification Permission</string>
+    <string name="permission_notification_desc">Used for daily location recording reminders</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="permissions_needed_title">Required Permissions</string>
+    <string name="start_using_button">Start Using</string>
+    <string name="main_features_title">Main Features</string>
+    <string name="auto_detection_title">Auto Detection</string>
+    <string name="auto_detection_desc">Automatically record WFO when entering %1$s 800m range</string>
+    <string name="manual_recording_title">Manual Recording</string>
+    <string name="manual_recording_desc">Support manual WFO/WFH/Leave recording for any date</string>
+    <string name="daily_reminder_title">Daily Reminder</string>
+    <string name="daily_reminder_desc">Location recording reminder at 10 AM</string>
+    
+    <!-- Permission Guide -->
+    <string name="grant_permission_button">Grant</string>
+    <string name="battery_optimization_title">Battery Optimization</string>
+    <string name="go_to_settings_button">Go to Settings</string>
+    <string name="auto_start_permission_title">Auto Start Permission</string>
+    <string name="auto_start_permission_desc">Your device is %1$s, it\'s recommended to enable auto start permission to ensure geofence monitoring resumes after app restart</string>
+    
+    <!-- Settings -->
+    <string name="location_test">Location Test</string>
+    <string name="refresh_location">Refresh Location</string>
+    <string name="getting_location">Getting location...</string>
+    <string name="current_location">Current Location</string>
+    <string name="latitude_format">Latitude: %.6f N</string>
+    <string name="longitude_format">Longitude: %.6f E</string>
+    <string name="accuracy_format">Accuracy: +/-%.0f m</string>
+    <string name="distance_to_office">Distance to %s</string>
+    <string name="in_range_message">Within 800m range, will auto-record WFO</string>
+    <string name="out_of_range_message">Beyond 800m range</string>
+    <string name="target_location">Target Location (%s)</string>
+    <string name="target_coordinates_format">%1$.6f N, %2$.6f E</string>
+    <string name="get_current_location">Get Current Location</string>
+    <string name="permission_settings">Permission Settings</string>
+    <string name="test_notification">Test Notification</string>
+    <string name="test_notification_desc">Click button to test notification function. Based on your current location, it will show either in-office or work-from-home notification.</string>
+    <string name="send_test_notification">Send Test Notification</string>
+    
+    <string name="about">About</string>
+    <string name="version_format">Version %s</string>
+    <string name="app_description">%s Office Location Tracker\nSupports native GPS positioning, no Google Play Services required</string>
+    <string name="target_location_format">Target: %1$.6f N, %2$.6f E\nRange: 800m</string>
+    
+    <!-- Notifications -->
+    <string name="notification_channel_name">Location Recording Reminder</string>
+    <string name="notification_channel_desc">Daily location recording reminder</string>
+    <string name="notification_title_location_updated">Office Location Updated Automatically</string>
+    <string name="notification_message_wfo_updated">Today has been automatically recorded as WFO (Working From Office)</string>
+    <string name="notification_message_wfh_updated">Today has been automatically recorded as WFH (Working From Home)</string>
+    
+    <!-- Location Notes -->
+    <string name="location_note_wfo">GPS Positioning: Distance to %1$s %2$d m</string>
+    <string name="location_note_wfh">GPS Positioning: Distance to %1$s %2$d m (Working from Home)</string>
+    <string name="location_note_manual_wfo">Manually marked WFO</string>
+    <string name="location_note_manual_wfh">Manually marked WFH</string>
+    <string name="location_note_manual_leave">Marked as Leave</string>
+    <string name="location_note_auto_wfo">Auto-detected entering office area (within 800m)</string>
+    <string name="gps_auto_location">GPS Auto Positioning</string>
+    <string name="gps_location_format">GPS Positioning: Distance to %1$s %2$d m</string>
+    <string name="manual_mark_wfo">Manually marked WFO</string>
+    <string name="manual_mark_wfh">Marked as WFH</string>
+    <string name="manual_mark_leave">Marked as Leave</string>
+    <string name="manual_switch_wfo">Manually switched to WFO</string>
+    <string name="manual_switch_wfh">Manually switched to WFH</string>
+    <string name="manual_switch_leave">Manually switched to Leave</string>
+    <string name="monthly_attendance_progress">Monthly Attendance Progress</string>
+    
+    <!-- New notification titles -->
+    <string name="notification_title_wfo_success">Office Check-in Successful</string>
+    <string name="notification_title_wfh_recorded">Remote Work Recorded</string>
+    <string name="notification_title_overtime">Non-working Hours</string>
+    <string name="notification_title_weekend">Weekend Rest</string>
+    <string name="notification_title_completed">Completed for Today</string>
+    <string name="notification_title_retrying">Retrying</string>
+    <string name="notification_title_system_alert">System Alert</string>
+    
+    <!-- New notification messages -->
+    <string name="notification_message_office_distance">Distance to office %s - WFO</string>
+    <string name="notification_message_home_distance">Distance to office %s - WFH</string>
+    <string name="notification_message_outside_working_hours">Currently outside working hours\nSystem will auto-detect during working hours</string>
+    <string name="notification_message_weekend_rest">Today is weekend\nSystem will continue auto-detection on weekdays</string>
+    <string name="notification_message_today_completed">Today\'s record completed\nNo need to repeat detection</string>
+    <string name="notification_message_retrying">Location acquisition failed\nSystem will retry automatically</string>
+    <string name="notification_message_system_issue">System encountered issue\nWill retry later</string>
+    <string name="notification_title_auto_record_wfo">Auto Record WFO</string>
+    <string name="notification_message_auto_record_wfo">Detected you arrived near %s, automatically recorded today\'s WFO</string>
+    
+    <!-- Settings screen strings -->
+    <string name="setting">Setting</string>
+    <string name="back">Back</string>
+    <string name="location_test_card_title">Location Test</string>
+    <string name="permissions_setting_title">Permission Settings</string>
+    <string name="background_location_permission_title">Background Location Permission</string>
+    <string name="background_location_permission_desc">Detect office location even when app is closed</string>
+    <string name="notification_permission_title">Notification Permission</string>
+    <string name="notification_permission_desc">Used for daily location recording reminders</string>
+    <string name="battery_optimization_setting_title">Background Running Settings</string>
+    <string name="about_title">About</string>
+    <string name="getting_location_text">Getting location...</string>
+    <string name="latitude_label">Latitude</string>
+    <string name="longitude_label">Longitude</string>
+    <string name="accuracy_label">Accuracy</string>
+    <string name="distance_in_range_message">Within range, will auto-record WFO</string>
+    <string name="distance_out_of_range_message">Beyond 800m range</string>
+    <string name="click_to_refresh_location">Click to refresh location</string>
+    <string name="need_location_permission">Location permission needed</string>
+    <string name="grant_location_permission">Grant location permission</string>
+    <string name="battery_optimization_whitelist">Battery Setting</string>
+    <string name="already_set">Already set</string>
+    <string name="not_set">Not set</string>
+    <string name="battery_optimization_desc">To ensure background scheduled tasks run properly, please add this app to battery optimization whitelist</string>
+    <string name="add_to_whitelist">Add to whitelist</string>
+    <string name="view_battery_settings">View battery settings</string>
+    <string name="app_description_short">Office location auto-recognition and recording assistant</string>
+    <string name="author_info">Author: Stephen An</string>
+    
+    <!-- Additional strings -->
+    <string name="target_location_with_radius">Target: %1$s N, %2$s E (800m range)</string>
+    <string name="grant_location_permission_button">Grant Location Permission</string>
+    <string name="target_location_format_new">Target: %1$s N, %2$s E</string>
+    <string name="language_setting_title">Language Settings</string>
+    <string name="location_permission_title">Location Permission</string>
+    <string name="location_permission_desc">Used to detect if you are near the office</string>
+    <string name="refresh_location_content_desc">Refresh location</string>
+    <string name="switch_language">Switch Language</string>
+    <string name="accuracy_format_string">+/- %s m</string>
+    <string name="distance_format_string">%d m</string>
+    <string name="distance_kilometer_format">%.1f km</string>
+    
+    <!-- Home Screen Strings -->
+    <string name="monthly_attendance_goal">Monthly Attendance Goal</string>
+    <string name="wfo_completed">WFO Completed</string>
+    <string name="wfo_needed">Needed</string>
+    <string name="remaining_workdays">Remaining Workdays</string>
+    <string name="quick_record">Quick Record</string>
+    <string name="record_success">Record Successful!</string>
+    <string name="today_work">Today\'s Work</string>
+    <string name="office_wfo">Office (WFO)</string>
+    <string name="home_wfh">Home (WFH)</string>
+    <string name="enjoy_holiday">Enjoy Holiday</string>
+    <string name="click_to_set_status">Click to Set Status</string>
+    
+    <!-- Language Settings -->
+    <string name="chinese_language">Chinese</string>
+    <string name="english_language">English</string>
+    
+    <!-- Calendar Screen -->
+    <string name="calendar_record">Calendar Records</string>
+    <string name="previous_month">Previous Month</string>
+    <string name="next_month">Next Month</string>
+    <string name="company_work">Office Work</string>
+    <string name="home_work">Remote Work</string>
+    <string name="legend_explanation">Legend Explanation</string>
+    <string name="long_press_hint">Long press date to record, weekends require long press confirmation</string>
+    <string name="month_overview">Month Overview</string>
+    <string name="total">Total</string>
+    <string name="weekend_confirm_message">You selected %1$s (%2$s), are you sure you want to record this day?</string>
+    <string name="select_status">Select Status</string>
+    <string name="company_work_wfo">Office Work (WFO)</string>
+    <string name="home_work_wfh">Remote Work (WFH)</string>
+    <string name="leave_leave">Leave (Leave)</string>
+    <string name="note_prefix">Note: %s</string>
+    
+    <!-- Statistics Screen -->
+    <string name="attendance_statistics">Attendance Statistics</string>
+    <string name="monthly_wfo_statistics">Monthly WFO Statistics</string>
+    <string name="goal_formula">Goal: (Total workdays %1$d - Leave %2$d) × 60%% = Required WFO %3$d days</string>
+    <string name="remaining_days_label">Remaining</string>
+    <string name="completed">Completed</string>
+    <string name="status">Status</string>
+    <string name="congrats_goal_reached">Congratulations! You\'ve met the 60%% WFO requirement this month</string>
+    <string name="no_history_data">No historical data</string>
+    
+    <!-- Weekdays -->
+    <string name="weekday_sun">Sun</string>
+    <string name="weekday_mon">Mon</string>
+    <string name="weekday_tue">Tue</string>
+    <string name="weekday_wed">Wed</string>
+    <string name="weekday_thu">Thu</string>
+    <string name="weekday_fri">Fri</string>
+    <string name="weekday_sat">Sat</string>
+    <string name="weekday_monday">Monday</string>
+    <string name="weekday_tuesday">Tuesday</string>
+    <string name="weekday_wednesday">Wednesday</string>
+    <string name="weekday_thursday">Thursday</string>
+    <string name="weekday_friday">Friday</string>
+    <string name="weekday_saturday">Saturday</string>
+    <string name="weekday_sunday">Sunday</string>
+    
+    <!-- Date and Time Formats -->
+    <string name="year_format">%1$d\u0020</string>
+    <string name="month_format">%1$d</string>
+    <string name="day_format">%1$d</string>
+    <string name="date_format">%1$d/%2$d/%3$d</string>
+    <string name="wfo_stats_format">WFO: %1$d/%2$d days (%3$d%%)</string>
+    <string name="days_unit">days</string>
+    <string name="month_abbr_jan">Jan</string>
+    <string name="month_abbr_feb">Feb</string>
+    <string name="month_abbr_mar">Mar</string>
+    <string name="month_abbr_apr">Apr</string>
+    <string name="month_abbr_may">May</string>
+    <string name="month_abbr_jun">Jun</string>
+    <string name="month_abbr_jul">Jul</string>
+    <string name="month_abbr_aug">Aug</string>
+    <string name="month_abbr_sep">Sep</string>
+    <string name="month_abbr_oct">Oct</string>
+    <string name="month_abbr_nov">Nov</string>
+    <string name="month_abbr_dec">Dec</string>
+    
+    <!-- Time Greetings -->
+    <string name="morning">Morning</string>
+    <string name="noon">Noon</string>
+    <string name="afternoon">Afternoon</string>
+    <string name="evening">Evening</string>
+    <string name="midnight">Midnight</string>
+    <string name="weekend_greeting">Weekend</string>
+    
+    <!-- Status Labels -->
+    <string name="unknown_status">Unknown</string>
+    <string name="total_workdays_label">Total</string>
+    <string name="leave_days_label">Leave</string>
+    
+    <!-- Version Info -->
+    <string name="version_info">Version %s</string>
+    
+    <!-- Battery Optimization Guide -->
+    <string name="xiaomi_guide">Xiaomi Phone Setup Steps:\n1. Settings > Battery and Power > App Smart Power Saving > This App > No Restrictions\n2. Settings > App Settings > App Management > This App > Autostart > Allow\n3. Settings > App Settings > Permission Management > Background Pop-up > Allow\n4. Long press app icon > App Info > Power Saving Policy > No Restrictions</string>
+    <string name="oppo_guide">OPPO Phone Setup Steps:\n1. Phone Manager > Permissions and Privacy > Background Autostart Management > Allow This App\n2. Settings > Battery > App Power Consumption Management > This App > Allow Background Running\n3. Settings > App Management > This App > Power Protection > Allow Background Running</string>
+    <string name="vivo_guide">vivo Phone Setup Steps:\n1. iManager > App Management > Autostart Management > Allow This App\n2. Settings > Battery > Background Power Consumption Management > This App > Allow High Background Power Consumption\n3. Settings > More Settings > Permission Management > Permissions > Autostart > Allow</string>
+    <string name="huawei_guide">Huawei Phone Setup Steps:\n1. Phone Manager > App Startup Management > This App > Manual Management > Allow Autostart/Allow Background Activities\n2. Settings > Battery > App Startup Management > This App > Manual Management\n3. Settings > Apps > App Startup Management > Turn Off Auto Management > Allow Background Activities</string>
+    <string name="general_guide">General Setup Steps:\n1. Settings > Battery/Power Saving > Battery Optimization > All Apps > Find This App > Don\'t Optimize\n2. Settings > App Management > This App > Battery > No Restrictions/Allow Background Running\n3. Ensure Autostart Permission is Enabled</string>
+</resources>

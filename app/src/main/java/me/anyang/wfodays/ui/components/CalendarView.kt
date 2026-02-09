@@ -35,6 +35,8 @@ import me.anyang.wfodays.ui.theme.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import androidx.compose.ui.res.stringResource
+import me.anyang.wfodays.R
 
 @Composable
 fun CalendarView(
@@ -83,7 +85,15 @@ fun CalendarView(
         Column {
             // 星期标题
             Row(modifier = Modifier.fillMaxWidth()) {
-                val daysOfWeek = listOf("日", "一", "二", "三", "四", "五", "六")
+                val daysOfWeek = listOf(
+                    stringResource(R.string.weekday_sun),
+                    stringResource(R.string.weekday_mon),
+                    stringResource(R.string.weekday_tue),
+                    stringResource(R.string.weekday_wed),
+                    stringResource(R.string.weekday_thu),
+                    stringResource(R.string.weekday_fri),
+                    stringResource(R.string.weekday_sat)
+                )
                 daysOfWeek.forEachIndexed { index, day ->
                     val isWeekend = index == 0 || index == 6
                     Box(

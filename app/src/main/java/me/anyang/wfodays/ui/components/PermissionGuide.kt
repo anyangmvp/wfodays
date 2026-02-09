@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.anyang.wfodays.ui.theme.HSBCRed
 import me.anyang.wfodays.ui.theme.WarningYellow
+import androidx.compose.ui.res.stringResource
+import me.anyang.wfodays.R
 
 @Composable
 fun PermissionGuideCard(
@@ -78,7 +80,7 @@ fun PermissionGuideCard(
             
             if (!isGranted) {
                 Button(onClick = onRequest) {
-                    Text("授权")
+                    Text(stringResource(R.string.grant_permission_button))
                 }
             }
         }
@@ -107,7 +109,7 @@ fun BatteryOptimizationGuide(
                 )
                 
                 Text(
-                    text = "电池优化设置",
+                    text = stringResource(R.string.battery_optimization_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 12.dp)
@@ -117,7 +119,7 @@ fun BatteryOptimizationGuide(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "请将本App加入电池优化白名单，确保后台定位功能正常工作，否则可能无法自动打卡",
+                text = stringResource(R.string.battery_optimization_desc),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -128,7 +130,7 @@ fun BatteryOptimizationGuide(
                 onClick = onOpenSettings,
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("去设置")
+                Text(stringResource(R.string.go_to_settings_button))
             }
         }
     }
@@ -159,7 +161,7 @@ fun AutoStartGuide(
                 )
                 
                 Text(
-                    text = "自启动权限",
+                    text = stringResource(R.string.auto_start_permission_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 12.dp)
@@ -169,7 +171,7 @@ fun AutoStartGuide(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "您的设备是 ${manufacturer}，建议开启自启动权限，确保App重启后自动恢复地理围栏监听",
+                text = stringResource(R.string.auto_start_permission_desc, manufacturer),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -180,7 +182,7 @@ fun AutoStartGuide(
                 onClick = onOpenSettings,
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("去设置")
+                Text(stringResource(R.string.go_to_settings_button))
             }
         }
     }

@@ -32,6 +32,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.res.stringResource
+import me.anyang.wfodays.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +58,7 @@ fun CalendarScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "日历记录",
+                        text = stringResource(R.string.calendar_record),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -66,7 +68,7 @@ fun CalendarScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "返回",
+                            contentDescription = stringResource(R.string.back),
                             tint = Color.White
                         )
                     }
@@ -271,7 +273,7 @@ private fun MonthNavigationCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronLeft,
-                    contentDescription = "上月",
+                    contentDescription = stringResource(R.string.previous_month),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -279,12 +281,19 @@ private fun MonthNavigationCard(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "${yearMonth.year}年",
+                    text = buildString {
+                        append(yearMonth.year)
+                        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.8f)
                 )
                 Text(
-                    text = "${yearMonth.monthValue}月",
+                    text = buildString {
+                        append(yearMonth.year)
+                        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+                        append(getMonthName(yearMonth.monthValue))
+                    },
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -299,7 +308,7 @@ private fun MonthNavigationCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "下月",
+                    contentDescription = stringResource(R.string.next_month),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -334,7 +343,7 @@ private fun LegendCard() {
                         .background(PrimaryBlue, RoundedCornerShape(2.dp))
                 )
                 Text(
-                    text = "图例说明",
+                    text = stringResource(R.string.legend_explanation),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 12.dp),
@@ -350,20 +359,20 @@ private fun LegendCard() {
                 LegendItem(
                     icon = Icons.Default.Business,
                     color = PrimaryBlue,
-                    text = "WFO",
-                    subtext = "公司办公"
+                    text = stringResource(R.string.wfo),
+                    subtext = stringResource(R.string.company_work)
                 )
                 LegendItem(
                     icon = Icons.Default.HomeWork,
                     color = SuccessGreen,
-                    text = "WFH",
-                    subtext = "居家办公"
+                    text = stringResource(R.string.wfh),
+                    subtext = stringResource(R.string.home_work)
                 )
                 LegendItem(
                     icon = Icons.Default.BeachAccess,
                     color = WarningYellow,
-                    text = "休假",
-                    subtext = "享受假期"
+                    text = stringResource(R.string.leave),
+                    subtext = stringResource(R.string.enjoy_holiday)
                 )
             }
 
@@ -389,11 +398,11 @@ private fun LegendCard() {
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = "长按日期可记录，周末需长按确认",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PrimaryBlue.copy(alpha = 0.6f),
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+                    text = stringResource(R.string.long_press_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = PrimaryBlue.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
                 }
             }
         }
@@ -475,7 +484,7 @@ private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiS
                         .background(PrimaryBlue, RoundedCornerShape(2.dp))
                 )
                 Text(
-                    text = "本月概览",
+                    text = stringResource(R.string.month_overview),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 12.dp),
@@ -502,13 +511,13 @@ private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiS
                 )
                 SummaryStatItem(
                     count = leaveCount,
-                    label = "休假",
+                    label = stringResource(R.string.leave_days_label),
                     color = WarningYellow,
                     icon = Icons.Default.BeachAccess
                 )
                 SummaryStatItem(
                     count = uiState.monthRecords.size,
-                    label = "总计",
+                    label = stringResource(R.string.total),
                     color = Color.Gray,
                     icon = Icons.Default.CalendarMonth
                 )
@@ -577,7 +586,7 @@ private fun WeekendConfirmDialog(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "周末确认",
+                    text = stringResource(R.string.weekend_confirm_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryBlueDark
@@ -586,7 +595,19 @@ private fun WeekendConfirmDialog(
         },
         text = {
             Text(
-                text = "您选择的是 ${date.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"))}（${getWeekdayName(date.dayOfWeek)}），确定要记录这一天吗？",
+                text = stringResource(
+                    R.string.weekend_confirm_message,
+                    buildString {
+                        append(date.year)
+                        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+                        append(getMonthName(date.monthValue))
+                        append(date.dayOfMonth.toString().padStart(2, '0'))
+                        if (stringResource(R.string.date_format, 2024, 1, 1).contains("/")) {
+                            append(stringResource(R.string.day_format, 1).replace("1", ""))
+                        }
+                    },
+                    getWeekdayName(date.dayOfWeek)
+                ),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -598,7 +619,7 @@ private fun WeekendConfirmDialog(
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("确定")
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
@@ -606,7 +627,7 @@ private fun WeekendConfirmDialog(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("取消")
+                Text(stringResource(R.string.cancel))
             }
         },
         containerColor = Color.White,
@@ -629,14 +650,22 @@ private fun DateActionDialog(
         title = {
             Column {
                 Text(
-                    text = date.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")),
+                    text = buildString {
+                        append(date.year)
+                        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
+                        append(getMonthName(date.monthValue))
+                        append(date.dayOfMonth.toString().padStart(2, '0'))
+                        if (stringResource(R.string.date_format, 2024, 1, 1).contains("/")) {
+                            append("日")
+                        }
+                    },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryBlueDark
                 )
                 if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
                     Text(
-                        text = "周末",
+                        text = stringResource(R.string.weekend_hint).removePrefix("* "),
                         style = MaterialTheme.typography.bodySmall,
                         color = WarningYellow,
                         modifier = Modifier.padding(top = 4.dp)
@@ -650,8 +679,8 @@ private fun DateActionDialog(
                     val (label, color, icon) = when (record.workMode) {
                         WorkMode.WFO -> Triple("WFO", PrimaryBlue, Icons.Default.Business)
                         WorkMode.WFH -> Triple("WFH", SuccessGreen, Icons.Default.HomeWork)
-                        WorkMode.LEAVE -> Triple("休假", WarningYellow, Icons.Default.BeachAccess)
-                        else -> Triple("未知", Color.Gray, Icons.Default.Help)
+                        WorkMode.LEAVE -> Triple(stringResource(R.string.leave_days_label), WarningYellow, Icons.Default.BeachAccess)
+                        else -> Triple(stringResource(R.string.unknown_status), Color.Gray, Icons.Default.Help)
                     }
 
                     // 当前状态卡片
@@ -683,7 +712,7 @@ private fun DateActionDialog(
                                 modifier = Modifier.padding(start = 16.dp)
                             ) {
                                 Text(
-                                    text = "当前状态",
+                                    text = stringResource(R.string.current_status),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.Gray
                                 )
@@ -700,7 +729,7 @@ private fun DateActionDialog(
                     record.note?.let {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "备注: $it",
+                            text = stringResource(R.string.note_prefix, it),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -708,7 +737,7 @@ private fun DateActionDialog(
                 } else {
                     // 未记录状态 - 显示选择按钮
                     Text(
-                        text = "选择状态",
+                        text = stringResource(R.string.select_status),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
                         modifier = Modifier.padding(bottom = 12.dp)
@@ -720,7 +749,7 @@ private fun DateActionDialog(
                     ) {
                         // WFO 按钮
                         StatusOptionButton(
-                            text = "公司办公 (WFO)",
+                            text = stringResource(R.string.company_work_wfo),
                             color = PrimaryBlue,
                             icon = Icons.Default.Business,
                             onClick = onMarkWFO
@@ -728,7 +757,7 @@ private fun DateActionDialog(
 
                         // WFH 按钮
                         StatusOptionButton(
-                            text = "居家办公 (WFH)",
+                            text = stringResource(R.string.home_work_wfh),
                             color = SuccessGreen,
                             icon = Icons.Default.HomeWork,
                             onClick = onMarkWFH
@@ -736,7 +765,7 @@ private fun DateActionDialog(
 
                         // 休假按钮
                         StatusOptionButton(
-                            text = "休假 (Leave)",
+                            text = stringResource(R.string.leave_leave),
                             color = WarningYellow,
                             icon = Icons.Default.BeachAccess,
                             onClick = onMarkLeave
@@ -760,7 +789,7 @@ private fun DateActionDialog(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("删除记录")
+                    Text(stringResource(R.string.delete_record))
                 }
             } else {
                 // 未记录时不显示确认按钮
@@ -772,7 +801,7 @@ private fun DateActionDialog(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("取消")
+                Text(stringResource(R.string.cancel))
             }
         },
         containerColor = Color.White,
@@ -867,14 +896,34 @@ private fun ActionButton(
     }
 }
 
+@Composable
 private fun getWeekdayName(dayOfWeek: DayOfWeek): String {
     return when (dayOfWeek) {
-        DayOfWeek.MONDAY -> "周一"
-        DayOfWeek.TUESDAY -> "周二"
-        DayOfWeek.WEDNESDAY -> "周三"
-        DayOfWeek.THURSDAY -> "周四"
-        DayOfWeek.FRIDAY -> "周五"
-        DayOfWeek.SATURDAY -> "周六"
-        DayOfWeek.SUNDAY -> "周日"
+        DayOfWeek.MONDAY -> stringResource(R.string.weekday_monday)
+        DayOfWeek.TUESDAY -> stringResource(R.string.weekday_tuesday)
+        DayOfWeek.WEDNESDAY -> stringResource(R.string.weekday_wednesday)
+        DayOfWeek.THURSDAY -> stringResource(R.string.weekday_thursday)
+        DayOfWeek.FRIDAY -> stringResource(R.string.weekday_friday)
+        DayOfWeek.SATURDAY -> stringResource(R.string.weekday_saturday)
+        DayOfWeek.SUNDAY -> stringResource(R.string.weekday_sunday)
+    }
+}
+
+@Composable
+private fun getMonthName(monthValue: Int): String {
+    return when (monthValue) {
+        1 -> stringResource(R.string.month_abbr_jan)
+        2 -> stringResource(R.string.month_abbr_feb)
+        3 -> stringResource(R.string.month_abbr_mar)
+        4 -> stringResource(R.string.month_abbr_apr)
+        5 -> stringResource(R.string.month_abbr_may)
+        6 -> stringResource(R.string.month_abbr_jun)
+        7 -> stringResource(R.string.month_abbr_jul)
+        8 -> stringResource(R.string.month_abbr_aug)
+        9 -> stringResource(R.string.month_abbr_sep)
+        10 -> stringResource(R.string.month_abbr_oct)
+        11 -> stringResource(R.string.month_abbr_nov)
+        12 -> stringResource(R.string.month_abbr_dec)
+        else -> monthValue.toString()
     }
 }

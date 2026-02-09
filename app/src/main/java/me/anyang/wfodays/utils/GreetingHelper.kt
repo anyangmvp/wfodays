@@ -3,6 +3,9 @@ package me.anyang.wfodays.utils
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import kotlin.random.Random
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import me.anyang.wfodays.R
 
 /**
  * 问候语帮助类
@@ -135,15 +138,32 @@ object GreetingHelper {
 
         // 周末
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            return "周末"
+            return "weekend"
         }
 
         return when (hour) {
-            in 6..11 -> "上午"
-            in 12..13 -> "中午"
-            in 14..17 -> "下午"
-            in 18..23 -> "晚上"
-            else -> "凌晨"
+            in 6..11 -> "morning"
+            in 12..13 -> "noon"
+            in 14..17 -> "afternoon"
+            in 18..23 -> "evening"
+            else -> "midnight"
+        }
+    }
+
+    /**
+     * 获取本地化的时间段名称
+     */
+    @Composable
+    fun getLocalizedTimePeriod(): String {
+        val timePeriod = getTimePeriod()
+        return when (timePeriod) {
+            "morning" -> stringResource(R.string.morning)
+            "noon" -> stringResource(R.string.noon)
+            "afternoon" -> stringResource(R.string.afternoon)
+            "evening" -> stringResource(R.string.evening)
+            "midnight" -> stringResource(R.string.midnight)
+            "weekend" -> stringResource(R.string.weekend_greeting)
+            else -> stringResource(R.string.morning)
         }
     }
 }
