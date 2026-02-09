@@ -405,13 +405,15 @@ private fun TodayStatusCard(
 
 @Composable
 private fun GreetingSection() {
-    var greeting by remember { mutableStateOf(GreetingHelper.getGreeting()) }
+    val context = LocalContext.current
+    val currentLanguage = remember { LanguageManager.getCurrentLanguage(context) }
+    var greeting by remember { mutableStateOf(GreetingHelper.getGreeting(currentLanguage)) }
     val timePeriodKey = GreetingHelper.getTimePeriod()
     val timePeriod = GreetingHelper.getLocalizedTimePeriod()
 
     // 每次重新组合时更新问候语（如果需要）
     LaunchedEffect(Unit) {
-        greeting = GreetingHelper.getGreeting()
+        greeting = GreetingHelper.getGreeting(currentLanguage)
     }
 
     var isVisible by remember { mutableStateOf(false) }

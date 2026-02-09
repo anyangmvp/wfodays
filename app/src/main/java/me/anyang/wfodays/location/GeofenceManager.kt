@@ -10,6 +10,7 @@ import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
+import me.anyang.wfodays.utils.Constants
 import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 import javax.inject.Inject
@@ -22,11 +23,10 @@ class GeofenceManager @Inject constructor(
     private val locationManager: NativeLocationManager
 ) {
     companion object {
-        // 中软国际办公楼坐标
-        const val OFFICE_LATITUDE = 34.2098056
-        const val OFFICE_LONGITUDE = 108.8379444
-        const val GEOFENCE_RADIUS_METERS = 800f
-        const val OFFICE_NAME = "中软国际"
+        val OFFICE_LATITUDE: Double = Constants.OFFICE_LATITUDE
+        val OFFICE_LONGITUDE: Double = Constants.OFFICE_LONGITUDE
+        val GEOFENCE_RADIUS_METERS: Float = Constants.OFFICE_RADIUS_METERS
+        val OFFICE_NAME: String = Constants.OFFICE_NAME
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)

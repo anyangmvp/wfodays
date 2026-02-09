@@ -97,25 +97,110 @@ object GreetingHelper {
         "周末到了，愿你不负好时光"
     )
 
+    // English Morning Greetings (6:00 - 11:59)
+    private val morningGreetingsEn = listOf(
+        "Good morning! Start your day with energy.",
+        "Rise and shine! Make today productive.",
+        "Morning! Fresh start, fresh goals.",
+        "Good morning! Ready to tackle the day?",
+        "A new day begins. Let's make it count.",
+        "Good morning! Embrace the opportunities ahead.",
+        "Rise and grind! Success awaits.",
+        "Morning! Today is full of possibilities.",
+        "Good morning! Stay positive and focused.",
+        "A fresh morning brings fresh chances."
+    )
+
+    // English Noon Greetings (12:00 - 13:59)
+    private val noonGreetingsEn = listOf(
+        "Good afternoon! Take a break.",
+        "Lunch time! Recharge your energy.",
+        "Midday check-in. Keep going strong.",
+        "Pause and refresh. You've got this.",
+        "Afternoon! Stay focused and balanced.",
+        "Good afternoon! Halfway through the day.",
+        "Take a breath. You're doing great.",
+        "Lunch break! Fuel up for later.",
+        "Midday moment. Reflect and continue.",
+        "Good afternoon! Keep the momentum."
+    )
+
+    // English Afternoon Greetings (14:00 - 17:59)
+    private val afternoonGreetingsEn = listOf(
+        "Good afternoon! Maintain your momentum.",
+        "Stay productive. The day's in full swing.",
+        "Afternoon! Keep pushing forward.",
+        "You're doing great. Finish strong.",
+        "Productive afternoon ahead!",
+        "Good afternoon! Stay on track.",
+        "The day's not over. Keep shining.",
+        "Afternoon energy! Let's get things done.",
+        "Stay focused. Success is near.",
+        "Good afternoon! Make every minute count."
+    )
+
+    // English Evening Greetings (18:00 - 23:59)
+    private val eveningGreetingsEn = listOf(
+        "Good evening! Time to unwind.",
+        "Great work today. Enjoy your evening.",
+        "Evening! Relax and recharge.",
+        "Well done today. Rest well.",
+        "Good evening! You earned this break.",
+        "The day is done. Be proud of yourself.",
+        "Evening! Time for yourself now.",
+        "Good evening! Reflect on today's wins.",
+        "Relax and enjoy. Tomorrow's a new day.",
+        "Evening! Peaceful moments ahead."
+    )
+
+    // English Night Greetings (00:00 - 5:59)
+    private val nightGreetingsEn = listOf(
+        "Late night! Get some rest.",
+        "Time to sleep. Tomorrow awaits.",
+        "Rest up. Big day ahead.",
+        "Night owl mode. Don't overdo it.",
+        "Quiet hours. Recharge now.",
+        "Good night! Sweet dreams.",
+        "Rest well. You deserve it.",
+        "Night time. Let go of today's stress.",
+        "Sleep tight. See you tomorrow.",
+        "Late hours. Prioritize your rest."
+    )
+
+    // English Weekend Greetings
+    private val weekendGreetingsEn = listOf(
+        "Happy weekend! Enjoy your time off.",
+        "Weekend vibes! Do what you love.",
+        "It's the weekend! Relax and recharge.",
+        "Weekend mode on. Make it memorable.",
+        "Enjoy your weekend! You've earned it.",
+        "Happy weekend! Adventure awaits.",
+        "Weekend! Time for fun and rest.",
+        "It's the weekend. Live in the moment.",
+        "Happy weekend! Create great memories.",
+        "Weekend joy! Embrace the freedom."
+    )
+
     /**
-     * 获取当前时间段的随机问候语
+     * 获取当前时间段的随机问候语（根据语言自动选择）
      */
-    fun getGreeting(): String {
+    fun getGreeting(languageCode: String = "zh"): String {
         val now = LocalDateTime.now()
         val hour = now.hour
         val dayOfWeek = now.dayOfWeek
 
+        val isEnglish = languageCode == "en"
+
         // 周末优先显示周末问候语
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            // 周末也有50%概率显示普通时段问候语
             return if (Random.nextBoolean()) {
-                weekendGreetings.random()
+                if (isEnglish) weekendGreetingsEn.random() else weekendGreetings.random()
             } else {
-                getTimeBasedGreeting(hour)
+                if (isEnglish) getTimeBasedGreetingEn(hour) else getTimeBasedGreeting(hour)
             }
         }
 
-        return getTimeBasedGreeting(hour)
+        return if (isEnglish) getTimeBasedGreetingEn(hour) else getTimeBasedGreeting(hour)
     }
 
     private fun getTimeBasedGreeting(hour: Int): String {
@@ -125,6 +210,16 @@ object GreetingHelper {
             in 14..17 -> afternoonGreetings.random()
             in 18..23 -> eveningGreetings.random()
             else -> nightGreetings.random() // 0-5点
+        }
+    }
+
+    private fun getTimeBasedGreetingEn(hour: Int): String {
+        return when (hour) {
+            in 6..11 -> morningGreetingsEn.random()
+            in 12..13 -> noonGreetingsEn.random()
+            in 14..17 -> afternoonGreetingsEn.random()
+            in 18..23 -> eveningGreetingsEn.random()
+            else -> nightGreetingsEn.random() // 0-5点
         }
     }
 

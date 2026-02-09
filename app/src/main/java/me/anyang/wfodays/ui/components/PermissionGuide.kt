@@ -12,11 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BatteryAlert
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -25,14 +26,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.WarningYellow
-import androidx.compose.ui.res.stringResource
 import me.anyang.wfodays.R
+import me.anyang.wfodays.ui.theme.PrimaryBlue
+import me.anyang.wfodays.ui.theme.PrimaryBlueDark
+import me.anyang.wfodays.ui.theme.PrimaryBlueLight
+import me.anyang.wfodays.ui.theme.SuccessGreen
 
 @Composable
 fun PermissionGuideCard(
@@ -40,47 +47,92 @@ fun PermissionGuideCard(
     description: String,
     isGranted: Boolean,
     onRequest: () -> Unit,
+    icon: ImageVector = Icons.Default.LocationOn,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isGranted) 
-                Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = if (isGranted) Icons.Default.Info else Icons.Default.LocationOn,
-                contentDescription = null,
-                tint = if (isGranted) Color(0xFF4CAF50) else HSBCRed,
-                modifier = Modifier.size(32.dp)
+    val iconColor = if (isGranted) SuccessGreen else PrimaryBlue
+    val backgroundColor = if (isGranted) 
+        SuccessGreen.copy(alpha = 0.05f) else PrimaryBlue.copy(alpha = 0.05f)
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.1f)
             )
-            
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            if (!isGranted) {
-                Button(onClick = onRequest) {
-                    Text(stringResource(R.string.grant_permission_button))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(backgroundColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isGranted) Icons.Default.CheckCircle else icon,
+                            contentDescription = null,
+                            tint = iconColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.padding(start = 12.dp)
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = PrimaryBlueDark
+                        )
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
+
+                if (!isGranted) {
+                    Button(
+                        onClick = onRequest,
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.grant_permission_button),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(SuccessGreen.copy(alpha = 0.1f))
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.permission_granted),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = SuccessGreen,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
@@ -88,51 +140,87 @@ fun PermissionGuideCard(
 }
 
 @Composable
-fun BatteryOptimizationGuide(
-    onOpenSettings: () -> Unit,
-    modifier: Modifier = Modifier
+fun SettingsCard(
+    title: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF3E0)
-        )
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.BatteryAlert,
-                    contentDescription = null,
-                    tint = WarningYellow,
-                    modifier = Modifier.size(28.dp)
-                )
-                
-                Text(
-                    text = stringResource(R.string.battery_optimization_title),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = stringResource(R.string.battery_optimization_desc),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
             )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Button(
-                onClick = onOpenSettings,
-                modifier = Modifier.align(Alignment.End)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.go_to_settings_button))
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(PrimaryBlue.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
+                )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            content()
         }
+    }
+}
+
+@Composable
+fun SettingsGroupTitle(
+    title: String,
+    icon: ImageVector = Icons.Default.Settings
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(PrimaryBlue.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = PrimaryBlue,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 10.dp),
+            color = PrimaryBlueDark
+        )
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import me.anyang.wfodays.utils.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.atan2
@@ -23,14 +24,11 @@ import kotlin.math.sqrt
 class NativeLocationManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    // 中软国际办公楼坐标
     companion object {
-        // 34°12'35.3"N = 34 + 12/60 + 35.3/3600 = 34.2098056
-        const val OFFICE_LATITUDE = 34.2098056
-        // 108°50'16.6"E = 108 + 50/60 + 16.6/3600 = 108.8379444
-        const val OFFICE_LONGITUDE = 108.8379444
-        const val OFFICE_RADIUS_METERS = 800f
-        const val OFFICE_NAME = "中软国际"
+        val OFFICE_LATITUDE: Double = Constants.OFFICE_LATITUDE
+        val OFFICE_LONGITUDE: Double = Constants.OFFICE_LONGITUDE
+        val OFFICE_RADIUS_METERS: Float = Constants.OFFICE_RADIUS_METERS
+        val OFFICE_NAME: String = Constants.OFFICE_NAME
     }
 
     private val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager

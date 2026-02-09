@@ -107,7 +107,7 @@
     
     <!-- Permission Guide -->
     <string name="grant_permission_button">Grant</string>
-    <string name="battery_optimization_title">Battery Optimization</string>
+    <string name="permission_granted">Granted</string>
     <string name="go_to_settings_button">Go to Settings</string>
     <string name="auto_start_permission_title">Auto Start Permission</string>
     <string name="auto_start_permission_desc">Your device is %1$s, it\'s recommended to enable auto start permission to ensure geofence monitoring resumes after app restart</string>
@@ -161,13 +161,13 @@
     <string name="monthly_attendance_progress">Monthly Attendance Progress</string>
     
     <!-- New notification titles -->
-    <string name="notification_title_wfo_success">Office Check-in Successful</string>
-    <string name="notification_title_wfh_recorded">Remote Work Recorded</string>
-    <string name="notification_title_overtime">Non-working Hours</string>
-    <string name="notification_title_weekend">Weekend Rest</string>
-    <string name="notification_title_completed">Completed for Today</string>
-    <string name="notification_title_retrying">Retrying</string>
-    <string name="notification_title_system_alert">System Alert</string>
+    <string name="notification_title_wfo_success">✅ Office Check-in Successful</string>
+    <string name="notification_title_wfh_recorded">🏠 Remote Work Recorded</string>
+    <string name="notification_title_overtime">🕒 Non-working Hours</string>
+    <string name="notification_title_weekend">📅 Weekend Rest</string>
+    <string name="notification_title_completed">✅ Completed for Today</string>
+    <string name="notification_title_retrying">🔄 Retrying</string>
+    <string name="notification_title_system_alert">⚠️ System Alert</string>
     
     <!-- New notification messages -->
     <string name="notification_message_office_distance">Distance to office %s - WFO</string>
@@ -189,7 +189,6 @@
     <string name="background_location_permission_desc">Detect office location even when app is closed</string>
     <string name="notification_permission_title">Notification Permission</string>
     <string name="notification_permission_desc">Used for daily location recording reminders</string>
-    <string name="battery_optimization_setting_title">Background Running Settings</string>
     <string name="about_title">About</string>
     <string name="getting_location_text">Getting location...</string>
     <string name="latitude_label">Latitude</string>
@@ -200,15 +199,11 @@
     <string name="click_to_refresh_location">Click to refresh location</string>
     <string name="need_location_permission">Location permission needed</string>
     <string name="grant_location_permission">Grant location permission</string>
-    <string name="battery_optimization_whitelist">Battery Setting</string>
-    <string name="already_set">Already set</string>
-    <string name="not_set">Not set</string>
-    <string name="battery_optimization_desc">To ensure background scheduled tasks run properly, please add this app to battery optimization whitelist</string>
-    <string name="add_to_whitelist">Add to whitelist</string>
     <string name="view_battery_settings">View battery settings</string>
     <string name="app_description_short">Office location auto-recognition and recording assistant</string>
-    <string name="author_info">Author: Stephen An</string>
-    
+    <string name="author_label">Author</string>
+    <string name="target_location_label">Target Location</string>
+
     <!-- Additional strings -->
     <string name="target_location_with_radius">Target: %1$s N, %2$s E (800m range)</string>
     <string name="grant_location_permission_button">Grant Location Permission</string>

@@ -72,11 +72,18 @@ import me.anyang.wfodays.R
 import me.anyang.wfodays.location.NativeLocationManager
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.components.PermissionGuideCard
+import me.anyang.wfodays.ui.components.SettingsCard
+import me.anyang.wfodays.ui.components.SettingsGroupTitle
+import me.anyang.wfodays.ui.theme.NeutralGray200
+import me.anyang.wfodays.ui.theme.NeutralGray400
+import me.anyang.wfodays.ui.theme.NeutralGray500
+import me.anyang.wfodays.ui.theme.NeutralGray600
+import me.anyang.wfodays.ui.theme.NeutralGray700
+import me.anyang.wfodays.ui.theme.NeutralGray900
 import me.anyang.wfodays.ui.theme.PrimaryBlue
 import me.anyang.wfodays.ui.theme.PrimaryBlueDark
 import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 import me.anyang.wfodays.ui.theme.SuccessGreen
-import me.anyang.wfodays.utils.BatteryOptimizationHelper
 import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 
@@ -170,10 +177,10 @@ fun SettingsScreen(
                     )
                 )
                 .padding(padding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // 位置测试卡片 - 商务风格
+            // 位置测试卡片
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(400)) + slideInVertically(
@@ -182,6 +189,8 @@ fun SettingsScreen(
                 )
             ) {
                 LocationTestCard(
+                    title = stringResource(R.string.location_test_card_title),
+                    icon = Icons.Default.LocationOn,
                     locationState = locationState,
                     currentLat = currentLat,
                     currentLon = currentLon,
@@ -193,9 +202,9 @@ fun SettingsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 权限设置标题
+            // 权限设置分组
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(500)) + slideInVertically(
@@ -203,13 +212,13 @@ fun SettingsScreen(
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
             ) {
-                SectionTitle(
+                SettingsGroupTitle(
                     icon = Icons.Default.Settings,
                     title = stringResource(R.string.permissions_setting_title)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 位置权限
             AnimatedVisibility(
@@ -223,7 +232,8 @@ fun SettingsScreen(
                     title = stringResource(R.string.location_permission_title),
                     description = stringResource(R.string.location_permission_desc),
                     isGranted = locationPermissionState.status.isGranted,
-                    onRequest = { locationPermissionState.launchPermissionRequest() }
+                    onRequest = { locationPermissionState.launchPermissionRequest() },
+                    icon = Icons.Default.LocationOn
                 )
             }
 
@@ -243,7 +253,8 @@ fun SettingsScreen(
                             title = stringResource(R.string.background_location_permission_title),
                             description = stringResource(R.string.background_location_permission_desc),
                             isGranted = state.status.isGranted,
-                            onRequest = { state.launchPermissionRequest() }
+                            onRequest = { state.launchPermissionRequest() },
+                            icon = Icons.Default.LocationOn
                         )
                     }
                 }
@@ -264,48 +275,36 @@ fun SettingsScreen(
                             title = stringResource(R.string.notification_permission_title),
                             description = stringResource(R.string.notification_permission_desc),
                             isGranted = state.status.isGranted,
-                            onRequest = { state.launchPermissionRequest() }
+                            onRequest = { state.launchPermissionRequest() },
+                            icon = Icons.Default.Notifications
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 电池优化设置标题
+            // 测试通知分组
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(tween(850)) + slideInVertically(
+                enter = fadeIn(tween(950)) + slideInVertically(
                     initialOffsetY = { 30 },
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
             ) {
-                SectionTitle(
-                    icon = Icons.Default.Settings,
-                    title = stringResource(R.string.battery_optimization_setting_title)
+                SettingsGroupTitle(
+                    icon = Icons.Default.Notifications,
+                    title = stringResource(R.string.test_notification)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 电池优化设置
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(tween(900)) + slideInVertically(
-                    initialOffsetY = { 30 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                )
-            ) {
-                BatteryOptimizationCard()
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 测试通知
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(tween(900)) + slideInVertically(
+                enter = fadeIn(tween(1000)) + slideInVertically(
                     initialOffsetY = { 30 },
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
@@ -317,23 +316,23 @@ fun SettingsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 关于
+            // 关于分组
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(tween(1000)) + slideInVertically(
+                enter = fadeIn(tween(1050)) + slideInVertically(
                     initialOffsetY = { 30 },
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
             ) {
-                SectionTitle(
+                SettingsGroupTitle(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.about_title)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             AnimatedVisibility(
                 visible = isVisible,
@@ -345,45 +344,15 @@ fun SettingsScreen(
                 AboutCard()
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
-    }
-}
-
-@Composable
-private fun SectionTitle(
-    icon: ImageVector,
-    title: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(PrimaryBlue.copy(alpha = 0.1f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = PrimaryBlue,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 12.dp),
-            color = PrimaryBlueDark
-        )
     }
 }
 
 @Composable
 private fun LocationTestCard(
+    title: String,
+    icon: ImageVector,
     locationState: NativeLocationManager.LocationState,
     currentLat: Double,
     currentLon: Double,
@@ -401,20 +370,25 @@ private fun LocationTestCard(
             .fillMaxWidth()
             .shadow(
                 elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            // 标题栏
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            // 标题行 - 标题和刷新按钮在同一行
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Box(
                         modifier = Modifier
                             .size(40.dp)
@@ -423,14 +397,14 @@ private fun LocationTestCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.LocationOn,
+                            imageVector = icon,
                             contentDescription = null,
                             tint = PrimaryBlue,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                     Text(
-                        text = stringResource(R.string.location_test_card_title),
+                        text = title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 12.dp),
@@ -438,6 +412,7 @@ private fun LocationTestCard(
                     )
                 }
 
+                // 刷新按钮
                 IconButton(
                     onClick = onRefresh,
                     enabled = !isLoading && hasPermission
@@ -452,34 +427,62 @@ private fun LocationTestCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isLoading) {
-                LoadingState()
-            } else if (currentLat != 0.0 && currentLon != 0.0) {
-                // 位置信息
-                LocationInfo(
-                    lat = currentLat,
-                    lon = currentLon,
-                    accuracy = currentAccuracy
-                )
+            // 内容区域
+            LocationTestContentBody(
+                locationState = locationState,
+                currentLat = currentLat,
+                currentLon = currentLon,
+                currentAccuracy = currentAccuracy,
+                distanceToOffice = distanceToOffice,
+                isInRange = isInRange,
+                isLoading = isLoading,
+                onRequestPermission = onRequestPermission,
+                hasPermission = hasPermission
+            )
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(16.dp))
+@Composable
+private fun LocationTestContentBody(
+    locationState: NativeLocationManager.LocationState,
+    currentLat: Double,
+    currentLon: Double,
+    currentAccuracy: Float,
+    distanceToOffice: Float,
+    isInRange: Boolean,
+    isLoading: Boolean,
+    onRequestPermission: () -> Unit,
+    hasPermission: Boolean
+) {
+    Column {
+        if (isLoading) {
+            LoadingState()
+        } else if (currentLat != 0.0 && currentLon != 0.0) {
+            // 位置信息
+            LocationInfo(
+                lat = currentLat,
+                lon = currentLon,
+                accuracy = currentAccuracy
+            )
 
-                // 距离卡片
-                DistanceCard(
-                    distance = distanceToOffice,
-                    isInRange = isInRange
-                )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
+            // 距离卡片
+            DistanceCard(
+                distance = distanceToOffice,
+                isInRange = isInRange
+            )
 
-                // 目标位置
-                TargetLocationInfo()
-            } else {
-                EmptyLocationState(
-                    hasPermission = hasPermission,
-                    onRequestPermission = onRequestPermission
-                )
-            }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 目标位置
+            TargetLocationInfo()
+        } else {
+            EmptyLocationState(
+                hasPermission = hasPermission,
+                onRequestPermission = onRequestPermission
+            )
         }
     }
 }
@@ -685,247 +688,71 @@ private fun NotificationTestCard(
         label = "button_scale"
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color.White)
+    SettingsCard(
+        title = stringResource(R.string.test_notification),
+        icon = Icons.Default.Notifications
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            // 标题
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(PrimaryBlue.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null,
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(24.dp)
-                    )
+        Text(
+            text = stringResource(R.string.test_notification_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = {
+                isPressed = true
+                // 获取配置好语言的 Context，确保通知显示正确的语言
+                val localizedContext = LanguageManager.getLocalizedContext(context)
+
+                // 根据当前位置判断是在公司还是家里
+                val isInOffice = if (currentLat != 0.0 && currentLon != 0.0) {
+                    locationManager.isWithinOfficeRadius(currentLat, currentLon)
+                } else {
+                    true
                 }
-                Text(
-                    text = stringResource(R.string.test_notification),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp),
-                    color = PrimaryBlueDark
-                )
-            }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                val distance = if (currentLat != 0.0 && currentLon != 0.0) {
+                     locationManager.calculateDistanceToOffice(currentLat, currentLon)
+                 } else {
+                     100f // 默认距离
+                 }
 
-            Text(
-                text = stringResource(R.string.test_notification_desc),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                 // 距离显示逻辑（参考DailyLocationCheckWorker中的实现）
+                 val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
+                     val roundedDistance = ((distance / 100).toInt()) * 100
+                     localizedContext.getString(R.string.distance_format_string, roundedDistance)
+                 } else {
+                     localizedContext.getString(R.string.distance_kilometer_format, distance / 1000)
+                 }
+
+                 if (isInOffice) {
+                     NotificationHelper.showAttendanceNotification(
+                         localizedContext,
+                         LocalDate.now(),
+                         localizedContext.getString(R.string.notification_title_wfo_success),
+                         localizedContext.getString(R.string.notification_message_office_distance, distanceDisplay)
+                     )
+                 } else {
+                     NotificationHelper.showAttendanceNotification(
+                         localizedContext,
+                         LocalDate.now(),
+                         localizedContext.getString(R.string.notification_title_wfh_recorded),
+                         localizedContext.getString(R.string.notification_message_home_distance, distanceDisplay)
+                     )
+                 }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    isPressed = true
-                    // 获取配置好语言的 Context，确保通知显示正确的语言
-                    val localizedContext = LanguageManager.getLocalizedContext(context)
-                    
-                    // 根据当前位置判断是在公司还是家里
-                    val isInOffice = if (currentLat != 0.0 && currentLon != 0.0) {
-                        locationManager.isWithinOfficeRadius(currentLat, currentLon)
-                    } else {
-                        true
-                    }
-
-                    val distance = if (currentLat != 0.0 && currentLon != 0.0) {
-                         locationManager.calculateDistanceToOffice(currentLat, currentLon)
-                     } else {
-                         100f // 默认距离
-                     }
-                     
-                     // 距离显示逻辑（参考DailyLocationCheckWorker中的实现）
-                     val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
-                         val roundedDistance = ((distance / 100).toInt()) * 100
-                         localizedContext.getString(R.string.distance_format_string, roundedDistance)
-                     } else {
-                         localizedContext.getString(R.string.distance_kilometer_format, distance / 1000)
-                     }
-
-                     if (isInOffice) {
-                         NotificationHelper.showAttendanceNotification(
-                             localizedContext,
-                             LocalDate.now(),
-                             localizedContext.getString(R.string.notification_title_wfo_success),
-                             localizedContext.getString(R.string.notification_message_office_distance, distanceDisplay)
-                         )
-                     } else {
-                         NotificationHelper.showAttendanceNotification(
-                             localizedContext,
-                             LocalDate.now(),
-                             localizedContext.getString(R.string.notification_title_wfh_recorded),
-                             localizedContext.getString(R.string.notification_message_home_distance, distanceDisplay)
-                         )
-                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .scale(scale),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(stringResource(R.string.send_test_notification))
-            }
-        }
-    }
-}
-
-@Composable
-private fun BatteryOptimizationCard() {
-    val context = LocalContext.current
-    var isIgnoringBatteryOptimizations by remember {
-        mutableStateOf(BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context))
-    }
-
-    // 每次显示时刷新状态
-    LaunchedEffect(Unit) {
-        isIgnoringBatteryOptimizations = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color.White)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            // 标题栏
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(
-                                if (isIgnoringBatteryOptimizations)
-                                    SuccessGreen.copy(alpha = 0.1f)
-                                else
-                                    PrimaryBlue.copy(alpha = 0.1f)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (isIgnoringBatteryOptimizations)
-                                Icons.Default.CheckCircle
-                            else
-                                Icons.Default.Notifications,
-                            contentDescription = null,
-                            tint = if (isIgnoringBatteryOptimizations) SuccessGreen else PrimaryBlue,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.battery_optimization_whitelist),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 12.dp),
-                        color = PrimaryBlueDark
-                    )
-                }
-
-                // 状态标签
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            if (isIgnoringBatteryOptimizations)
-                                SuccessGreen.copy(alpha = 0.1f)
-                            else
-                                PrimaryBlue.copy(alpha = 0.1f)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = if (isIgnoringBatteryOptimizations) stringResource(R.string.already_set) else stringResource(R.string.not_set),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (isIgnoringBatteryOptimizations) SuccessGreen else PrimaryBlue,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 说明文字
-            Text(
-                text = stringResource(R.string.battery_optimization_desc),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 品牌特定指南
-            Text(
-                text = BatteryOptimizationHelper.getBrandSpecificGuide(context),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray.copy(alpha = 0.8f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (!isIgnoringBatteryOptimizations) {
-                Button(
-                    onClick = {
-                        val intent = BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(context)
-                        context.startActivity(intent)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(stringResource(R.string.add_to_whitelist))
-                }
-            } else {
-                OutlinedButton(
-                    onClick = {
-                        val intent = BatteryOptimizationHelper.openBatteryOptimizationSettings(context)
-                        context.startActivity(intent)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(stringResource(R.string.view_battery_settings))
-                }
-            }
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(stringResource(R.string.send_test_notification))
         }
     }
 }
@@ -938,33 +765,38 @@ private fun AboutCard() {
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+                elevation = 4.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = NeutralGray400.copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(24.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
-                )
-            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            // 应用信息
+        Column(modifier = Modifier.padding(20.dp)) {
+            // 应用信息区域
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // 应用图标容器 - 使用柔和的渐变背景
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(64.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White.copy(alpha = 0.2f)),
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    PrimaryBlue.copy(alpha = 0.1f),
+                                    PrimaryBlueLight.copy(alpha = 0.05f)
+                                )
+                            )
+                        )
+                        .padding(1.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = PrimaryBlue,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -976,72 +808,106 @@ private fun AboutCard() {
                         text = context.applicationInfo.loadLabel(context.packageManager).toString(),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = NeutralGray900
                     )
                     Text(
                         text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = NeutralGray500
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 分隔线
+            // 分隔线 - 使用浅灰色
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(Color.White.copy(alpha = 0.3f))
+                    .background(NeutralGray200)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 应用描述
+            Text(
+                text = stringResource(R.string.app_description_short),
+                style = MaterialTheme.typography.bodyMedium,
+                color = NeutralGray600,
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 描述
-            Text(
-                text = stringResource(R.string.app_description_short),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.9f)
+            // 信息列表
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // 作者信息
+                InfoRow(
+                    icon = Icons.Default.Person,
+                    iconBackgroundColor = SuccessGreen.copy(alpha = 0.1f),
+                    iconTint = SuccessGreen,
+                    label = stringResource(R.string.author_label),
+                    value = "Stephen An"
+                )
+
+                // 目标位置
+                InfoRow(
+                    icon = Icons.Default.LocationOn,
+                    iconBackgroundColor = PrimaryBlue.copy(alpha = 0.1f),
+                    iconTint = PrimaryBlue,
+                    label = stringResource(R.string.target_location_label),
+                    value = NativeLocationManager.OFFICE_NAME
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    icon: ImageVector,
+    iconBackgroundColor: Color,
+    iconTint: Color,
+    label: String,
+    value: String
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // 图标容器
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(iconBackgroundColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(18.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 作者信息
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.7f),
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = stringResource(R.string.author_info),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // 目标位置
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.7f),
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = stringResource(R.string.target_location_format_new, 
-                        NativeLocationManager.OFFICE_LATITUDE.toString(), 
-                        NativeLocationManager.OFFICE_LONGITUDE.toString()),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
+        Column(
+            modifier = Modifier.padding(start = 12.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = NeutralGray400
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = NeutralGray700,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
