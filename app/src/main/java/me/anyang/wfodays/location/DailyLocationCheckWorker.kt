@@ -57,23 +57,11 @@ class DailyLocationCheckWorker(
             // 检查当前时间是否在工作时间范围内（9:00 - 18:30）
             if (currentTime.isBefore(WORK_START_TIME) || currentTime.isAfter(WORK_END_TIME)) {
                 Log.d(TAG, "[$timeStr] 不在工作时间范围内，跳过检测")
-                NotificationHelper.showAttendanceNotification(
-                    localizedContext,
-                    LocalDate.now(),
-                    localizedContext.getString(R.string.notification_title_overtime),
-                    localizedContext.getString(R.string.notification_message_outside_working_hours)
-                )
                 DailyCheckScheduler.scheduleDailyCheck(applicationContext)
                 result = Result.success()
             } else if (today.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
                 // 检查是否是工作日（周一到周五）
                 Log.d(TAG, "[$timeStr] 周末，跳过检测")
-                NotificationHelper.showAttendanceNotification(
-                    localizedContext,
-                    LocalDate.now(),
-                    localizedContext.getString(R.string.notification_title_weekend),
-                    localizedContext.getString(R.string.notification_message_weekend_rest)
-                )
                 DailyCheckScheduler.scheduleDailyCheck(applicationContext)
                 result = Result.success()
             } else {
@@ -83,12 +71,6 @@ class DailyLocationCheckWorker(
                 // 如果今天已经有WFO记录，不再自动定位和记录
                 if (todayRecord != null && (todayRecord.workMode == WorkMode.WFO || todayRecord.workMode == WorkMode.LEAVE)) {
                     Log.d(TAG, "[$timeStr] 今天已有WFO或请假记录，跳过检测")
-                    NotificationHelper.showAttendanceNotification(
-                        localizedContext,
-                        LocalDate.now(),
-                        localizedContext.getString(R.string.notification_title_completed),
-                        localizedContext.getString(R.string.notification_message_today_completed)
-                    )
                     DailyCheckScheduler.scheduleDailyCheck(applicationContext)
                     result = Result.success()
                 } else {
@@ -179,12 +161,6 @@ class DailyLocationCheckWorker(
                     } else {
                         // 位置获取失败
                         Log.d(TAG, "[$timeStr] 位置获取失败，1分钟后重试")
-                        NotificationHelper.showAttendanceNotification(
-                            localizedContext,
-                            LocalDate.now(),
-                            localizedContext.getString(R.string.notification_title_retrying),
-                            localizedContext.getString(R.string.notification_message_retrying)
-                        )
                         DailyCheckScheduler.scheduleRetry(applicationContext)
                         result = Result.retry()
                     }
@@ -193,12 +169,6 @@ class DailyLocationCheckWorker(
         } catch (e: Exception) {
             // 出错时重试
             Log.e(TAG, "[$timeStr] 执行异常: ${e.message}", e)
-            NotificationHelper.showAttendanceNotification(
-                applicationContext,
-                LocalDate.now(),
-                applicationContext.getString(R.string.notification_title_system_alert),
-                applicationContext.getString(R.string.notification_message_system_issue)
-            )
             DailyCheckScheduler.scheduleRetry(applicationContext)
             result = Result.retry()
         }

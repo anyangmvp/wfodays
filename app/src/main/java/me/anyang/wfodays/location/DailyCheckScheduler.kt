@@ -19,7 +19,7 @@ object DailyCheckScheduler {
     private const val RETRY_WORK_NAME = "daily_location_check_retry"
 
     // 测试模式：每分钟检测一次
-    private const val TEST_MODE = true
+    private const val TEST_MODE = false
 
     fun scheduleDailyCheck(context: Context) {
         val delayMillis = if (TEST_MODE) {

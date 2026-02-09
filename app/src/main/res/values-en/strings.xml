@@ -319,4 +319,8 @@
     <string name="vivo_guide">vivo Phone Setup Steps:\n1. iManager > App Management > Autostart Management > Allow This App\n2. Settings > Battery > Background Power Consumption Management > This App > Allow High Background Power Consumption\n3. Settings > More Settings > Permission Management > Permissions > Autostart > Allow</string>
     <string name="huawei_guide">Huawei Phone Setup Steps:\n1. Phone Manager > App Startup Management > This App > Manual Management > Allow Autostart/Allow Background Activities\n2. Settings > Battery > App Startup Management > This App > Manual Management\n3. Settings > Apps > App Startup Management > Turn Off Auto Management > Allow Background Activities</string>
     <string name="general_guide">General Setup Steps:\n1. Settings > Battery/Power Saving > Battery Optimization > All Apps > Find This App > Don\'t Optimize\n2. Settings > App Management > This App > Battery > No Restrictions/Allow Background Running\n3. Ensure Autostart Permission is Enabled</string>
+    
+    <!-- Notification Actions -->
+    <string name="notification_action_view">View Details</string>
+    <string name="notification_action_record">View Records</string>
 </resources>

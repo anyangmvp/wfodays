@@ -251,6 +251,10 @@
     <string name="leave_leave">休假 (Leave)</string>
     <string name="note_prefix">备注: %s</string>
     
+    <!-- Notification Actions -->
+    <string name="notification_action_view">查看详情</string>
+    <string name="notification_action_record">查看记录</string>
+    
     <!-- Statistics Screen -->
     <string name="attendance_statistics">出勤统计</string>
     <string name="monthly_wfo_statistics">本月 WFO 统计</string>
