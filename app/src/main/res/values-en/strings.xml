@@ -228,7 +228,7 @@
     <string name="office_wfo">Office (WFO)</string>
     <string name="home_wfh">Home (WFH)</string>
     <string name="enjoy_holiday">Enjoy Holiday</string>
-    <string name="click_to_set_status">Click to Set Status</string>
+    <string name="click_to_set_status">Set Status</string>
     
     <!-- Language Settings -->
     <string name="chinese_language">Chinese</string>

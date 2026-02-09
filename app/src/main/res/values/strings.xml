@@ -79,8 +79,8 @@
     <string name="welcome_subtitle">%s办公位置记录助手</string>
     <string name="main_features">主要功能</string>
     <string name="feature_auto_detect">自动检测：进入%s800米范围自动记录WFO</string>
-    <string name="feature_manual">手动记录：支持任意日期手动补录WFO/WFH/休假</string>
-    <string name="feature_reminder">每日提醒：上午10点半自动检测并记录位置</string>
+    <string name="feature_manual">手动记录：支持任意日期手动补录WFO/WFH</string>
+    <string name="feature_reminder">每日提醒：上午10:30自动检测并记录位置</string>
     <string name="permissions_needed">需要以下权限</string>
     <string name="grant_permission">授权</string>
     <string name="start_using">开始使用</string>
@@ -101,7 +101,7 @@
     <string name="auto_detection_title">自动检测</string>
     <string name="auto_detection_desc">进入%1$s800米范围自动记录WFO</string>
     <string name="manual_recording_title">手动记录</string>
-    <string name="manual_recording_desc">支持任意日期手动补录WFO/WFH/休假</string>
+    <string name="manual_recording_desc">支持任意日期手动补录WFO/WFH</string>
     <string name="daily_reminder_title">每日提醒</string>
     <string name="daily_reminder_desc">上午10点位置记录提醒</string>
     
