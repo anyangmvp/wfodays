@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 object DailyCheckScheduler {
     
     private const val WORK_NAME = "daily_location_check"
+    private const val RETRY_WORK_NAME = "daily_location_check_retry"
     
     fun scheduleDailyCheck(context: Context) {
         val now = LocalDateTime.now()
@@ -46,7 +47,22 @@ object DailyCheckScheduler {
         )
     }
     
+    fun scheduleRetry(context: Context) {
+        val retryDelayMillis = Duration.ofMinutes(15).toMillis()
+        
+        val workRequest = OneTimeWorkRequestBuilder<DailyLocationCheckWorker>()
+            .setInitialDelay(retryDelayMillis, TimeUnit.MILLISECONDS)
+            .build()
+        
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            RETRY_WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+    }
+    
     fun cancelDailyCheck(context: Context) {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+        WorkManager.getInstance(context).cancelUniqueWork(RETRY_WORK_NAME)
     }
 }

@@ -75,6 +75,7 @@ cd wfodays
 ## 📱 应用截图
 
 <p align="center">
+  <img src="screenshots/onboarding.png" width="200" alt="引导页">
   <img src="screenshots/home.png" width="200" alt="首页">
   <img src="screenshots/calendar.png" width="200" alt="日历">
   <img src="screenshots/stats.png" width="200" alt="统计">

@@ -100,6 +100,10 @@ class DailyLocationCheckWorker @AssistedInject constructor(
                         applicationContext.getString(R.string.notification_title_location_updated),
                         applicationContext.getString(R.string.notification_message_wfo_updated)
                     )
+
+                    // 检测成功，安排明天的检查
+                    DailyCheckScheduler.scheduleDailyCheck(applicationContext)
+                    return Result.success()
                 } else {
                     // 不在办公室，记录WFH（只有没有记录时才记录）
                     if (todayRecord == null) {
@@ -122,15 +126,19 @@ class DailyLocationCheckWorker @AssistedInject constructor(
                             applicationContext.getString(R.string.notification_message_wfh_updated)
                         )
                     }
-                }
-            }
 
-            // 重新安排明天的检查
-            DailyCheckScheduler.scheduleDailyCheck(applicationContext)
-            Result.success()
+                    // 检测成功，安排明天的检查
+                    DailyCheckScheduler.scheduleDailyCheck(applicationContext)
+                    return Result.success()
+                }
+            } else {
+                // 位置获取失败，15分钟后重试
+                DailyCheckScheduler.scheduleRetry(applicationContext)
+                return Result.retry()
+            }
         } catch (e: Exception) {
-            // 出错时重试，并重新安排明天的检查
-            DailyCheckScheduler.scheduleDailyCheck(applicationContext)
+            // 出错时15分钟后重试
+            DailyCheckScheduler.scheduleRetry(applicationContext)
             Result.retry()
         }
     }
