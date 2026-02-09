@@ -26,7 +26,7 @@
 
 ### 📝 灵活记录方式
 - **自动记录**：基于位置自动判断 WFO/WFH
-- **手动记录**：支持任意日期手动补录 WFO/WFH/休假
+- **手动记录**：支持任意日期手动补录 WFO/WFH/LEAVE
 - **长按切换**：长按今日状态卡片快速切换工作模式
 
 ### 📊 出勤统计
@@ -68,7 +68,7 @@ cd wfodays
 ### 首次使用
 1. 打开应用，授权位置权限
 2. 应用会自动根据当前位置记录今日状态
-3. 长按今日状态卡片可手动切换 WFO/WFH/休假
+3. 双击今日状态卡片可手动切换 WFO/WFH/休假
 
 ---
 
@@ -123,14 +123,14 @@ app/src/main/java/me/anyang/wfodays/
 ## ⚙️ 配置说明
 
 ### 公司位置配置
-在 `NativeLocationManager.kt` 中修改公司坐标：
+在 `Constants.kt` 中修改公司坐标：
 
 ```kotlin
 companion object {
-    const val OFFICE_LATITUDE = 34.2098056   // 公司纬度
-    const val OFFICE_LONGITUDE = 108.8388056 // 公司经度
-    const val OFFICE_RADIUS_METERS = 800f    // 检测范围（米）
-    const val OFFICE_NAME = "环普产业园"        // 公司名称
+    const val OFFICE_LATITUDE = 34.211892
+    const val OFFICE_LONGITUDE = 108.834240
+    const val OFFICE_RADIUS_METERS = 800f
+    const val OFFICE_NAME = "环普产业园"
 }
 ```
 

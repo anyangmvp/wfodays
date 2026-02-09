@@ -5,10 +5,8 @@ object Constants {
     const val DATABASE_VERSION = 1
     
     // 公司坐标（环普产业园）
-    // 34°12'35.3"N = 34 + 12/60 + 35.3/3600 = 34.2098056
-    const val OFFICE_LATITUDE = 34.2098056
-    // 108°50'19.7"E = 108 + 50/60 + 19.7/3600 = 108.8388056
-    const val OFFICE_LONGITUDE = 108.8388056
+    const val OFFICE_LATITUDE = 34.211892
+    const val OFFICE_LONGITUDE = 108.834240
     const val OFFICE_RADIUS_METERS = 800f
     const val OFFICE_NAME = "环普产业园"
     

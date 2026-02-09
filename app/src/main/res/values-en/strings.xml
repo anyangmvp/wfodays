@@ -144,17 +144,17 @@
     <string name="notification_message_wfh_updated">Today has been automatically recorded as WFH (Working From Home)</string>
     
     <!-- Location Notes -->
-    <string name="location_note_wfo">GPS Positioning: Distance to %1$s %2$d m</string>
-    <string name="location_note_wfh">GPS Positioning: Distance to %1$s %2$d m (Working from Home)</string>
+    <string name="location_note_wfo">GPS Positioning: Distance to %1$s %2$d m (WFO)</string>
+    <string name="location_note_wfh">GPS Positioning: Distance to %1$s %2$d m (WFH)</string>
     <string name="location_note_manual_wfo">Manually marked WFO</string>
     <string name="location_note_manual_wfh">Manually marked WFH</string>
-    <string name="location_note_manual_leave">Marked as Leave</string>
+    <string name="location_note_manual_leave">Manually marked LEAVE</string>
     <string name="location_note_auto_wfo">Auto-detected entering office area (within 800m)</string>
     <string name="gps_auto_location">GPS Auto Positioning</string>
     <string name="gps_location_format">GPS Positioning: Distance to %1$s %2$d m</string>
     <string name="manual_mark_wfo">Manually marked WFO</string>
-    <string name="manual_mark_wfh">Marked as WFH</string>
-    <string name="manual_mark_leave">Marked as Leave</string>
+    <string name="manual_mark_wfh">Manually marked WFH</string>
+    <string name="manual_mark_leave">Manually marked LEAVE</string>
     <string name="manual_switch_wfo">Manually switched to WFO</string>
     <string name="manual_switch_wfh">Manually switched to WFH</string>
     <string name="manual_switch_leave">Manually switched to Leave</string>
@@ -228,8 +228,12 @@
     <string name="office_wfo">Office (WFO)</string>
     <string name="home_wfh">Home (WFH)</string>
     <string name="enjoy_holiday">Enjoy Holiday</string>
-    <string name="click_to_set_status">Click to Set Status</string>
-    
+    <string name="click_to_set_status">Set Status</string>
+    <string name="double_tap_to_auto_locate">Dbl Tap to Locate</string>
+    <string name="auto_located">Auto Located</string>
+    <string name="manually_recorded">Manually Recorded</string>
+    <string name="location_success">Location Success</string>
+
     <!-- Language Settings -->
     <string name="chinese_language">Chinese</string>
     <string name="english_language">English</string>

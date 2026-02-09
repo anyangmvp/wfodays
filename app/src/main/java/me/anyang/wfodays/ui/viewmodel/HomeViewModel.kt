@@ -8,19 +8,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.entity.AttendanceRecord
-import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.data.repository.MonthlyStatistics
+import me.anyang.wfodays.location.LocationBasedAttendanceRecorder
 import me.anyang.wfodays.location.NativeLocationManager
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -38,6 +35,11 @@ class HomeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    // 基于位置的考勤记录器
+    private val locationRecorder by lazy {
+        LocationBasedAttendanceRecorder(context, repository, locationManager)
+    }
 
     companion object {
         // 工作时间范围：早上9点到下午6点半
@@ -100,8 +102,8 @@ class HomeViewModel @Inject constructor(
 
         // 检查今天是否已有WFO记录
         val todayRecord = repository.getTodayRecord()
-        if (todayRecord != null && todayRecord.workMode == WorkMode.WFO) {
-            // 今天已经有WFO记录，不再自动记录
+        if (todayRecord != null && (todayRecord.workMode == WorkMode.WFO || todayRecord.workMode == WorkMode.LEAVE)) {
+            // 今天已经有WFO或请假记录，不再自动记录
             return
         }
 
@@ -114,52 +116,10 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        var latitude = 0.0
-        var longitude = 0.0
-
-        withContext(Dispatchers.Main) {
-            locationManager.getCurrentLocation { lat, lon, _ ->
-                latitude = lat
-                longitude = lon
-            }
-        }
-
-        // 等待位置回调
-        delay(2000)
-
-        if (latitude != 0.0 && longitude != 0.0) {
-            val distance = locationManager.calculateDistanceToOffice(latitude, longitude)
-            val isInOffice = distance <= NativeLocationManager.OFFICE_RADIUS_METERS
-
-            if (isInOffice) {
-                // 在公司，记录WFO
-                repository.recordAttendance(
-                    date = LocalDate.now(),
-                    isPresent = true,
-                    workMode = WorkMode.WFO,
-                    type = RecordType.AUTO,
-                    note = context.getString(
-                        R.string.location_note_wfo,
-                        NativeLocationManager.OFFICE_NAME,
-                        distance.toInt()
-                    )
-                )
-            } else {
-                // 在家，记录WFH（只有没有记录时才记录）
-                if (todayRecord == null) {
-                    repository.recordAttendance(
-                        date = LocalDate.now(),
-                        isPresent = true,
-                        workMode = WorkMode.WFH,
-                        type = RecordType.AUTO,
-                        note = context.getString(
-                            R.string.location_note_wfh,
-                            NativeLocationManager.OFFICE_NAME,
-                            distance.toInt()
-                        )
-                    )
-                }
-            }
+        // 使用公共记录器执行位置检测并记录
+        val result = locationRecorder.detectAndRecord(skipExistingCheck = false)
+        if (result is LocationBasedAttendanceRecorder.RecordResult.Success) {
+            loadData()
         }
     }
 
@@ -209,38 +169,28 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * 切换今日状态（WFO -> WFH -> LEAVE -> WFO）
+     * 根据当前位置自动检测并记录今日状态（供UI长按调用）
+     * 返回是否成功记录了状态
      */
-    fun toggleTodayStatus() {
-        viewModelScope.launch {
-            try {
-                val todayRecord = repository.getTodayRecord()
-                val currentMode = todayRecord?.workMode
-
-                // 循环切换：WFO -> WFH -> LEAVE -> WFO
-                val nextMode = when (currentMode) {
-                    WorkMode.WFO -> WorkMode.WFH
-                    WorkMode.WFH -> WorkMode.LEAVE
-                    WorkMode.LEAVE -> WorkMode.WFO
-                    null -> WorkMode.WFO
-                }
-
-                val note = when (nextMode) {
-                    WorkMode.WFO -> context.getString(R.string.manual_switch_wfo)
-                    WorkMode.WFH -> context.getString(R.string.manual_switch_wfh)
-                    WorkMode.LEAVE -> context.getString(R.string.manual_switch_leave)
-                }
-
-                repository.markWorkMode(
-                    date = LocalDate.now(),
-                    workMode = nextMode,
-                    note = note
-                )
-                loadData()
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
-            }
+    suspend fun autoDetectAndRecordByLocation(): Boolean {
+        // 检查是否有位置权限
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return false
         }
+
+        val result = locationRecorder.detectAndRecord(skipExistingCheck = true)
+        val success = result is LocationBasedAttendanceRecorder.RecordResult.Success
+
+        // 如果记录成功，刷新数据
+        if (success) {
+            loadData()
+        }
+
+        return success
     }
 }
 

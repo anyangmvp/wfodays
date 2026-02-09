@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -16,9 +17,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -30,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.anyang.wfodays.R
+import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.HomeViewModel
@@ -45,11 +49,22 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showSuccessAnimation by remember { mutableStateOf(false) }
+    // 用于触发自动定位成功的卡片动画
+    var triggerAutoLocateAnimation by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
+    }
+
+    // 监听今日记录变化，如果是自动定位记录的，触发动画（每次进入页面都触发）
+    LaunchedEffect(uiState.todayRecord) {
+        uiState.todayRecord?.let { record ->
+            // 如果是自动定位记录，触发卡片动画
+            if (record.recordType == RecordType.AUTO) {
+                triggerAutoLocateAnimation = true
+            }
+        }
     }
 
     Scaffold(
@@ -182,13 +197,17 @@ fun HomeScreen(
             // 今日状态卡片 - 渐变背景
             TodayStatusCard(
                 todayMode = uiState.todayRecord?.workMode,
-                onToggle = {
-                    viewModel.toggleTodayStatus()
+                recordType = uiState.todayRecord?.recordType,
+                isAutoLocateSuccess = triggerAutoLocateAnimation,
+                onAnimationEnd = { triggerAutoLocateAnimation = false },
+                onLongPress = {
+                    // 长按根据位置自动检测并记录
                     scope.launch {
-                        delay(300)
-                        showSuccessAnimation = true
-                        delay(1500)
-                        showSuccessAnimation = false
+                        val success = viewModel.autoDetectAndRecordByLocation()
+                        if (success) {
+                            // 长按成功后触发动画
+                            triggerAutoLocateAnimation = true
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -248,30 +267,12 @@ fun HomeScreen(
             QuickActionsSection(
                 onWFOClick = {
                     viewModel.manualCheckIn()
-                    scope.launch {
-                        delay(300)
-                        showSuccessAnimation = true
-                        delay(1500)
-                        showSuccessAnimation = false
-                    }
                 },
                 onWFHClick = {
                     viewModel.markAsWFH()
-                    scope.launch {
-                        delay(300)
-                        showSuccessAnimation = true
-                        delay(1500)
-                        showSuccessAnimation = false
-                    }
                 },
                 onLeaveClick = {
                     viewModel.markAsLeave()
-                    scope.launch {
-                        delay(300)
-                        showSuccessAnimation = true
-                        delay(1500)
-                        showSuccessAnimation = false
-                    }
                 }
             )
 
@@ -279,20 +280,15 @@ fun HomeScreen(
         }
     }
 
-    // 成功动画
-    AnimatedVisibility(
-        visible = showSuccessAnimation,
-        enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut()
-    ) {
-        SuccessOverlay(onDismiss = { showSuccessAnimation = false })
-    }
 }
 
 @Composable
 private fun TodayStatusCard(
     todayMode: WorkMode?,
-    onToggle: () -> Unit,
+    recordType: RecordType?,
+    isAutoLocateSuccess: Boolean = false,
+    onAnimationEnd: () -> Unit = {},
+    onLongPress: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (backgroundBrush, icon, title, subtitle) = when (todayMode) {
@@ -318,87 +314,233 @@ private fun TodayStatusCard(
             Brush.linearGradient(listOf(Color(0xFF64748B), Color(0xFF94A3B8))),
             Icons.Default.Help,
             stringResource(R.string.today_not_recorded),
-            stringResource(R.string.click_to_set_status)
+            stringResource(R.string.double_tap_to_auto_locate)
         )
     }
 
     var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.98f else 1f,
+
+    // 自动定位成功动画状态
+    var playSuccessAnimation by remember { mutableStateOf(false) }
+
+    // 监听自动定位成功信号
+    LaunchedEffect(isAutoLocateSuccess) {
+        if (isAutoLocateSuccess) {
+            playSuccessAnimation = true
+            delay(2000)
+            playSuccessAnimation = false
+            onAnimationEnd()
+        }
+    }
+
+    // 卡片缩放动画
+    val cardScale by animateFloatAsState(
+        targetValue = when {
+            playSuccessAnimation -> 1.05f
+            isPressed -> 0.98f
+            else -> 1f
+        },
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "card_scale"
     )
 
+    // 成功动画的光晕效果
+    val glowAlpha by animateFloatAsState(
+        targetValue = if (playSuccessAnimation) 0.6f else 0f,
+        animationSpec = tween(300, easing = EaseOutQuad),
+        label = "glow_alpha"
+    )
+
+    // 成功动画的旋转效果
+    val rotation by animateFloatAsState(
+        targetValue = if (playSuccessAnimation) 360f else 0f,
+        animationSpec = tween(800, easing = EaseOutBack),
+        label = "rotation"
+    )
+
     Box(
         modifier = modifier
-            .scale(scale)
+            .scale(cardScale)
             .shadow(
-                elevation = 12.dp,
+                elevation = if (playSuccessAnimation) 24.dp else 12.dp,
                 shape = RoundedCornerShape(24.dp),
-                spotColor = when (todayMode) {
-                    WorkMode.WFO -> PrimaryBlue.copy(alpha = 0.4f)
-                    WorkMode.WFH -> SuccessGreen.copy(alpha = 0.4f)
-                    WorkMode.LEAVE -> WarningYellow.copy(alpha = 0.4f)
-                    null -> Color.Gray.copy(alpha = 0.3f)
+                spotColor = when {
+                    playSuccessAnimation -> Color.White.copy(alpha = 0.5f)
+                    todayMode == WorkMode.WFO -> PrimaryBlue.copy(alpha = 0.4f)
+                    todayMode == WorkMode.WFH -> SuccessGreen.copy(alpha = 0.4f)
+                    todayMode == WorkMode.LEAVE -> WarningYellow.copy(alpha = 0.4f)
+                    else -> Color.Gray.copy(alpha = 0.3f)
                 }
             )
             .clip(RoundedCornerShape(24.dp))
             .background(backgroundBrush)
-            .clickable {
-                isPressed = true
-                onToggle()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                    },
+                    onDoubleTap = {
+                        onLongPress()
+                    }
+                )
             }
             .padding(24.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.9f)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-            }
-
-            // 图标动画
-            val infiniteScale by rememberInfiniteTransition(label = "icon").animateFloat(
-                initialValue = 1f,
-                targetValue = 1.1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(1500, easing = EaseInOutSine),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "icon_scale"
-            )
-
+        // 成功动画光晕层
+        if (playSuccessAnimation) {
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .scale(infiniteScale)
+                    .fillMaxSize()
                     .background(
-                        Color.White.copy(alpha = 0.2f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = glowAlpha),
+                                Color.Transparent
+                            ),
+                            radius = 300f
+                        )
+                    )
+            )
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(36.dp)
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                // 图标动画
+                val infiniteScale by rememberInfiniteTransition(label = "icon").animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1500, easing = EaseInOutSine),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "icon_scale"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .scale(if (playSuccessAnimation) 1.2f else infiniteScale)
+                        .rotate(if (playSuccessAnimation) rotation else 0f)
+                        .background(
+                            Color.White.copy(alpha = if (playSuccessAnimation) 0.4f else 0.2f),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (playSuccessAnimation) Icons.Default.CheckCircle else icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+            }
+
+            // 记录类型标识
+            if (todayMode != null && recordType != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                RecordTypeBadge(
+                    recordType = recordType,
+                    playAnimation = playSuccessAnimation
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun RecordTypeBadge(
+    recordType: RecordType,
+    playAnimation: Boolean = false
+) {
+    val (icon, text, baseBackgroundColor) = when (recordType) {
+        RecordType.AUTO -> Triple(
+            Icons.Default.LocationOn,
+            stringResource(R.string.auto_located),
+            Color(0xFF4ADE80).copy(alpha = 0.3f)  // 更亮的绿色背景
+        )
+        RecordType.MANUAL -> Triple(
+            Icons.Default.TouchApp,
+            stringResource(R.string.manually_recorded),
+            Color(0xFF60A5FA).copy(alpha = 0.3f)  // 蓝色背景
+        )
+    }
+
+    // 动画时的背景色
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = if (playAnimation && recordType == RecordType.AUTO) {
+            Color(0xFF22C55E).copy(alpha = 0.6f)  // 动画时更亮的绿色
+        } else {
+            baseBackgroundColor
+        },
+        animationSpec = tween(300),
+        label = "badge_bg_color"
+    )
+
+    // 徽章缩放动画
+    val badgeScale by animateFloatAsState(
+        targetValue = if (playAnimation) 1.1f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "badge_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .scale(badgeScale)
+            .background(
+                color = animatedBackgroundColor,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                imageVector = if (playAnimation && recordType == RecordType.AUTO) {
+                    Icons.Default.CheckCircle  // 动画时显示勾选图标
+                } else {
+                    icon
+                },
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.95f),
+                modifier = Modifier.size(14.dp)
+            )
+            Text(
+                text = if (playAnimation && recordType == RecordType.AUTO) {
+                    stringResource(R.string.location_success)  // 动画时显示成功文字
+                } else {
+                    text
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.95f),
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
