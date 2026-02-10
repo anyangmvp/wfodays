@@ -219,9 +219,9 @@
     
     <!-- Home Screen Strings -->
     <string name="monthly_attendance_goal">本月出勤目标</string>
-    <string name="wfo_completed">已公司办公</string>
-    <string name="wfo_needed">还需</string>
-    <string name="remaining_workdays">剩余天数</string>
+    <string name="wfo_completed">已在公司天数</string>
+    <string name="wfo_needed">还需天数</string>
+    <string name="remaining_workdays">剩余工作日</string>
     <string name="quick_record">快捷记录</string>
     <string name="record_success">记录成功！</string>
     <string name="today_work">今日办公</string>

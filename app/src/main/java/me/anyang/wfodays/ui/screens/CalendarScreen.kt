@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -680,7 +681,7 @@ private fun DateActionDialog(
                         WorkMode.WFO -> Triple("WFO", PrimaryBlue, Icons.Default.Business)
                         WorkMode.WFH -> Triple("WFH", SuccessGreen, Icons.Default.HomeWork)
                         WorkMode.LEAVE -> Triple(stringResource(R.string.leave_days_label), WarningYellow, Icons.Default.BeachAccess)
-                        else -> Triple(stringResource(R.string.unknown_status), Color.Gray, Icons.Default.Help)
+                        else -> Triple(stringResource(R.string.unknown_status), Color.Gray, Icons.AutoMirrored.Filled.Help)
                     }
 
                     // 当前状态卡片

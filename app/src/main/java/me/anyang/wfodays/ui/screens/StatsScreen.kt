@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -354,7 +355,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                 StatsGridItem(
                     value = if (stats.remainingDays > 0) "${stats.remainingDays}" else stringResource(R.string.completed),
                     label = if (stats.remainingDays > 0) stringResource(R.string.remaining_days_label) else stringResource(R.string.status),
-                    icon = if (stats.remainingDays > 0) Icons.Default.TrendingUp else Icons.Default.CheckCircle,
+                    icon = if (stats.remainingDays > 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.Default.CheckCircle,
                     delayMillis = 600,
                     isSuccess = isGoalReached
                 )

@@ -25,6 +25,7 @@ class LocaleHelper @Inject constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             context.resources.configuration.locales.get(0)
         } else {
+            @Suppress("DEPRECATION")
             context.resources.configuration.locale
         }
     }
@@ -41,7 +42,9 @@ class LocaleHelper @Inject constructor(
             configuration.setLocales(localeList)
             context.createConfigurationContext(configuration)
         } else {
+            @Suppress("DEPRECATION")
             configuration.locale = locale
+            @Suppress("DEPRECATION")
             context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
             context
         }

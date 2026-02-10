@@ -37,6 +37,7 @@ object LanguageManager {
             configuration.locale = locale
         }
         
+        @Suppress("DEPRECATION")
         resources.updateConfiguration(configuration, resources.displayMetrics)
         
         // 保存语言设置到偏好设置
@@ -85,6 +86,7 @@ object LanguageManager {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             context.createConfigurationContext(configuration)
         } else {
+            @Suppress("DEPRECATION")
             context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
             context
         }

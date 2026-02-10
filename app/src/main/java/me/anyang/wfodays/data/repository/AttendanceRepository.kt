@@ -106,6 +106,14 @@ class AttendanceRepository @Inject constructor(
         // Calculate remaining days
         val remainingDays = kotlin.math.max(0, requiredDays - wfoDays)
         
+        // Calculate remaining workdays in month (from today to end of month)
+        val today = LocalDate.now()
+        val remainingWorkdays = if (yearMonth == YearMonth.from(today)) {
+            WorkdayCalculator.getRemainingWorkdays(yearMonth, today)
+        } else {
+            0
+        }
+        
         // Current rate
         val currentRate = if (effectiveWorkdays > 0) wfoDays.toFloat() / effectiveWorkdays else 0f
 
@@ -118,6 +126,7 @@ class AttendanceRepository @Inject constructor(
             wfhDays = records.count { it.workMode == WorkMode.WFH },
             requiredDays = requiredDays,
             remainingDays = remainingDays,
+            remainingWorkdays = remainingWorkdays,
             currentRate = currentRate
         )
     }
@@ -143,6 +152,7 @@ data class MonthlyStatistics(
     val wfoDays: Int,
     val wfhDays: Int,
     val requiredDays: Int,  // effectiveWorkdays * 0.6
-    val remainingDays: Int,
+    val remainingDays: Int,  // 还需多少天WFO才能达到目标
+    val remainingWorkdays: Int,  // 本月剩余工作日（从今天到月底）
     val currentRate: Float
 )

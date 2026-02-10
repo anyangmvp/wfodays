@@ -11,7 +11,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -124,6 +126,7 @@ fun HomeScreen(
                             it.finish()
                             it.startActivity(intent)
                             // 禁用动画使切换更平滑
+                            @Suppress("DEPRECATION")
                             it.overridePendingTransition(0, 0)
                         }
                     }) {
@@ -248,11 +251,11 @@ fun HomeScreen(
                         BusinessStatItem(
                             value = stats.remainingDays,
                             label = stringResource(R.string.wfo_needed),
-                            icon = Icons.Default.TrendingUp,
+                            icon = Icons.AutoMirrored.Filled.TrendingUp,
                             delayMillis = 400
                         )
                         BusinessStatItem(
-                            value = stats.remainingDays,
+                            value = stats.remainingWorkdays,
                             label = stringResource(R.string.remaining_workdays),
                             icon = Icons.Default.CalendarToday,
                             delayMillis = 500
@@ -312,7 +315,7 @@ private fun TodayStatusCard(
         )
         null -> Quad(
             Brush.linearGradient(listOf(Color(0xFF64748B), Color(0xFF94A3B8))),
-            Icons.Default.Help,
+            Icons.AutoMirrored.Filled.Help,
             stringResource(R.string.today_not_recorded),
             stringResource(R.string.double_tap_to_auto_locate)
         )
@@ -464,6 +467,7 @@ private fun TodayStatusCard(
                 Spacer(modifier = Modifier.height(12.dp))
                 RecordTypeBadge(
                     recordType = recordType,
+                    workMode = todayMode,
                     playAnimation = playSuccessAnimation
                 )
             }
@@ -474,25 +478,59 @@ private fun TodayStatusCard(
 @Composable
 private fun RecordTypeBadge(
     recordType: RecordType,
+    workMode: WorkMode,
     playAnimation: Boolean = false
 ) {
-    val (icon, text, baseBackgroundColor) = when (recordType) {
-        RecordType.AUTO -> Triple(
-            Icons.Default.LocationOn,
-            stringResource(R.string.auto_located),
-            Color(0xFF4ADE80).copy(alpha = 0.3f)  // 更亮的绿色背景
-        )
-        RecordType.MANUAL -> Triple(
-            Icons.Default.TouchApp,
-            stringResource(R.string.manually_recorded),
-            Color(0xFF60A5FA).copy(alpha = 0.3f)  // 蓝色背景
-        )
+    // 根据工作模式和记录类型组合确定徽章背景色
+    // 使用与卡片背景协调的颜色，但有所区分
+    val (icon, text, baseBackgroundColor) = when (workMode) {
+        WorkMode.WFO -> when (recordType) {
+            RecordType.AUTO -> Triple(
+                Icons.Default.LocationOn,
+                stringResource(R.string.auto_located),
+                Color(0xFF1E3A5F).copy(alpha = 0.55f)  // 深蓝色，与WFO卡片协调
+            )
+            RecordType.MANUAL -> Triple(
+                Icons.Default.TouchApp,
+                stringResource(R.string.manually_recorded),
+                Color(0xFF2563EB).copy(alpha = 0.5f)  // 亮蓝色，与WFO卡片协调
+            )
+        }
+        WorkMode.WFH -> when (recordType) {
+            RecordType.AUTO -> Triple(
+                Icons.Default.LocationOn,
+                stringResource(R.string.auto_located),
+                Color(0xFF059669).copy(alpha = 0.55f)  // 中等绿色，与WFH卡片协调
+            )
+            RecordType.MANUAL -> Triple(
+                Icons.Default.TouchApp,
+                stringResource(R.string.manually_recorded),
+                Color(0xFF34D399).copy(alpha = 0.5f)  // 浅绿色，与WFH卡片协调
+            )
+        }
+        WorkMode.LEAVE -> when (recordType) {
+            RecordType.AUTO -> Triple(
+                Icons.Default.LocationOn,
+                stringResource(R.string.auto_located),
+                Color(0xFFB45309).copy(alpha = 0.55f)  // 深琥珀色，与LEAVE卡片协调
+            )
+            RecordType.MANUAL -> Triple(
+                Icons.Default.TouchApp,
+                stringResource(R.string.manually_recorded),
+                Color(0xFFF59E0B).copy(alpha = 0.5f)  // 金黄色，与LEAVE黄色背景协调
+            )
+        }
     }
 
     // 动画时的背景色
     val animatedBackgroundColor by animateColorAsState(
         targetValue = if (playAnimation && recordType == RecordType.AUTO) {
-            Color(0xFF22C55E).copy(alpha = 0.6f)  // 动画时更亮的绿色
+            // 动画时使用更亮的同色系颜色
+            when (workMode) {
+                WorkMode.WFO -> Color(0xFF60A5FA).copy(alpha = 0.7f)
+                WorkMode.WFH -> Color(0xFF34D399).copy(alpha = 0.7f)
+                WorkMode.LEAVE -> Color(0xFFFBBF24).copy(alpha = 0.7f)
+            }
         } else {
             baseBackgroundColor
         },
