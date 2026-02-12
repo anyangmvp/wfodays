@@ -15,35 +15,41 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = HSBCRedLight,
-    secondary = HSBCRed,
-    tertiary = HSBCRedDark,
-    background = BackgroundDark,
-    surface = SurfaceDark,
-    onPrimary = HSBCWhite,
-    onSecondary = HSBCWhite,
-    onTertiary = HSBCWhite,
-    onBackground = OnSurfaceDark,
-    onSurface = OnSurfaceDark,
-    error = ErrorRed,
-    onError = HSBCWhite
+// 快乐活力主题 - 深色模式
+private val JoyDarkColorScheme = darkColorScheme(
+    primary = JoyCoral,
+    secondary = JoyMint,
+    tertiary = JoyPurple,
+    background = JoyGray900,
+    surface = JoyGray800,
+    onPrimary = JoyGray900,
+    onSecondary = JoyGray900,
+    onTertiary = JoyGray900,
+    onBackground = JoyGray100,
+    onSurface = JoyGray100,
+    error = JoyError,
+    onError = JoyGray900
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = HSBCRed,
-    secondary = HSBCRedDark,
-    tertiary = HSBCRedLight,
-    background = BackgroundLight,
-    surface = SurfaceLight,
-    onPrimary = HSBCWhite,
-    onSecondary = HSBCWhite,
-    onTertiary = HSBCRed,
-    onBackground = OnSurfaceLight,
-    onSurface = OnSurfaceLight,
-    error = ErrorRed,
-    onError = HSBCWhite
+// 快乐活力主题 - 浅色模式
+private val JoyLightColorScheme = lightColorScheme(
+    primary = JoyOrange,
+    secondary = JoyMint,
+    tertiary = JoyPurple,
+    background = JoyBackground,
+    surface = JoySurface,
+    onPrimary = JoyOnPrimary,
+    onSecondary = JoyGray900,
+    onTertiary = JoyOnPrimary,
+    onBackground = JoyOnBackground,
+    onSurface = JoyOnSurface,
+    error = JoyError,
+    onError = JoyOnPrimary
 )
+
+// 向后兼容的别名
+private val DarkColorScheme = JoyDarkColorScheme
+private val LightColorScheme = JoyLightColorScheme
 
 @Composable
 fun WFODaysTheme(

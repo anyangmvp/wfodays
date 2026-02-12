@@ -327,4 +327,13 @@
     <!-- Notification Actions -->
     <string name="notification_action_view">View Details</string>
     <string name="notification_action_record">View Records</string>
+    
+    <!-- Debug Notification Mode -->
+    <string name="debug_notification_mode">Debug Notification Mode</string>
+    <string name="debug_notification_mode_desc">Auto check-in at set intervals when enabled</string>
+    <string name="execution_interval">Execution Interval</string>
+    <string name="interval_minutes">%dmin</string>
+    <string name="custom_interval">Custom</string>
+    <string name="input_hint">Input</string>
+    <string name="minutes_unit">min</string>
 </resources>

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -36,10 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.anyang.wfodays.R
-import me.anyang.wfodays.ui.theme.PrimaryBlue
-import me.anyang.wfodays.ui.theme.PrimaryBlueDark
-import me.anyang.wfodays.ui.theme.PrimaryBlueLight
-import me.anyang.wfodays.ui.theme.SuccessGreen
+import me.anyang.wfodays.ui.theme.*
 
 @Composable
 fun PermissionGuideCard(
@@ -50,19 +48,19 @@ fun PermissionGuideCard(
     icon: ImageVector = Icons.Default.LocationOn,
     modifier: Modifier = Modifier
 ) {
-    val iconColor = if (isGranted) SuccessGreen else PrimaryBlue
+    val gradientColors = if (isGranted) JoyGradientWFH else JoyGradientPrimary
     val backgroundColor = if (isGranted) 
-        SuccessGreen.copy(alpha = 0.05f) else PrimaryBlue.copy(alpha = 0.05f)
+        JoyMint.copy(alpha = 0.1f) else JoyOrange.copy(alpha = 0.08f)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.1f)
+                elevation = 6.dp,
+                shape = RoundedCornerShape(18.dp),
+                spotColor = gradientColors.first().copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(18.dp))
             .background(Color.White)
     ) {
         Column(
@@ -79,31 +77,39 @@ fun PermissionGuideCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(backgroundColor),
+                            .size(42.dp)
+                            .shadow(
+                                elevation = 4.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                spotColor = gradientColors.first().copy(alpha = 0.25f)
+                            )
+                            .background(
+                                Brush.linearGradient(gradientColors),
+                                RoundedCornerShape(12.dp)
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isGranted) Icons.Default.CheckCircle else icon,
                             contentDescription = null,
-                            tint = iconColor,
-                            modifier = Modifier.size(20.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                     Column(
-                        modifier = Modifier.padding(start = 12.dp)
+                        modifier = Modifier.padding(start = 14.dp)
                     ) {
                         Text(
                             text = title,
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = PrimaryBlueDark
+                            fontWeight = FontWeight.Bold,
+                            color = JoyOnBackground
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            color = JoyOnSurfaceVariant
                         )
                     }
                 }
@@ -111,27 +117,45 @@ fun PermissionGuideCard(
                 if (!isGranted) {
                     Button(
                         onClick = onRequest,
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                        shape = RoundedCornerShape(10.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = JoyOrange),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.grant_permission_button),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 } else {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(SuccessGreen.copy(alpha = 0.1f))
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                            .shadow(
+                                elevation = 2.dp,
+                                shape = RoundedCornerShape(10.dp),
+                                spotColor = JoyMint.copy(alpha = 0.2f)
+                            )
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(
+                                Brush.linearGradient(JoyGradientWFH),
+                            )
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.permission_granted),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = SuccessGreen,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.permission_granted),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -150,42 +174,49 @@ fun SettingsCard(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.15f)
+                elevation = 10.dp,
+                shape = RoundedCornerShape(22.dp),
+                spotColor = JoyCoral.copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(22.dp))
             .background(Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(22.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(PrimaryBlue.copy(alpha = 0.1f)),
+                        .size(44.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(12.dp),
+                            spotColor = JoyCoral.copy(alpha = 0.25f)
+                        )
+                        .background(
+                            Brush.linearGradient(JoyGradientPrimary),
+                            RoundedCornerShape(12.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(22.dp)
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp),
-                    color = PrimaryBlueDark
+                    modifier = Modifier.padding(start = 14.dp),
+                    color = JoyOnBackground
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             content()
         }
     }
@@ -198,80 +229,32 @@ fun SettingsGroupTitle(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(PrimaryBlue.copy(alpha = 0.1f)),
+                .size(40.dp)
+                .background(
+                    Brush.linearGradient(listOf(JoyPurple, JoyLavender)),
+                    RoundedCornerShape(10.dp)
+                ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = PrimaryBlue,
-                modifier = Modifier.size(16.dp)
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
             )
         }
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 10.dp),
-            color = PrimaryBlueDark
+            color = JoyOnBackground
         )
-    }
-}
-
-@Composable
-fun AutoStartGuide(
-    onOpenSettings: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val manufacturer = android.os.Build.MANUFACTURER
-    
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE3F2FD)
-        )
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-                
-                Text(
-                    text = stringResource(R.string.auto_start_permission_title),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = stringResource(R.string.auto_start_permission_desc, manufacturer),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Button(
-                onClick = onOpenSettings,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(stringResource(R.string.go_to_settings_button))
-            }
-        }
     }
 }

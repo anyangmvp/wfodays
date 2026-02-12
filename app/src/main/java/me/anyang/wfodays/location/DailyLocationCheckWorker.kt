@@ -32,7 +32,6 @@ class DailyLocationCheckWorker(
         val now = LocalDateTime.now()
         val timeStr = now.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
-        Log.d(TAG, "[$timeStr] Worker 被系统触发执行！")
         Log.d(TAG, "[$timeStr] 定时任务开始执行")
 
         // 获取配置好语言的 Context，确保通知显示正确的语言
@@ -90,8 +89,8 @@ class DailyLocationCheckWorker(
 
             // 执行位置检测并记录
             val result = locationRecorder.detectAndRecord(
-                skipExistingCheck = false,
-                showNotification = false
+                skipExistingCheck = true,
+                showNotification = true
             )
 
             when (result) {
