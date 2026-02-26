@@ -15,8 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// 快乐活力主题 - 深色模式
-private val JoyDarkColorScheme = darkColorScheme(
+// 办公专业主题 - 深色模式
+private val OfficeDarkColorScheme = darkColorScheme(
     primary = JoyCoral,
     secondary = JoyMint,
     tertiary = JoyPurple,
@@ -31,8 +31,8 @@ private val JoyDarkColorScheme = darkColorScheme(
     onError = JoyGray900
 )
 
-// 快乐活力主题 - 浅色模式
-private val JoyLightColorScheme = lightColorScheme(
+// 办公专业主题 - 浅色模式
+private val OfficeLightColorScheme = lightColorScheme(
     primary = JoyOrange,
     secondary = JoyMint,
     tertiary = JoyPurple,
@@ -48,8 +48,8 @@ private val JoyLightColorScheme = lightColorScheme(
 )
 
 // 向后兼容的别名
-private val DarkColorScheme = JoyDarkColorScheme
-private val LightColorScheme = JoyLightColorScheme
+private val DarkColorScheme = OfficeDarkColorScheme
+private val LightColorScheme = OfficeLightColorScheme
 
 @Composable
 fun WFODaysTheme(
