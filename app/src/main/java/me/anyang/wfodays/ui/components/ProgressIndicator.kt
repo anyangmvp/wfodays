@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.anyang.wfodays.R
-import me.anyang.wfodays.ui.theme.*
+import me.anyang.wfodays.ui.theme.HSBCRed
+import me.anyang.wfodays.ui.theme.HSBCRedLight
 
 @Composable
 fun AnimatedProgressIndicator(
@@ -47,29 +47,25 @@ fun AnimatedProgressIndicator(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = JoyOnSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
-                .height(14.dp)
-                .shadow(
-                    elevation = 2.dp,
-                    shape = RoundedCornerShape(7.dp),
-                    spotColor = JoyOrange.copy(alpha = 0.15f)
-                )
-                .clip(RoundedCornerShape(7.dp))
-                .background(JoyGray100)
+                .height(12.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress.value)
-                    .height(14.dp)
+                    .height(12.dp)
                     .background(
-                        Brush.horizontalGradient(JoyGradientPrimary)
+                        Brush.horizontalGradient(
+                            colors = listOf(HSBCRed, HSBCRedLight)
+                        )
                     )
             )
         }
@@ -97,39 +93,32 @@ fun TargetProgressCard(
         )
     }
 
-    val progressGradient = if (remainingDays <= 0) {
-        JoyGradientWFH
-    } else {
-        JoyGradientPrimary
-    }
-
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.monthly_attendance_progress),
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = JoyOnBackground
+            fontWeight = FontWeight.SemiBold
         )
         
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp)
-                .height(18.dp)
-                .shadow(
-                    elevation = 3.dp,
-                    shape = RoundedCornerShape(9.dp),
-                    spotColor = progressGradient.first().copy(alpha = 0.2f)
-                )
-                .clip(RoundedCornerShape(9.dp))
-                .background(JoyGray100)
+                .height(16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress.value)
-                    .height(18.dp)
+                    .height(16.dp)
                     .background(
-                        Brush.horizontalGradient(progressGradient)
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                if (remainingDays <= 0) Color(0xFF4CAF50) else HSBCRed,
+                                if (remainingDays <= 0) Color(0xFF81C784) else HSBCRedLight
+                            )
+                        )
                     )
             )
         }
@@ -137,8 +126,7 @@ fun TargetProgressCard(
         Text(
             text = "$presentDays / $requiredDays 天 (${(progress * 100).toInt()}%)",
             style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = JoyOnSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

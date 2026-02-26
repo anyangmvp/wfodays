@@ -50,45 +50,27 @@ fun StatsScreen(
     }
 
     Scaffold(
-        containerColor = JoyBackground,
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.BarChart,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(R.string.attendance_statistics),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.attendance_statistics),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = JoyPurple,
+                    containerColor = PrimaryBlue,
                     titleContentColor = Color.White
                 )
             )
@@ -100,9 +82,8 @@ fun StatsScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            JoyPurple.copy(alpha = 0.08f),
-                            JoyBackground,
-                            JoyCardAccent2.copy(alpha = 0.2f)
+                            PrimaryBlue.copy(alpha = 0.05f),
+                            Color.White
                         )
                     )
                 )
@@ -110,6 +91,7 @@ fun StatsScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            // 当前月统计卡片 - 带渐变和动画
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(400)) + slideInVertically(
@@ -124,6 +106,7 @@ fun StatsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 历史统计标题
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(600)) + slideInVertically(
@@ -136,32 +119,31 @@ fun StatsScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
-                            .background(
-                                Brush.linearGradient(listOf(JoyCoral, JoyPeach)),
-                                RoundedCornerShape(12.dp)
-                            ),
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(PrimaryBlue.copy(alpha = 0.1f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.History,
                             contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
+                            tint = PrimaryBlue,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                     Text(
-                        text = stringResource(R.string.history),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 12.dp),
-                        color = JoyOnBackground
-                    )
+                    text = stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
+                )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // 历史统计列表
             if (uiState.allStats.isEmpty()) {
                 AnimatedVisibility(
                     visible = isVisible,
@@ -216,12 +198,6 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
         label = "card_alpha"
     )
 
-    val gradientColors = if (isGoalReached) {
-        listOf(JoyMint, JoyMintDark, JoyTeal)
-    } else {
-        listOf(JoyPurple, JoyViolet, JoyLavender)
-    }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,16 +206,23 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(24.dp),
-                spotColor = if (isGoalReached) JoyMint.copy(alpha = 0.3f)
-                else JoyPurple.copy(alpha = 0.3f)
+                spotColor = if (isGoalReached) SuccessGreen.copy(alpha = 0.3f)
+                else PrimaryBlue.copy(alpha = 0.3f)
             )
             .clip(RoundedCornerShape(24.dp))
             .background(
-                Brush.linearGradient(gradientColors)
+                Brush.linearGradient(
+                    colors = if (isGoalReached) {
+                        listOf(SuccessGreen, SuccessGreen.copy(green = 0.8f))
+                    } else {
+                        listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
+                    }
+                )
             )
             .padding(24.dp)
     ) {
         Column {
+            // 标题行
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -260,14 +243,15 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                             append(getMonthName(stats.yearMonth.monthValue))
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.85f)
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
 
+                // 完成状态图标
                 if (isGoalReached) {
                     val infiniteScale by rememberInfiniteTransition(label = "check").animateFloat(
                         initialValue = 1f,
-                        targetValue = 1.15f,
+                        targetValue = 1.2f,
                         animationSpec = infiniteRepeatable(
                             animation = tween(800, easing = EaseInOutSine),
                             repeatMode = RepeatMode.Reverse
@@ -279,11 +263,11 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                         modifier = Modifier
                             .size(56.dp)
                             .scale(infiniteScale)
-                            .background(Color.White.copy(alpha = 0.25f), CircleShape),
+                            .background(Color.White.copy(alpha = 0.2f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.EmojiEvents,
+                            imageVector = Icons.Default.CheckCircle,
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(32.dp)
@@ -294,6 +278,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 计算公式
             Text(
                 text = stringResource(
                     R.string.goal_formula,
@@ -302,11 +287,12 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                     stats.requiredDays
                 ),
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.85f)
+                color = Color.White.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // 环形进度条
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -315,7 +301,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                     progress = { progress.coerceAtMost(1f) },
                     modifier = Modifier.size(140.dp),
                     color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.25f),
+                    trackColor = Color.White.copy(alpha = 0.2f),
                     strokeWidth = 12.dp,
                     strokeCap = StrokeCap.Round
                 )
@@ -330,7 +316,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                     Text(
                         text = "/ ${stats.requiredDays} ${stringResource(R.string.days_unit)}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.85f)
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                     Text(
                         text = "${(stats.currentRate * 100).toInt()}%",
@@ -343,6 +329,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // 统计详情网格
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -374,13 +361,14 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                 )
             }
 
+            // 目标达成提示
             if (isGoalReached) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White.copy(alpha = 0.25f))
+                        .background(Color.White.copy(alpha = 0.2f))
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -388,14 +376,13 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Celebration,
+                            imageVector = Icons.Default.EmojiEvents,
                             contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White
                         )
                         Text(
                             text = stringResource(R.string.congrats_goal_reached),
-                            modifier = Modifier.padding(start = 10.dp),
+                            modifier = Modifier.padding(start = 8.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -444,7 +431,7 @@ private fun StatsGridItem(
             modifier = Modifier
                 .size(44.dp)
                 .background(
-                    Color.White.copy(alpha = 0.25f),
+                    Color.White.copy(alpha = 0.2f),
                     CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -466,7 +453,7 @@ private fun StatsGridItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.85f)
+            color = Color.White.copy(alpha = 0.8f)
         )
     }
 }
@@ -476,39 +463,24 @@ private fun EmptyHistoryCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = JoyGray300.copy(alpha = 0.3f)
-            )
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFFF1F5F9))
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .background(
-                        JoyCardAccent1.copy(alpha = 0.3f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.History,
-                    contentDescription = null,
-                    tint = JoyOrange,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(14.dp))
-            Text(
-                text = stringResource(R.string.no_history_data),
-                style = MaterialTheme.typography.bodyLarge,
-                color = JoyOnSurfaceVariant
+            Icon(
+                imageVector = Icons.Default.History,
+                contentDescription = null,
+                tint = Color.Gray.copy(alpha = 0.5f),
+                modifier = Modifier.size(48.dp)
             )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                    text = stringResource(R.string.no_history_data),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
         }
     }
 }
@@ -542,26 +514,20 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
         label = "history_alpha"
     )
 
-    val gradientColors = if (isGoalReached) {
-        listOf(JoyMint, JoyMintLight)
-    } else {
-        listOf(JoyOrange, JoyCoral)
-    }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .scale(scale)
             .alpha(animatedAlpha)
             .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = if (isGoalReached) JoyMint.copy(alpha = 0.2f)
-                else JoyOrange.copy(alpha = 0.2f)
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = if (isGoalReached) SuccessGreen.copy(alpha = 0.2f)
+                else PrimaryBlue.copy(alpha = 0.2f)
             )
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .padding(18.dp)
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -569,25 +535,22 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // 月份图标
                 Box(
                     modifier = Modifier
-                        .size(52.dp)
-                        .shadow(
-                            elevation = 4.dp,
-                            shape = RoundedCornerShape(14.dp),
-                            spotColor = gradientColors.first().copy(alpha = 0.3f)
-                        )
-                        .clip(RoundedCornerShape(14.dp))
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(
-                            Brush.linearGradient(gradientColors)
+                            if (isGoalReached) SuccessGreen.copy(alpha = 0.1f)
+                            else PrimaryBlue.copy(alpha = 0.1f)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(26.dp)
+                        tint = if (isGoalReached) SuccessGreen else PrimaryBlue,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -598,50 +561,44 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
                         text = monthStr,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = JoyOnBackground
+                        color = PrimaryBlueDark
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.wfo_stats_format, stats.wfoDays, stats.effectiveWorkdays, (progress * 100).toInt()),
                         style = MaterialTheme.typography.bodySmall,
-                        color = JoyOnSurfaceVariant
+                        color = Color.Gray
                     )
                 }
             }
 
+            // 状态指示
             if (isGoalReached) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(JoyMint.copy(alpha = 0.3f), JoyMint.copy(alpha = 0.1f))
-                            ),
-                            CircleShape
-                        ),
+                        .size(40.dp)
+                        .background(SuccessGreen.copy(alpha = 0.1f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = JoyMint,
-                        modifier = Modifier.size(26.dp)
+                        tint = SuccessGreen,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             } else {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            Brush.linearGradient(listOf(LeaveYellow, LeaveYellowLight))
-                        )
-                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                        .background(WarningYellow.copy(alpha = 0.1f))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.days_remaining_format, stats.remainingDays),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        color = WarningYellow,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -649,6 +606,7 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
     }
 }
 
+// 缓动函数
 private val EaseInOutSine = CubicBezierEasing(0.37f, 0f, 0.63f, 1f)
 
 @Composable

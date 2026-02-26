@@ -5,10 +5,10 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -57,45 +57,27 @@ fun CalendarScreen(
     }
 
     Scaffold(
-        containerColor = JoyBackground,
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(R.string.calendar_record),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.calendar_record),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = JoyOrange,
+                    containerColor = PrimaryBlue,
                     titleContentColor = Color.White
                 )
             )
@@ -107,16 +89,16 @@ fun CalendarScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            JoyOrange.copy(alpha = 0.08f),
-                            JoyBackground,
-                            JoyCardAccent1.copy(alpha = 0.2f)
+                            PrimaryBlue.copy(alpha = 0.05f),
+                            Color.White
                         )
                     )
                 )
                 .padding(padding)
-                .padding(16.dp)
                 .verticalScroll(rememberScrollState())
+                .padding(16.dp)
         ) {
+            // 月份导航卡片 - 带渐变背景
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(400)) + slideInVertically(
@@ -133,6 +115,7 @@ fun CalendarScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 日历视图 - 带入场动画
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(600)) + slideInVertically(
@@ -145,6 +128,7 @@ fun CalendarScreen(
                     records = uiState.monthRecords,
                     onDateClick = { date ->
                         if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                            // 周六日不允许普通点击
                         } else {
                             selectedDate = date
                         }
@@ -165,6 +149,7 @@ fun CalendarScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 图例说明 - 商务风格卡片
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(800)) + slideInVertically(
@@ -177,6 +162,7 @@ fun CalendarScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 本月统计概览
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(900)) + slideInVertically(
@@ -186,10 +172,9 @@ fun CalendarScreen(
             ) {
                 MonthSummaryCard(uiState = uiState)
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
 
+        // 周末确认对话框
         if (showWeekendConfirm && longPressedDate != null) {
             WeekendConfirmDialog(
                 date = longPressedDate!!,
@@ -204,6 +189,7 @@ fun CalendarScreen(
             )
         }
 
+        // 日期操作对话框
         selectedDate?.let { date ->
             DateActionDialog(
                 date = date,
@@ -266,15 +252,17 @@ private fun MonthNavigationCard(
             .scale(scale)
             .alpha(animatedAlpha)
             .shadow(
-                elevation = 12.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyShadowOrange
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.3f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(
-                Brush.linearGradient(JoyGradientPrimary)
+                Brush.linearGradient(
+                    colors = listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
+                )
             )
-            .padding(24.dp)
+            .padding(20.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -284,8 +272,8 @@ private fun MonthNavigationCard(
             IconButton(
                 onClick = onPreviousMonth,
                 modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.White.copy(alpha = 0.25f), CircleShape)
+                    .size(44.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronLeft,
@@ -302,7 +290,7 @@ private fun MonthNavigationCard(
                         append(stringResource(R.string.year_format, 2024).replace("2024", ""))
                     },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = Color.White.copy(alpha = 0.8f)
                 )
                 Text(
                     text = buildString {
@@ -319,8 +307,8 @@ private fun MonthNavigationCard(
             IconButton(
                 onClick = onNextMonth,
                 modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.White.copy(alpha = 0.25f), CircleShape)
+                    .size(44.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
@@ -340,75 +328,67 @@ private fun LegendCard() {
             .fillMaxWidth()
             .shadow(
                 elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyOrange.copy(alpha = 0.15f)
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
-            .padding(24.dp)
+            .padding(20.dp)
     ) {
         Column {
+            // 标题
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 18.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .background(
-                            Brush.linearGradient(JoyGradientPrimary),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
+                )
                 Text(
                     text = stringResource(R.string.legend_explanation),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
                 )
             }
 
+            // 图例项
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 LegendItem(
                     icon = Icons.Default.Business,
-                    gradientColors = JoyGradientWFO,
+                    color = PrimaryBlue,
                     text = stringResource(R.string.wfo),
                     subtext = stringResource(R.string.company_work)
                 )
                 LegendItem(
                     icon = Icons.Default.HomeWork,
-                    gradientColors = JoyGradientWFH,
+                    color = SuccessGreen,
                     text = stringResource(R.string.wfh),
                     subtext = stringResource(R.string.home_work)
                 )
                 LegendItem(
                     icon = Icons.Default.BeachAccess,
-                    gradientColors = JoyGradientLeave,
+                    color = WarningYellow,
                     text = stringResource(R.string.leave),
                     subtext = stringResource(R.string.enjoy_holiday)
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // 提示文字
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(JoyCardAccent1.copy(alpha = 0.3f))
-                    .padding(14.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(PrimaryBlue.copy(alpha = 0.05f))
+                    .padding(12.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -416,18 +396,17 @@ private fun LegendCard() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        imageVector = Icons.Default.TouchApp,
+                        imageVector = Icons.Default.Info,
                         contentDescription = null,
-                        tint = JoyOrange,
-                        modifier = Modifier.size(18.dp)
+                        tint = PrimaryBlue.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = stringResource(R.string.long_press_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = JoyOrange,
-                        modifier = Modifier.padding(start = 8.dp),
-                        fontWeight = FontWeight.Medium
-                    )
+                    text = stringResource(R.string.long_press_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = PrimaryBlue.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
                 }
             }
         }
@@ -437,7 +416,7 @@ private fun LegendCard() {
 @Composable
 private fun LegendItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    gradientColors: List<Color>,
+    color: Color,
     text: String,
     subtext: String
 ) {
@@ -447,34 +426,34 @@ private fun LegendItem(
     ) {
         Box(
             modifier = Modifier
-                .size(52.dp)
+                .size(48.dp)
                 .shadow(
-                    elevation = 6.dp,
-                    shape = RoundedCornerShape(14.dp),
-                    spotColor = gradientColors.first().copy(alpha = 0.35f)
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    spotColor = color.copy(alpha = 0.4f)
                 )
-                .clip(RoundedCornerShape(14.dp))
-                .background(Brush.linearGradient(gradientColors)),
+                .clip(RoundedCornerShape(12.dp))
+                .background(color.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(26.dp)
+                tint = color,
+                modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = gradientColors.first()
+            fontWeight = FontWeight.SemiBold,
+            color = color
         )
         Text(
             text = subtext,
             style = MaterialTheme.typography.bodySmall,
-            color = JoyOnSurfaceVariant
+            color = Color.Gray
         )
     }
 }
@@ -490,43 +469,34 @@ private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiS
             .fillMaxWidth()
             .shadow(
                 elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyPurple.copy(alpha = 0.15f)
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
-            .padding(24.dp)
+            .padding(20.dp)
     ) {
         Column {
+            // 标题
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 18.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .background(
-                            Brush.linearGradient(listOf(JoyPurple, JoyLavender)),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Summarize,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
+                )
                 Text(
                     text = stringResource(R.string.month_overview),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = PrimaryBlueDark
                 )
             }
 
+            // 统计数据
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -534,25 +504,25 @@ private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiS
                 SummaryStatItem(
                     count = wfoCount,
                     label = "WFO",
-                    gradientColors = JoyGradientWFO,
+                    color = PrimaryBlue,
                     icon = Icons.Default.Business
                 )
                 SummaryStatItem(
                     count = wfhCount,
                     label = "WFH",
-                    gradientColors = JoyGradientWFH,
+                    color = SuccessGreen,
                     icon = Icons.Default.HomeWork
                 )
                 SummaryStatItem(
                     count = leaveCount,
                     label = stringResource(R.string.leave_days_label),
-                    gradientColors = JoyGradientLeave,
+                    color = WarningYellow,
                     icon = Icons.Default.BeachAccess
                 )
                 SummaryStatItem(
                     count = uiState.monthRecords.size,
                     label = stringResource(R.string.total),
-                    gradientColors = listOf(JoyGray500, JoyGray400),
+                    color = Color.Gray,
                     icon = Icons.Default.CalendarMonth
                 )
             }
@@ -564,39 +534,34 @@ private fun MonthSummaryCard(uiState: me.anyang.wfodays.ui.viewmodel.CalendarUiS
 private fun SummaryStatItem(
     count: Int,
     label: String,
-    gradientColors: List<Color>,
+    color: Color,
     icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(44.dp)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(gradientColors.first().copy(alpha = 0.2f), gradientColors.first().copy(alpha = 0.05f))
-                    ),
-                    CircleShape
-                ),
+                .size(40.dp)
+                .background(color.copy(alpha = 0.1f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = gradientColors.first(),
-                modifier = Modifier.size(22.dp)
+                tint = color,
+                modifier = Modifier.size(20.dp)
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = count.toString(),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = gradientColors.first()
+            color = color
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = JoyOnSurfaceVariant
+            color = Color.Gray
         )
     }
 }
@@ -613,18 +578,14 @@ private fun WeekendConfirmDialog(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            Brush.linearGradient(JoyGradientLeave),
-                            CircleShape
-                        ),
+                        .size(40.dp)
+                        .background(WarningYellow.copy(alpha = 0.1f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
+                        tint = WarningYellow
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -632,7 +593,7 @@ private fun WeekendConfirmDialog(
                     text = stringResource(R.string.weekend_confirm_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    color = PrimaryBlueDark
                 )
             }
         },
@@ -651,17 +612,16 @@ private fun WeekendConfirmDialog(
                     },
                     getWeekdayName(date.dayOfWeek)
                 ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnSurface
+                style = MaterialTheme.typography.bodyMedium
             )
         },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = JoyOrange
+                    containerColor = PrimaryBlue
                 ),
-                shape = RoundedCornerShape(14.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(stringResource(R.string.confirm))
             }
@@ -669,16 +629,13 @@ private fun WeekendConfirmDialog(
         dismissButton = {
             OutlinedButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = JoyOnSurfaceVariant
-                )
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(stringResource(R.string.cancel))
             }
         },
         containerColor = Color.White,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(20.dp)
     )
 }
 
@@ -708,60 +665,50 @@ private fun DateActionDialog(
                     },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    color = PrimaryBlueDark
                 )
                 if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 6.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Weekend,
-                            contentDescription = null,
-                            tint = LeaveYellow,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = getWeekdayName(date.dayOfWeek),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = LeaveYellow,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.weekend_hint).removePrefix("* "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = WarningYellow,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
         },
         text = {
             Column {
                 if (record != null) {
-                    val (label, gradientColors, icon) = when (record.workMode) {
-                        WorkMode.WFO -> Triple("WFO", JoyGradientWFO, Icons.Default.Business)
-                        WorkMode.WFH -> Triple("WFH", JoyGradientWFH, Icons.Default.HomeWork)
-                        WorkMode.LEAVE -> Triple(stringResource(R.string.leave_days_label), JoyGradientLeave, Icons.Default.BeachAccess)
-                        else -> Triple(stringResource(R.string.unknown_status), listOf(JoyGray500, JoyGray400), Icons.AutoMirrored.Filled.Help)
+                    val (label, color, icon) = when (record.workMode) {
+                        WorkMode.WFO -> Triple("WFO", PrimaryBlue, Icons.Default.Business)
+                        WorkMode.WFH -> Triple("WFH", SuccessGreen, Icons.Default.HomeWork)
+                        WorkMode.LEAVE -> Triple(stringResource(R.string.leave_days_label), WarningYellow, Icons.Default.BeachAccess)
+                        else -> Triple(stringResource(R.string.unknown_status), Color.Gray, Icons.AutoMirrored.Filled.Help)
                     }
 
+                    // 当前状态卡片
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(Brush.linearGradient(gradientColors))
-                            .padding(20.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color.copy(alpha = 0.1f))
+                            .padding(16.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(52.dp)
-                                    .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(14.dp)),
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(color.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = icon,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = color,
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
@@ -771,13 +718,13 @@ private fun DateActionDialog(
                                 Text(
                                     text = stringResource(R.string.current_status),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color.White.copy(alpha = 0.8f)
+                                    color = Color.Gray
                                 )
                                 Text(
                                     text = label,
-                                    style = MaterialTheme.typography.titleLarge,
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = color
                                 )
                             }
                         }
@@ -785,51 +732,45 @@ private fun DateActionDialog(
 
                     record.note?.let {
                         Spacer(modifier = Modifier.height(12.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notes,
-                                contentDescription = null,
-                                tint = JoyOnSurfaceVariant,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.note_prefix, it),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = JoyOnSurfaceVariant
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.note_prefix, it),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 } else {
+                    // 未记录状态 - 显示选择按钮
                     Text(
                         text = stringResource(R.string.select_status),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = JoyOnSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 14.dp)
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
 
+                    // 使用垂直布局显示三个选项
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // WFO 按钮
                         StatusOptionButton(
                             text = stringResource(R.string.company_work_wfo),
-                            gradientColors = JoyGradientWFO,
+                            color = PrimaryBlue,
                             icon = Icons.Default.Business,
                             onClick = onMarkWFO
                         )
 
+                        // WFH 按钮
                         StatusOptionButton(
                             text = stringResource(R.string.home_work_wfh),
-                            gradientColors = JoyGradientWFH,
+                            color = SuccessGreen,
                             icon = Icons.Default.HomeWork,
                             onClick = onMarkWFH
                         )
 
+                        // 休假按钮
                         StatusOptionButton(
                             text = stringResource(R.string.leave_leave),
-                            gradientColors = JoyGradientLeave,
+                            color = WarningYellow,
                             icon = Icons.Default.BeachAccess,
                             onClick = onMarkLeave
                         )
@@ -842,48 +783,46 @@ private fun DateActionDialog(
                 Button(
                     onClick = onDelete,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = JoyError
+                        containerColor = MaterialTheme.colorScheme.error
                     ),
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(stringResource(R.string.delete_record))
                 }
             } else {
+                // 未记录时不显示确认按钮
                 Box {}
             }
         },
         dismissButton = {
             OutlinedButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = JoyOnSurfaceVariant
-                )
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(stringResource(R.string.cancel))
             }
         },
         containerColor = Color.White,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(20.dp)
     )
 }
 
 @Composable
 private fun StatusOptionButton(
     text: String,
-    gradientColors: List<Color>,
+    color: Color,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
+        targetValue = if (isPressed) 0.98f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "button_scale"
     )
@@ -892,38 +831,72 @@ private fun StatusOptionButton(
         modifier = Modifier
             .fillMaxWidth()
             .scale(scale)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Brush.linearGradient(gradientColors))
+            .clip(RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.1f))
             .clickable {
                 isPressed = true
                 onClick()
             }
-            .padding(14.dp)
+            .padding(12.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(10.dp)),
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(22.dp)
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontWeight = FontWeight.Medium,
+                color = color
             )
         }
+    }
+}
+
+@Composable
+private fun ActionButton(
+    text: String,
+    color: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "button_scale"
+    )
+
+    Button(
+        onClick = {
+            isPressed = true
+            onClick()
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        modifier = Modifier.scale(scale),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.size(4.dp))
+        Text(text)
     }
 }
 

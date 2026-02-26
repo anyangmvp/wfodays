@@ -119,7 +119,8 @@ class AttendanceRepository @Inject constructor(
         val currentMonth = YearMonth.now()
         val statistics = mutableListOf<MonthlyStatistics>()
         
-        for (i in 0..11) {
+        // 显示最近6个月的数据
+        for (i in 0..5) {
             val month = currentMonth.minusMonths(i.toLong())
             statistics.add(getMonthlyStatistics(month))
         }

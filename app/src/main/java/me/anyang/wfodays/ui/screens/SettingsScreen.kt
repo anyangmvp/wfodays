@@ -8,11 +8,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,18 +18,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.HomeWork
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,8 +43,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -53,7 +52,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,24 +64,28 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import me.anyang.wfodays.R
-import me.anyang.wfodays.data.local.PreferencesManager
-import me.anyang.wfodays.location.DailyCheckScheduler
 import me.anyang.wfodays.location.NativeLocationManager
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.components.PermissionGuideCard
 import me.anyang.wfodays.ui.components.SettingsCard
 import me.anyang.wfodays.ui.components.SettingsGroupTitle
-import me.anyang.wfodays.ui.theme.*
+import me.anyang.wfodays.ui.theme.NeutralGray200
+import me.anyang.wfodays.ui.theme.NeutralGray400
+import me.anyang.wfodays.ui.theme.NeutralGray500
+import me.anyang.wfodays.ui.theme.NeutralGray600
+import me.anyang.wfodays.ui.theme.NeutralGray700
+import me.anyang.wfodays.ui.theme.NeutralGray900
+import me.anyang.wfodays.ui.theme.PrimaryBlue
+import me.anyang.wfodays.ui.theme.PrimaryBlueDark
+import me.anyang.wfodays.ui.theme.PrimaryBlueLight
+import me.anyang.wfodays.ui.theme.SuccessGreen
 import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -92,11 +94,6 @@ fun SettingsScreen(
     locationManager: NativeLocationManager
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    val preferencesManager = remember { PreferencesManager(context) }
-    val debugNotificationMode by preferencesManager.debugNotificationMode.collectAsState(initial = false)
-    val debugNotificationInterval by preferencesManager.debugNotificationInterval.collectAsState(initial = 10)
 
     val locationState by locationManager.locationState.collectAsState()
 
@@ -118,6 +115,7 @@ fun SettingsScreen(
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else null
 
+    // Update location display when state changes
     LaunchedEffect(locationState) {
         if (locationState is NativeLocationManager.LocationState.Success) {
             val state = locationState as NativeLocationManager.LocationState.Success
@@ -128,6 +126,7 @@ fun SettingsScreen(
         }
     }
 
+    // Start location updates when permission is granted
     LaunchedEffect(locationPermissionState.status.isGranted) {
         if (locationPermissionState.status.isGranted) {
             locationManager.startLocationUpdates()
@@ -140,45 +139,27 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        containerColor = JoyBackground,
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(R.string.setting),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.setting),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = JoyCoral,
+                    containerColor = PrimaryBlue,
                     titleContentColor = Color.White
                 )
             )
@@ -190,9 +171,8 @@ fun SettingsScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            JoyCoral.copy(alpha = 0.08f),
-                            JoyBackground,
-                            JoyCardAccent1.copy(alpha = 0.2f)
+                            PrimaryBlue.copy(alpha = 0.05f),
+                            Color.White
                         )
                     )
                 )
@@ -200,6 +180,7 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            // 位置测试卡片
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(400)) + slideInVertically(
@@ -223,6 +204,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // 权限设置分组
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(500)) + slideInVertically(
@@ -238,6 +220,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 位置权限
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(600)) + slideInVertically(
@@ -256,6 +239,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 后台位置权限
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 AnimatedVisibility(
                     visible = isVisible,
@@ -277,6 +261,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
+            // 通知权限
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 AnimatedVisibility(
                     visible = isVisible,
@@ -300,6 +285,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // 测试通知分组
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(950)) + slideInVertically(
@@ -315,6 +301,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 测试通知
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(1000)) + slideInVertically(
@@ -329,35 +316,9 @@ fun SettingsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(tween(1050)) + slideInVertically(
-                    initialOffsetY = { 30 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                )
-            ) {
-                DebugNotificationModeCard(
-                    isEnabled = debugNotificationMode,
-                    intervalMinutes = debugNotificationInterval,
-                    onToggle = { enabled ->
-                        coroutineScope.launch {
-                            preferencesManager.setDebugNotificationMode(enabled)
-                            DailyCheckScheduler.scheduleDailyCheck(context)
-                        }
-                    },
-                    onIntervalChange = { minutes ->
-                        coroutineScope.launch {
-                            preferencesManager.setDebugNotificationInterval(minutes)
-                            DailyCheckScheduler.scheduleDailyCheck(context)
-                        }
-                    }
-                )
-            }
-
             Spacer(modifier = Modifier.height(20.dp))
 
+            // 关于分组
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(tween(1050)) + slideInVertically(
@@ -408,16 +369,17 @@ private fun LocationTestCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyOrange.copy(alpha = 0.2f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(22.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
+            // 标题行 - 标题和刷新按钮在同一行
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -429,59 +391,43 @@ private fun LocationTestCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
-                            .shadow(
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(14.dp),
-                                spotColor = JoyOrange.copy(alpha = 0.3f)
-                            )
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                Brush.linearGradient(JoyGradientPrimary)
-                            ),
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(PrimaryBlue.copy(alpha = 0.1f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = PrimaryBlue,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 14.dp),
-                        color = JoyOnBackground
+                        modifier = Modifier.padding(start = 12.dp),
+                        color = PrimaryBlueDark
                     )
                 }
 
+                // 刷新按钮
                 IconButton(
                     onClick = onRefresh,
                     enabled = !isLoading && hasPermission
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                if (isLoading) JoyGray200 else JoyOrange.copy(alpha = 0.1f),
-                                CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.refresh_location_content_desc),
-                            tint = if (isLoading) JoyGray400 else JoyOrange,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.refresh_location_content_desc),
+                        tint = if (isLoading) Color.Gray else PrimaryBlue
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // 内容区域
             LocationTestContentBody(
                 locationState = locationState,
                 currentLat = currentLat,
@@ -513,6 +459,7 @@ private fun LocationTestContentBody(
         if (isLoading) {
             LoadingState()
         } else if (currentLat != 0.0 && currentLon != 0.0) {
+            // 位置信息
             LocationInfo(
                 lat = currentLat,
                 lon = currentLon,
@@ -521,6 +468,7 @@ private fun LocationTestContentBody(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 距离卡片
             DistanceCard(
                 distance = distanceToOffice,
                 isInRange = isInRange
@@ -528,6 +476,7 @@ private fun LocationTestContentBody(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // 目标位置
             TargetLocationInfo()
         } else {
             EmptyLocationState(
@@ -548,15 +497,15 @@ private fun LoadingState() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
-                modifier = Modifier.size(44.dp),
-                color = JoyOrange,
+                modifier = Modifier.size(40.dp),
+                color = PrimaryBlue,
                 strokeWidth = 3.dp
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.getting_location_text),
                 style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnSurfaceVariant
+                color = Color.Gray
             )
         }
     }
@@ -596,13 +545,13 @@ private fun LocationInfoItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = JoyOnSurfaceVariant
+            color = Color.Gray
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
-            color = JoyOnBackground
+            color = PrimaryBlueDark
         )
     }
 }
@@ -612,61 +561,52 @@ private fun DistanceCard(
     distance: Float,
     isInRange: Boolean
 ) {
-    val gradientColors = if (isInRange) JoyGradientWFH else JoyGradientPrimary
+    val cardColor = if (isInRange) SuccessGreen else PrimaryBlue
     val icon = if (isInRange) Icons.Default.Business else Icons.Default.HomeWork
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                Brush.linearGradient(gradientColors.map { it.copy(alpha = 0.15f) })
-            )
-            .padding(18.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(cardColor.copy(alpha = 0.1f))
+            .padding(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(60.dp)
-                    .shadow(
-                        elevation = 6.dp,
-                        shape = RoundedCornerShape(18.dp),
-                        spotColor = gradientColors.first().copy(alpha = 0.35f)
-                    )
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(
-                        Brush.linearGradient(gradientColors)
-                    ),
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(cardColor.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = cardColor,
                     modifier = Modifier.size(32.dp)
                 )
             }
 
             Column(
-                modifier = Modifier.padding(start = 18.dp)
+                modifier = Modifier.padding(start = 16.dp)
             ) {
                 Text(
                     text = stringResource(R.string.distance_to_office, NativeLocationManager.OFFICE_NAME),
                     style = MaterialTheme.typography.bodySmall,
-                    color = JoyOnSurfaceVariant
+                    color = Color.Gray
                 )
                 Text(
                     text = stringResource(R.string.distance_format_string, distance.toInt()),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = gradientColors.first()
+                    color = cardColor
                 )
                 Text(
                     text = if (isInRange) stringResource(R.string.distance_in_range_message) else stringResource(R.string.distance_out_of_range_message),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isInRange) JoyMint else JoyOnSurfaceVariant
+                    color = if (isInRange) SuccessGreen else Color.Gray
                 )
             }
         }
@@ -682,7 +622,7 @@ private fun TargetLocationInfo() {
         Icon(
             imageVector = Icons.Default.Info,
             contentDescription = null,
-            tint = JoyOnSurfaceVariant,
+            tint = Color.Gray,
             modifier = Modifier.size(14.dp)
         )
         Text(
@@ -690,8 +630,8 @@ private fun TargetLocationInfo() {
                 NativeLocationManager.OFFICE_LATITUDE.toString(), 
                 NativeLocationManager.OFFICE_LONGITUDE.toString()),
             style = MaterialTheme.typography.bodySmall,
-            color = JoyOnSurfaceVariant,
-            modifier = Modifier.padding(start = 6.dp)
+            color = Color.Gray,
+            modifier = Modifier.padding(start = 4.dp)
         )
     }
 }
@@ -708,34 +648,24 @@ private fun EmptyLocationState(
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        JoyCardAccent1.copy(alpha = 0.3f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = JoyOrange,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = Color.Gray.copy(alpha = 0.5f),
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (hasPermission) stringResource(R.string.click_to_refresh_location) else stringResource(R.string.need_location_permission),
                 style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnSurfaceVariant
+                color = Color.Gray
             )
             if (!hasPermission) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = onRequestPermission,
-                    colors = ButtonDefaults.buttonColors(containerColor = JoyOrange),
-                    shape = RoundedCornerShape(14.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(stringResource(R.string.grant_location_permission_button))
                 }
@@ -765,7 +695,7 @@ private fun NotificationTestCard(
         Text(
             text = stringResource(R.string.test_notification_desc),
             style = MaterialTheme.typography.bodyMedium,
-            color = JoyOnSurfaceVariant
+            color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -773,8 +703,10 @@ private fun NotificationTestCard(
         OutlinedButton(
             onClick = {
                 isPressed = true
+                // 获取配置好语言的 Context，确保通知显示正确的语言
                 val localizedContext = LanguageManager.getLocalizedContext(context)
 
+                // 根据当前位置判断是在公司还是家里
                 val isInOffice = if (currentLat != 0.0 && currentLon != 0.0) {
                     locationManager.isWithinOfficeRadius(currentLat, currentLon)
                 } else {
@@ -784,9 +716,10 @@ private fun NotificationTestCard(
                 val distance = if (currentLat != 0.0 && currentLon != 0.0) {
                      locationManager.calculateDistanceToOffice(currentLat, currentLon)
                  } else {
-                     100f
+                     100f // 默认距离
                  }
 
+                 // 距离显示逻辑（参考DailyLocationCheckWorker中的实现）
                  val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
                      val roundedDistance = ((distance / 100).toInt()) * 100
                      localizedContext.getString(R.string.distance_format_string, roundedDistance)
@@ -811,10 +744,7 @@ private fun NotificationTestCard(
                  }
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = JoyOrange
-            )
+            shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
@@ -828,222 +758,6 @@ private fun NotificationTestCard(
 }
 
 @Composable
-private fun DebugNotificationModeCard(
-    isEnabled: Boolean,
-    intervalMinutes: Int,
-    onToggle: (Boolean) -> Unit,
-    onIntervalChange: (Int) -> Unit
-) {
-    var intervalInput by remember { mutableStateOf(intervalMinutes.toString()) }
-    var isEditing by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyPurple.copy(alpha = 0.15f)
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color.White)
-    ) {
-        Column(modifier = Modifier.padding(22.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .shadow(
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(14.dp),
-                                spotColor = JoyPurple.copy(alpha = 0.3f)
-                            )
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                Brush.linearGradient(listOf(JoyPurple, JoyLavender))
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.debug_notification_mode),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = JoyOnBackground
-                        )
-                        Text(
-                            text = stringResource(R.string.debug_notification_mode_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = JoyOnSurfaceVariant
-                        )
-                    }
-                }
-                Switch(
-                    checked = isEnabled,
-                    onCheckedChange = onToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = JoyPurple,
-                        checkedTrackColor = JoyPurple.copy(alpha = 0.5f),
-                        uncheckedThumbColor = JoyGray400,
-                        uncheckedTrackColor = JoyGray200
-                    )
-                )
-            }
-
-            AnimatedVisibility(
-                visible = isEnabled,
-                enter = fadeIn(tween(300)) + slideInVertically(
-                    initialOffsetY = { -20 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                ),
-                exit = fadeOut(tween(200))
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(JoyPurple.copy(alpha = 0.06f))
-                            .padding(18.dp)
-                    ) {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.execution_interval),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = JoyOnBackground
-                            )
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                listOf(5, 10, 15, 30).forEach { minutes ->
-                                    val isSelected = intervalMinutes == minutes
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(
-                                                if (isSelected) JoyPurple else Color.White
-                                            )
-                                            .clickable {
-                                                intervalInput = minutes.toString()
-                                                onIntervalChange(minutes)
-                                            }
-                                            .padding(vertical = 12.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.interval_minutes, minutes),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                            color = if (isSelected) Color.White else JoyPurple
-                                        )
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.custom_interval),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = JoyOnSurfaceVariant
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color.White)
-                                        .border(
-                                            width = if (isEditing) 2.dp else 1.dp,
-                                            color = if (isEditing) JoyPurple else JoyGray300,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                                ) {
-                                    BasicTextField(
-                                        value = intervalInput,
-                                        onValueChange = { newValue ->
-                                            val filtered = newValue.filter { it.isDigit() }
-                                            if (filtered.length <= 2) {
-                                                intervalInput = filtered
-                                                filtered.toIntOrNull()?.let { minutes ->
-                                                    if (minutes in 1..60) {
-                                                        onIntervalChange(minutes)
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        singleLine = true,
-                                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                                            color = JoyOnBackground,
-                                            fontWeight = FontWeight.SemiBold,
-                                            textAlign = TextAlign.Center
-                                        ),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        decorationBox = { innerTextField ->
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.Center,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                if (intervalInput.isEmpty()) {
-                                                    Text(
-                                                        text = stringResource(R.string.input_hint),
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        color = JoyGray400
-                                                    )
-                                                }
-                                                innerTextField()
-                                            }
-                                        }
-                                    )
-                                }
-
-                                Text(
-                                    text = stringResource(R.string.minutes_unit),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = JoyOnSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun AboutCard() {
     val context = LocalContext.current
 
@@ -1051,89 +765,99 @@ private fun AboutCard() {
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyMint.copy(alpha = 0.15f)
+                elevation = 4.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = NeutralGray400.copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
     ) {
-        Column(modifier = Modifier.padding(22.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            // 应用信息区域
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // 应用图标容器 - 使用柔和的渐变背景
                 Box(
                     modifier = Modifier
-                        .size(68.dp)
-                        .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(18.dp),
-                            spotColor = JoyMint.copy(alpha = 0.35f)
-                        )
-                        .clip(RoundedCornerShape(18.dp))
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .background(
-                            Brush.linearGradient(listOf(JoyMint, JoyTeal))
-                        ),
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    PrimaryBlue.copy(alpha = 0.1f),
+                                    PrimaryBlueLight.copy(alpha = 0.05f)
+                                )
+                            )
+                        )
+                        .padding(1.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
 
                 Column(
-                    modifier = Modifier.padding(start = 18.dp)
+                    modifier = Modifier.padding(start = 16.dp)
                 ) {
                     Text(
                         text = context.applicationInfo.loadLabel(context.packageManager).toString(),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = JoyOnBackground
+                        color = NeutralGray900
                     )
                     Text(
                         text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = JoyOnSurfaceVariant
+                        color = NeutralGray500
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // 分隔线 - 使用浅灰色
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(JoyGray200)
+                    .background(NeutralGray200)
             )
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // 应用描述
             Text(
                 text = stringResource(R.string.app_description_short),
                 style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnSurfaceVariant,
+                color = NeutralGray600,
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // 信息列表
             Column(
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // 作者信息
                 InfoRow(
                     icon = Icons.Default.Person,
-                    gradientColors = listOf(JoyOrange, JoyCoral),
+                    iconBackgroundColor = SuccessGreen.copy(alpha = 0.1f),
+                    iconTint = SuccessGreen,
                     label = stringResource(R.string.author_label),
                     value = "Stephen An"
                 )
 
+                // 目标位置
                 InfoRow(
                     icon = Icons.Default.LocationOn,
-                    gradientColors = listOf(JoyMint, JoyMintDark),
+                    iconBackgroundColor = PrimaryBlue.copy(alpha = 0.1f),
+                    iconTint = PrimaryBlue,
                     label = stringResource(R.string.target_location_label),
                     value = NativeLocationManager.OFFICE_NAME
                 )
@@ -1145,7 +869,8 @@ private fun AboutCard() {
 @Composable
 private fun InfoRow(
     icon: ImageVector,
-    gradientColors: List<Color>,
+    iconBackgroundColor: Color,
+    iconTint: Color,
     label: String,
     value: String
 ) {
@@ -1153,40 +878,34 @@ private fun InfoRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
+        // 图标容器
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(12.dp),
-                    spotColor = gradientColors.first().copy(alpha = 0.3f)
-                )
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    Brush.linearGradient(gradientColors)
-                ),
+                .size(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(iconBackgroundColor),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
+                tint = iconTint,
+                modifier = Modifier.size(18.dp)
             )
         }
 
         Column(
-            modifier = Modifier.padding(start = 14.dp)
+            modifier = Modifier.padding(start = 12.dp)
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = JoyOnSurfaceVariant
+                color = NeutralGray400
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnBackground,
+                color = NeutralGray700,
                 fontWeight = FontWeight.Medium
             )
         }

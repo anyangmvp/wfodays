@@ -74,15 +74,16 @@ fun CalendarView(
             .scale(scale)
             .alpha(animatedAlpha)
             .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyOrange.copy(alpha = 0.15f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
-            .padding(22.dp)
+            .padding(20.dp)
     ) {
         Column {
+            // 星期标题
             Row(modifier = Modifier.fillMaxWidth()) {
                 val daysOfWeek = listOf(
                     stringResource(R.string.weekday_sun),
@@ -102,24 +103,26 @@ fun CalendarView(
                         Text(
                             text = day,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isWeekend) LeaveYellow else JoyOrange
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isWeekend) WarningYellow else PrimaryBlueDark
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // 分隔线
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(JoyOrange.copy(alpha = 0.15f))
+                    .background(PrimaryBlue.copy(alpha = 0.1f))
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // 日历网格
             val days = generateCalendarDays(yearMonth)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
@@ -161,25 +164,25 @@ private fun CalendarDayCell(
 ) {
     val cellState = when (record?.workMode) {
         WorkMode.WFO -> CellState(
-            gradientColors = JoyGradientPrimary,
+            backgroundColor = PrimaryBlue,
             icon = Icons.Default.Business,
             iconColor = Color.White,
             showBorder = false
         )
         WorkMode.WFH -> CellState(
-            gradientColors = JoyGradientWFH,
+            backgroundColor = SuccessGreen,
             icon = Icons.Default.HomeWork,
             iconColor = Color.White,
             showBorder = false
         )
         WorkMode.LEAVE -> CellState(
-            gradientColors = JoyGradientLeave,
+            backgroundColor = WarningYellow,
             icon = Icons.Default.BeachAccess,
             iconColor = Color.White,
             showBorder = false
         )
         else -> CellState(
-            gradientColors = null,
+            backgroundColor = Color.Transparent,
             icon = null,
             iconColor = Color.Transparent,
             showBorder = isToday
@@ -188,14 +191,14 @@ private fun CalendarDayCell(
 
     val textColor = when {
         record != null -> Color.White
-        isToday -> JoyOrange
-        isWeekend -> LeaveYellow
-        else -> JoyOnBackground
+        isToday -> PrimaryBlue
+        isWeekend -> WarningYellow.copy(alpha = 0.8f)
+        else -> PrimaryBlueDark
     }
 
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.85f else 1f,
+        targetValue = if (isPressed) 0.9f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "day_scale"
     )
@@ -206,32 +209,14 @@ private fun CalendarDayCell(
             .padding(2.dp)
             .scale(scale)
             .clip(CircleShape)
-            .then(
-                if (cellState.gradientColors != null) {
-                    Modifier.background(
-                        Brush.linearGradient(cellState.gradientColors),
-                        CircleShape
-                    )
-                } else {
-                    Modifier.background(Color.Transparent, CircleShape)
-                }
-            )
-            .then(
-                if (cellState.showBorder) {
-                    Modifier.shadow(
-                        elevation = 4.dp,
-                        shape = CircleShape,
-                        spotColor = JoyOrange.copy(alpha = 0.3f)
-                    )
-                } else Modifier
-            )
+            .background(cellState.backgroundColor)
             .then(
                 if (cellState.showBorder) {
                     Modifier.background(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                JoyOrange.copy(alpha = 0.15f),
-                                JoyBackground
+                                PrimaryBlue.copy(alpha = 0.1f),
+                                Color.Transparent
                             )
                         ),
                         shape = CircleShape
@@ -256,6 +241,7 @@ private fun CalendarDayCell(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // 日期数字
             Text(
                 text = date.dayOfMonth.toString(),
                 color = textColor,
@@ -263,6 +249,7 @@ private fun CalendarDayCell(
                 fontWeight = if (isToday || record != null) FontWeight.Bold else FontWeight.Normal
             )
 
+            // 状态图标
             if (cellState.icon != null) {
                 Icon(
                     imageVector = cellState.icon,
@@ -271,26 +258,29 @@ private fun CalendarDayCell(
                     modifier = Modifier.size(14.dp)
                 )
             } else if (isWeekend && !isToday) {
+                // 周末标记点
                 Box(
                     modifier = Modifier
                         .padding(top = 2.dp)
                         .size(4.dp)
-                        .background(LeaveYellow.copy(alpha = 0.6f), CircleShape)
+                        .background(WarningYellow.copy(alpha = 0.5f), CircleShape)
                 )
             } else if (isToday) {
+                // 今天标记点
                 Box(
                     modifier = Modifier
                         .padding(top = 2.dp)
-                        .size(5.dp)
-                        .background(JoyOrange, CircleShape)
+                        .size(4.dp)
+                        .background(PrimaryBlue, CircleShape)
                 )
             }
         }
     }
 }
 
+// 辅助数据类用于日历单元格状态
 private data class CellState(
-    val gradientColors: List<Color>?,
+    val backgroundColor: Color,
     val icon: androidx.compose.ui.graphics.vector.ImageVector?,
     val iconColor: Color,
     val showBorder: Boolean

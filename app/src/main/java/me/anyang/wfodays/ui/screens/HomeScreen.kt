@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
@@ -52,6 +51,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    // 用于触发自动定位成功的卡片动画
     var triggerAutoLocateAnimation by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -59,8 +59,10 @@ fun HomeScreen(
         viewModel.loadData()
     }
 
+    // 监听今日记录变化，如果是自动定位记录的，触发动画（每次进入页面都触发）
     LaunchedEffect(uiState.todayRecord) {
         uiState.todayRecord?.let { record ->
+            // 如果是自动定位记录，触发卡片动画
             if (record.recordType == RecordType.AUTO) {
                 triggerAutoLocateAnimation = true
             }
@@ -68,38 +70,29 @@ fun HomeScreen(
     }
 
     Scaffold(
-        containerColor = JoyBackground,
         topBar = {
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        val infiniteTransition = rememberInfiniteTransition(label = "logo")
-                        val scale by infiniteTransition.animateFloat(
+                        // Logo 动画
+                        val scale by rememberInfiniteTransition(label = "logo").animateFloat(
                             initialValue = 1f,
-                            targetValue = 1.08f,
+                            targetValue = 1.05f,
                             animationSpec = infiniteRepeatable(
                                 animation = tween(2000, easing = EaseInOutSine),
                                 repeatMode = RepeatMode.Reverse
                             ),
                             label = "logo_scale"
                         )
-                        val rotation by infiniteTransition.animateFloat(
-                            initialValue = 0f,
-                            targetValue = 5f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(3000, easing = EaseInOutSine),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "logo_rotation"
-                        )
                         Box(
                             modifier = Modifier
-                                .size(42.dp)
+                                .size(40.dp)
                                 .scale(scale)
-                                .rotate(rotation)
                                 .background(
-                                    Brush.linearGradient(JoyGradientPrimary),
-                                    RoundedCornerShape(14.dp)
+                                    Brush.linearGradient(
+                                        listOf(PrimaryBlue, PrimaryBlueLight)
+                                    ),
+                                    RoundedCornerShape(12.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -115,21 +108,24 @@ fun HomeScreen(
                             text = "WFODays",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = JoyOnBackground
+                            color = Color(0xFF1E293B)
                         )
                     }
                 },
                 actions = {
+                    // 语言切换图标
                     val context = LocalContext.current
                     
                     IconButton(onClick = {
                         LanguageManager.toggleLanguage(context)
+                        // 重启Activity以应用语言更改 - 使用Intent方式避免生命周期异常
                         val activity = context as? android.app.Activity
                         activity?.let {
                             val intent = it.intent
                             intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                             it.finish()
                             it.startActivity(intent)
+                            // 禁用动画使切换更平滑
                             @Suppress("DEPRECATION")
                             it.overridePendingTransition(0, 0)
                         }
@@ -137,15 +133,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Language,
                             contentDescription = "Switch Language",
-                            tint = JoyOrange
-                        )
-                    }
-                    
-                    IconButton(onClick = onNavigateToCalendar) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = stringResource(R.string.title_calendar),
-                            tint = JoyOrange
+                            tint = PrimaryBlue
                         )
                     }
                     
@@ -153,14 +141,14 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ShowChart,
                             contentDescription = stringResource(R.string.statistics),
-                            tint = JoyOrange
+                            tint = PrimaryBlue
                         )
                     }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = stringResource(R.string.settings),
-                            tint = JoyOrange
+                            tint = PrimaryBlue
                         )
                     }
                 },
@@ -168,39 +156,59 @@ fun HomeScreen(
                     containerColor = Color.Transparent
                 )
             )
+        },
+        floatingActionButton = {
+            val scale by rememberInfiniteTransition(label = "fab").animateFloat(
+                initialValue = 1f,
+                targetValue = 1.08f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1500, easing = EaseInOutSine),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "fab_pulse"
+            )
+
+            FloatingActionButton(
+                onClick = onNavigateToCalendar,
+                containerColor = PrimaryBlue,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.scale(scale)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = stringResource(R.string.title_calendar),
+                    tint = Color.White
+                )
+            }
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            JoyBackground,
-                            JoyBackgroundLight,
-                            JoyCardAccent1.copy(alpha = 0.3f)
-                        )
-                    )
-                )
+                .background(BackgroundLight)
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 问候语
             GreetingSection()
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // 今日状态卡片 - 渐变背景
             TodayStatusCard(
                 todayMode = uiState.todayRecord?.workMode,
                 recordType = uiState.todayRecord?.recordType,
                 isAutoLocateSuccess = triggerAutoLocateAnimation,
                 onAnimationEnd = { triggerAutoLocateAnimation = false },
                 onLongPress = {
+                    // 长按根据位置自动检测并记录
                     scope.launch {
                         val success = viewModel.autoDetectAndRecordByLocation()
                         if (success) {
+                            // 长按成功后触发动画
                             triggerAutoLocateAnimation = true
                         }
                     }
@@ -208,27 +216,73 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // 本月目标进度 - 商务卡片
             val stats = uiState.currentMonthStats
             if (stats != null) {
-                MonthlyProgressCard(
-                    stats = stats,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                BusinessInfoCard(
+                    title = stringResource(R.string.monthly_attendance_goal),
+                    icon = Icons.Default.Flag,
+                    delayMillis = 200
+                ) {
+                    val progress = if (stats.requiredDays > 0) {
+                        stats.wfoDays.toFloat() / stats.requiredDays
+                    } else 0f
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    AnimatedProgressBar(
+                        progress = progress,
+                        isSuccess = progress >= 1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        BusinessStatItem(
+                            value = stats.wfoDays,
+                            label = stringResource(R.string.wfo_completed),
+                            icon = Icons.Default.CheckCircle,
+                            delayMillis = 300
+                        )
+                        BusinessStatItem(
+                            value = stats.remainingDays,
+                            label = stringResource(R.string.wfo_needed),
+                            icon = Icons.AutoMirrored.Filled.TrendingUp,
+                            delayMillis = 400
+                        )
+                        BusinessStatItem(
+                            value = stats.remainingWorkdays,
+                            label = stringResource(R.string.remaining_workdays),
+                            icon = Icons.Default.CalendarToday,
+                            delayMillis = 500
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
+            // 快捷操作
             QuickActionsSection(
-                onWFOClick = { viewModel.manualCheckIn() },
-                onWFHClick = { viewModel.markAsWFH() },
-                onLeaveClick = { viewModel.markAsLeave() }
+                onWFOClick = {
+                    viewModel.manualCheckIn()
+                },
+                onWFHClick = {
+                    viewModel.markAsWFH()
+                },
+                onLeaveClick = {
+                    viewModel.markAsLeave()
+                }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
+
 }
 
 @Composable
@@ -240,40 +294,39 @@ private fun TodayStatusCard(
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (backgroundBrush, icon, title, subtitle, accentColor) = when (todayMode) {
-        WorkMode.WFO -> Quintuple(
-            Brush.linearGradient(JoyGradientWFO),
+    val (backgroundBrush, icon, title, subtitle) = when (todayMode) {
+        WorkMode.WFO -> Quad(
+            Brush.linearGradient(listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)),
             Icons.Default.Business,
             stringResource(R.string.today_work),
-            stringResource(R.string.office_wfo),
-            WFOOrange
+            stringResource(R.string.office_wfo)
         )
-        WorkMode.WFH -> Quintuple(
-            Brush.linearGradient(JoyGradientWFH),
+        WorkMode.WFH -> Quad(
+            Brush.linearGradient(listOf(SuccessGreen, SuccessGreen.copy(green = 0.7f))),
             Icons.Default.HomeWork,
             stringResource(R.string.today_work),
-            stringResource(R.string.home_wfh),
-            WFHMint
+            stringResource(R.string.home_wfh)
         )
-        WorkMode.LEAVE -> Quintuple(
-            Brush.linearGradient(JoyGradientLeave),
+        WorkMode.LEAVE -> Quad(
+            Brush.linearGradient(listOf(WarningYellow, WarningYellow.copy(red = 0.9f))),
             Icons.Default.BeachAccess,
             stringResource(R.string.today_leave),
-            stringResource(R.string.enjoy_holiday),
-            LeaveYellow
+            stringResource(R.string.enjoy_holiday)
         )
-        null -> Quintuple(
-            Brush.linearGradient(listOf(JoyGray400, JoyGray300)),
+        null -> Quad(
+            Brush.linearGradient(listOf(Color(0xFF64748B), Color(0xFF94A3B8))),
             Icons.AutoMirrored.Filled.Help,
             stringResource(R.string.today_not_recorded),
-            stringResource(R.string.double_tap_to_auto_locate),
-            JoyGray500
+            stringResource(R.string.double_tap_to_auto_locate)
         )
     }
 
     var isPressed by remember { mutableStateOf(false) }
+
+    // 自动定位成功动画状态
     var playSuccessAnimation by remember { mutableStateOf(false) }
 
+    // 监听自动定位成功信号
     LaunchedEffect(isAutoLocateSuccess) {
         if (isAutoLocateSuccess) {
             playSuccessAnimation = true
@@ -283,22 +336,25 @@ private fun TodayStatusCard(
         }
     }
 
+    // 卡片缩放动画
     val cardScale by animateFloatAsState(
         targetValue = when {
-            playSuccessAnimation -> 1.03f
-            isPressed -> 0.97f
+            playSuccessAnimation -> 1.05f
+            isPressed -> 0.98f
             else -> 1f
         },
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "card_scale"
     )
 
+    // 成功动画的光晕效果
     val glowAlpha by animateFloatAsState(
         targetValue = if (playSuccessAnimation) 0.6f else 0f,
         animationSpec = tween(300, easing = EaseOutQuad),
         label = "glow_alpha"
     )
 
+    // 成功动画的旋转效果
     val rotation by animateFloatAsState(
         targetValue = if (playSuccessAnimation) 360f else 0f,
         animationSpec = tween(800, easing = EaseOutBack),
@@ -309,17 +365,17 @@ private fun TodayStatusCard(
         modifier = modifier
             .scale(cardScale)
             .shadow(
-                elevation = if (playSuccessAnimation) 24.dp else 16.dp,
-                shape = RoundedCornerShape(28.dp),
+                elevation = if (playSuccessAnimation) 24.dp else 12.dp,
+                shape = RoundedCornerShape(24.dp),
                 spotColor = when {
                     playSuccessAnimation -> Color.White.copy(alpha = 0.5f)
-                    todayMode == WorkMode.WFO -> JoyShadowOrange
-                    todayMode == WorkMode.WFH -> JoyShadowMint
-                    todayMode == WorkMode.LEAVE -> JoyShadowYellow
-                    else -> JoyGray400.copy(alpha = 0.2f)
+                    todayMode == WorkMode.WFO -> PrimaryBlue.copy(alpha = 0.4f)
+                    todayMode == WorkMode.WFH -> SuccessGreen.copy(alpha = 0.4f)
+                    todayMode == WorkMode.LEAVE -> WarningYellow.copy(alpha = 0.4f)
+                    else -> Color.Gray.copy(alpha = 0.3f)
                 }
             )
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(24.dp))
             .background(backgroundBrush)
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -328,11 +384,14 @@ private fun TodayStatusCard(
                         tryAwaitRelease()
                         isPressed = false
                     },
-                    onDoubleTap = { onLongPress() }
+                    onDoubleTap = {
+                        onLongPress()
+                    }
                 )
             }
-            .padding(28.dp)
+            .padding(24.dp)
     ) {
+        // 成功动画光晕层
         if (playSuccessAnimation) {
             Box(
                 modifier = Modifier
@@ -349,19 +408,21 @@ private fun TodayStatusCard(
             )
         }
 
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.9f)
                     )
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.headlineMedium,
@@ -370,11 +431,12 @@ private fun TodayStatusCard(
                     )
                 }
 
+                // 图标动画
                 val infiniteScale by rememberInfiniteTransition(label = "icon").animateFloat(
                     initialValue = 1f,
-                    targetValue = 1.15f,
+                    targetValue = 1.1f,
                     animationSpec = infiniteRepeatable(
-                        animation = tween(1800, easing = EaseInOutSine),
+                        animation = tween(1500, easing = EaseInOutSine),
                         repeatMode = RepeatMode.Reverse
                     ),
                     label = "icon_scale"
@@ -382,11 +444,11 @@ private fun TodayStatusCard(
 
                 Box(
                     modifier = Modifier
-                        .size(72.dp)
-                        .scale(if (playSuccessAnimation) 1.3f else infiniteScale)
+                        .size(64.dp)
+                        .scale(if (playSuccessAnimation) 1.2f else infiniteScale)
                         .rotate(if (playSuccessAnimation) rotation else 0f)
                         .background(
-                            Color.White.copy(alpha = if (playSuccessAnimation) 0.4f else 0.25f),
+                            Color.White.copy(alpha = if (playSuccessAnimation) 0.4f else 0.2f),
                             CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -395,13 +457,14 @@ private fun TodayStatusCard(
                         imageVector = if (playSuccessAnimation) Icons.Default.CheckCircle else icon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(36.dp)
                     )
                 }
             }
 
+            // 记录类型标识
             if (todayMode != null && recordType != null) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 RecordTypeBadge(
                     recordType = recordType,
                     workMode = todayMode,
@@ -418,51 +481,55 @@ private fun RecordTypeBadge(
     workMode: WorkMode,
     playAnimation: Boolean = false
 ) {
+    // 根据工作模式和记录类型组合确定徽章背景色
+    // 使用与卡片背景协调的颜色，但有所区分
     val (icon, text, baseBackgroundColor) = when (workMode) {
         WorkMode.WFO -> when (recordType) {
             RecordType.AUTO -> Triple(
                 Icons.Default.LocationOn,
                 stringResource(R.string.auto_located),
-                Color(0xFFC44D20).copy(alpha = 0.6f)
+                Color(0xFF1E3A5F).copy(alpha = 0.55f)  // 深蓝色，与WFO卡片协调
             )
             RecordType.MANUAL -> Triple(
                 Icons.Default.TouchApp,
                 stringResource(R.string.manually_recorded),
-                WFOOrange.copy(alpha = 0.5f)
+                Color(0xFF2563EB).copy(alpha = 0.5f)  // 亮蓝色，与WFO卡片协调
             )
         }
         WorkMode.WFH -> when (recordType) {
             RecordType.AUTO -> Triple(
                 Icons.Default.LocationOn,
                 stringResource(R.string.auto_located),
-                Color(0xFF0D9488).copy(alpha = 0.6f)
+                Color(0xFF059669).copy(alpha = 0.55f)  // 中等绿色，与WFH卡片协调
             )
             RecordType.MANUAL -> Triple(
                 Icons.Default.TouchApp,
                 stringResource(R.string.manually_recorded),
-                WFHMint.copy(alpha = 0.5f)
+                Color(0xFF34D399).copy(alpha = 0.5f)  // 浅绿色，与WFH卡片协调
             )
         }
         WorkMode.LEAVE -> when (recordType) {
             RecordType.AUTO -> Triple(
                 Icons.Default.LocationOn,
                 stringResource(R.string.auto_located),
-                Color(0xFFD97706).copy(alpha = 0.6f)
+                Color(0xFFB45309).copy(alpha = 0.55f)  // 深琥珀色，与LEAVE卡片协调
             )
             RecordType.MANUAL -> Triple(
                 Icons.Default.TouchApp,
                 stringResource(R.string.manually_recorded),
-                LeaveYellow.copy(alpha = 0.5f)
+                Color(0xFFF59E0B).copy(alpha = 0.5f)  // 金黄色，与LEAVE黄色背景协调
             )
         }
     }
 
+    // 动画时的背景色
     val animatedBackgroundColor by animateColorAsState(
         targetValue = if (playAnimation && recordType == RecordType.AUTO) {
+            // 动画时使用更亮的同色系颜色
             when (workMode) {
-                WorkMode.WFO -> JoyCoral.copy(alpha = 0.8f)
-                WorkMode.WFH -> JoyMintLight.copy(alpha = 0.8f)
-                WorkMode.LEAVE -> LeaveYellowLight.copy(alpha = 0.8f)
+                WorkMode.WFO -> Color(0xFF60A5FA).copy(alpha = 0.7f)
+                WorkMode.WFH -> Color(0xFF34D399).copy(alpha = 0.7f)
+                WorkMode.LEAVE -> Color(0xFFFBBF24).copy(alpha = 0.7f)
             }
         } else {
             baseBackgroundColor
@@ -471,6 +538,7 @@ private fun RecordTypeBadge(
         label = "badge_bg_color"
     )
 
+    // 徽章缩放动画
     val badgeScale by animateFloatAsState(
         targetValue = if (playAnimation) 1.1f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -483,31 +551,31 @@ private fun RecordTypeBadge(
             .scale(badgeScale)
             .background(
                 color = animatedBackgroundColor,
-                shape = RoundedCornerShape(14.dp)
+                shape = RoundedCornerShape(12.dp)
             )
-            .padding(horizontal = 14.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Icon(
                 imageVector = if (playAnimation && recordType == RecordType.AUTO) {
-                    Icons.Default.CheckCircle
+                    Icons.Default.CheckCircle  // 动画时显示勾选图标
                 } else {
                     icon
                 },
                 contentDescription = null,
                 tint = Color.White.copy(alpha = 0.95f),
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(14.dp)
             )
             Text(
                 text = if (playAnimation && recordType == RecordType.AUTO) {
-                    stringResource(R.string.location_success)
+                    stringResource(R.string.location_success)  // 动画时显示成功文字
                 } else {
                     text
                 },
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = Color.White.copy(alpha = 0.95f),
                 fontWeight = FontWeight.Medium
             )
@@ -523,6 +591,7 @@ private fun GreetingSection() {
     val timePeriodKey = GreetingHelper.getTimePeriod()
     val timePeriod = GreetingHelper.getLocalizedTimePeriod()
 
+    // 每次重新组合时更新问候语（如果需要）
     LaunchedEffect(Unit) {
         greeting = GreetingHelper.getGreeting(currentLanguage)
     }
@@ -552,11 +621,11 @@ private fun GreetingSection() {
             .scale(scale)
             .alpha(animatedAlpha)
             .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = JoyOrange.copy(alpha = 0.15f)
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
             ),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
@@ -564,17 +633,10 @@ private fun GreetingSection() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            JoyCardAccent1.copy(alpha = 0.3f),
-                            JoyCardAccent4.copy(alpha = 0.2f)
-                        )
-                    )
-                )
-                .padding(18.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 时间段图标
             val timeIcon = when (timePeriodKey) {
                 "morning" -> Icons.Default.WbSunny
                 "noon" -> Icons.Default.BrightnessHigh
@@ -585,32 +647,22 @@ private fun GreetingSection() {
                 else -> Icons.Default.WbSunny
             }
 
-            val iconColor = when (timePeriodKey) {
-                "morning" -> JoyOrange
-                "noon" -> JoyWarning
-                "afternoon" -> JoyCoral
-                "evening" -> JoyPurple
-                "midnight" -> JoyLavender
-                "weekend" -> JoyMint
-                else -> JoyOrange
-            }
-
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(44.dp)
                     .background(
                         Brush.linearGradient(
-                            listOf(iconColor.copy(alpha = 0.2f), iconColor.copy(alpha = 0.1f))
+                            listOf(PrimaryBlue.copy(alpha = 0.2f), PrimaryBlueLight.copy(alpha = 0.1f))
                         ),
-                        RoundedCornerShape(14.dp)
+                        RoundedCornerShape(12.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = timeIcon,
                     contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(26.dp)
+                    tint = PrimaryBlue,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -620,14 +672,14 @@ private fun GreetingSection() {
                 Text(
                     text = timePeriod,
                     style = MaterialTheme.typography.labelMedium,
-                    color = iconColor,
-                    fontWeight = FontWeight.SemiBold
+                    color = PrimaryBlue,
+                    fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = greeting,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = JoyOnBackground,
+                    color = Color(0xFF1E293B),
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -636,14 +688,16 @@ private fun GreetingSection() {
 }
 
 @Composable
-private fun MonthlyProgressCard(
-    stats: me.anyang.wfodays.data.repository.MonthlyStatistics,
-    modifier: Modifier = Modifier
+private fun BusinessInfoCard(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    delayMillis: Int = 0,
+    content: @Composable () -> Unit
 ) {
     var isVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(200)
+        delay(delayMillis.toLong())
         isVisible = true
     }
 
@@ -659,102 +713,51 @@ private fun MonthlyProgressCard(
         label = "card_alpha"
     )
 
-    val progress = if (stats.requiredDays > 0) {
-        stats.wfoDays.toFloat() / stats.requiredDays
-    } else 0f
-    val isSuccess = progress >= 1f
-
     Card(
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxWidth()
             .scale(scale)
-            .alpha(animatedAlpha)
             .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = if (isSuccess) JoySuccess.copy(alpha = 0.25f) else JoyOrange.copy(alpha = 0.2f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
             ),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            if (isSuccess) JoyCardAccent2.copy(alpha = 0.3f) else JoyCardAccent1.copy(alpha = 0.3f),
-                            Color.White
-                        )
-                    )
-                )
-                .padding(24.dp)
+                .padding(20.dp)
+                .alpha(animatedAlpha)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .background(
-                            Brush.linearGradient(
-                                if (isSuccess) JoyGradientSuccess else JoyGradientPrimary
-                            ),
-                            RoundedCornerShape(12.dp)
-                        ),
+                        .size(36.dp)
+                        .background(PrimaryBlue.copy(alpha = 0.1f), RoundedCornerShape(10.dp)),
                     contentAlignment = Alignment.Center
-                    ) {
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Flag,
+                        imageVector = icon,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(14.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = stringResource(R.string.monthly_attendance_goal),
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    color = PrimaryBlueDark
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            AnimatedProgressBar(
-                progress = progress,
-                isSuccess = isSuccess,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatItem(
-                    value = stats.wfoDays,
-                    label = stringResource(R.string.wfo_completed),
-                    icon = Icons.Default.CheckCircle,
-                    color = WFOOrange,
-                    delayMillis = 300
-                )
-                StatItem(
-                    value = stats.remainingDays,
-                    label = stringResource(R.string.wfo_needed),
-                    icon = Icons.AutoMirrored.Filled.TrendingUp,
-                    color = JoyMint,
-                    delayMillis = 400
-                )
-                StatItem(
-                    value = stats.remainingWorkdays,
-                    label = stringResource(R.string.remaining_workdays),
-                    icon = Icons.Default.CalendarToday,
-                    color = JoyPurple,
-                    delayMillis = 500
-                )
-            }
+            content()
         }
     }
 }
@@ -779,72 +782,47 @@ private fun AnimatedProgressBar(
     )
 
     val progressColor = when {
-        isSuccess -> JoySuccess
-        progress >= 0.7f -> JoyMint
-        progress >= 0.4f -> JoyOrange
-        else -> JoyWarning
+        isSuccess -> SuccessGreen
+        progress >= 0.7f -> PrimaryBlue
+        else -> WarningYellow
     }
 
     Column(modifier = modifier) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(14.dp)
-                .background(JoyGray200, RoundedCornerShape(7.dp))
+                .height(12.dp)
+                .background(Color(0xFFE2E8F0), RoundedCornerShape(6.dp))
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress)
-                    .height(14.dp)
+                    .height(12.dp)
                     .background(
                         Brush.horizontalGradient(
                             listOf(progressColor, progressColor.copy(alpha = 0.8f))
                         ),
-                        RoundedCornerShape(7.dp)
+                        RoundedCornerShape(6.dp)
                     )
             )
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "${(animatedProgress * 100).toInt()}%",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = progressColor
-            )
-            if (isSuccess) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Celebration,
-                        contentDescription = null,
-                        tint = JoySuccess,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.goal_reached),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = JoySuccess,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-        }
+        Text(
+            text = "${(animatedProgress * 100).toInt()}%",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = progressColor
+        )
     }
 }
 
 @Composable
-private fun StatItem(
+private fun BusinessStatItem(
     value: Int,
     label: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color,
     delayMillis: Int = 0
 ) {
     var isVisible by remember { mutableStateOf(false) }
@@ -874,34 +852,28 @@ private fun StatItem(
     ) {
         Box(
             modifier = Modifier
-                .size(52.dp)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(color.copy(alpha = 0.15f), color.copy(alpha = 0.05f))
-                    ),
-                    CircleShape
-                ),
+                .size(48.dp)
+                .background(PrimaryBlue.copy(alpha = 0.1f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(26.dp)
+                tint = PrimaryBlue,
+                modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = value.toString(),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = JoyOnBackground
+            color = PrimaryBlueDark
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = JoyOnSurfaceVariant,
-            textAlign = TextAlign.Center
+            color = Color.Gray
         )
     }
 }
@@ -936,26 +908,14 @@ private fun QuickActionsSection(
             .offset(y = offsetY.dp)
             .alpha(animatedAlpha)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Default.FlashOn,
-                contentDescription = null,
-                tint = JoyOrange,
-                modifier = Modifier.size(22.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.quick_record),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = JoyOnBackground
-            )
-        }
+        Text(
+            text = stringResource(R.string.quick_record),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1E293B)
+        )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -964,8 +924,7 @@ private fun QuickActionsSection(
             QuickActionButton(
                 text = "WFO",
                 icon = Icons.Default.Business,
-                gradientColors = JoyGradientWFO,
-                shadowColor = JoyShadowOrange,
+                color = PrimaryBlue,
                 onClick = onWFOClick,
                 modifier = Modifier.weight(1f),
                 delayMillis = 700
@@ -973,8 +932,7 @@ private fun QuickActionsSection(
             QuickActionButton(
                 text = "WFH",
                 icon = Icons.Default.HomeWork,
-                gradientColors = JoyGradientWFH,
-                shadowColor = JoyShadowMint,
+                color = SuccessGreen,
                 onClick = onWFHClick,
                 modifier = Modifier.weight(1f),
                 delayMillis = 800
@@ -982,8 +940,7 @@ private fun QuickActionsSection(
             QuickActionButton(
                 text = stringResource(R.string.leave),
                 icon = Icons.Default.BeachAccess,
-                gradientColors = JoyGradientLeave,
-                shadowColor = JoyShadowYellow,
+                color = WarningYellow,
                 onClick = onLeaveClick,
                 modifier = Modifier.weight(1f),
                 delayMillis = 900
@@ -996,8 +953,7 @@ private fun QuickActionsSection(
 private fun QuickActionButton(
     text: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    gradientColors: List<Color>,
-    shadowColor: Color,
+    color: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     delayMillis: Int = 0
@@ -1013,7 +969,7 @@ private fun QuickActionButton(
 
     val scale by animateFloatAsState(
         targetValue = when {
-            isPressed -> 0.92f
+            isPressed -> 0.95f
             isVisible -> 1f
             else -> 0.8f
         },
@@ -1031,11 +987,6 @@ private fun QuickActionButton(
         modifier = modifier
             .scale(scale)
             .alpha(animatedAlpha)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = shadowColor
-            )
             .clickable {
                 isPressed = true
                 onClick()
@@ -1044,43 +995,102 @@ private fun QuickActionButton(
                     isPressed = false
                 }
             },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = color.copy(alpha = 0.1f)
         )
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(gradientColors))
-                .padding(vertical = 20.dp),
-            contentAlignment = Alignment.Center
+                .padding(vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(color.copy(alpha = 0.2f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = color
+            )
+        }
+    }
+}
+
+@Composable
+private fun SuccessOverlay(onDismiss: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.Center
+    ) {
+        val scale by animateFloatAsState(
+            targetValue = 1f,
+            animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
+            label = "success_scale"
+        )
+
+        Card(
+            modifier = Modifier
+                .scale(scale)
+                .padding(32.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
         ) {
             Column(
+                modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // 成功动画圆圈
+                val infiniteScale by rememberInfiniteTransition(label = "success").animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(600, easing = EaseInOutSine),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "success_pulse"
+                )
+
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            Color.White.copy(alpha = 0.25f),
-                            CircleShape
-                        ),
+                        .size(80.dp)
+                        .scale(infiniteScale)
+                        .background(SuccessGreen.copy(alpha = 0.2f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = icon,
+                        imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(26.dp)
+                        tint = SuccessGreen,
+                        modifier = Modifier.size(48.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(10.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = text,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.record_success),
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color(0xFF1E293B)
                 )
             }
         }
@@ -1088,10 +1098,8 @@ private fun QuickActionButton(
 }
 
 // 辅助数据类
-private data class Quintuple<A, B, C, D, E>(
-    val first: A,
-    val second: B,
-    val third: C,
-    val fourth: D,
-    val fifth: E
-)
+private data class Quad<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+
+// 缓动函数
+private val EaseInOutSine = CubicBezierEasing(0.37f, 0f, 0.63f, 1f)
+private val EaseOutCubic = CubicBezierEasing(0.33f, 1f, 0.68f, 1f)

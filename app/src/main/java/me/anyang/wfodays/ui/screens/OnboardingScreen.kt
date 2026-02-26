@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +51,7 @@ fun OnboardingScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // 权限状态
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
@@ -63,9 +64,11 @@ fun OnboardingScreen(
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else null
 
+    // 动画状态
     var isVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        // 启动每日定时检查（10:30）
         DailyCheckScheduler.scheduleDailyCheck(context)
         delay(100)
         isVisible = true
@@ -77,9 +80,8 @@ fun OnboardingScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        JoyOrange.copy(alpha = 0.08f),
-                        JoyBackground,
-                        JoyCardAccent1.copy(alpha = 0.25f)
+                        PrimaryBlue.copy(alpha = 0.05f),
+                        Color.White
                     )
                 )
             )
@@ -89,6 +91,7 @@ fun OnboardingScreen(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
+        // 欢迎图标 - 带脉冲动画
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(500)) + scaleIn(
@@ -98,7 +101,7 @@ fun OnboardingScreen(
         ) {
             val pulseScale by rememberInfiniteTransition(label = "pulse").animateFloat(
                 initialValue = 1f,
-                targetValue = 1.08f,
+                targetValue = 1.05f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(1500, easing = EaseInOutSine),
                     repeatMode = RepeatMode.Reverse
@@ -106,65 +109,35 @@ fun OnboardingScreen(
                 label = "pulse_scale"
             )
 
-            val rotation by rememberInfiniteTransition(label = "rotation").animateFloat(
-                initialValue = 0f,
-                targetValue = 360f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(20000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart
-                ),
-                label = "rotation_angle"
-            )
-
             Box(
                 modifier = Modifier
-                    .size(130.dp)
-                    .scale(pulseScale),
+                    .size(120.dp)
+                    .scale(pulseScale)
+                    .shadow(
+                        elevation = 16.dp,
+                        shape = CircleShape,
+                        spotColor = PrimaryBlue.copy(alpha = 0.4f)
+                    )
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
+                        ),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .graphicsLayer { rotationZ = rotation }
-                        .background(
-                            Brush.sweepGradient(
-                                colors = listOf(
-                                    JoyOrange.copy(alpha = 0.1f),
-                                    JoyCoral.copy(alpha = 0.2f),
-                                    JoyPeach.copy(alpha = 0.1f),
-                                    JoyOrange.copy(alpha = 0.1f)
-                                )
-                            ),
-                            CircleShape
-                        )
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp),
+                    tint = Color.White
                 )
-                
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .shadow(
-                            elevation = 16.dp,
-                            shape = CircleShape,
-                            spotColor = JoyOrange.copy(alpha = 0.4f)
-                        )
-                        .background(
-                            Brush.linearGradient(JoyGradientPrimary),
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.WbSunny,
-                        contentDescription = null,
-                        modifier = Modifier.size(50.dp),
-                        tint = Color.White
-                    )
-                }
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 欢迎标题
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(600, delayMillis = 200)) + slideInVertically(
@@ -177,15 +150,15 @@ fun OnboardingScreen(
                     text = stringResource(R.string.welcome_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    color = PrimaryBlueDark
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = stringResource(R.string.welcome_subtitle, NativeLocationManager.OFFICE_NAME),
                     style = MaterialTheme.typography.titleMedium,
-                    color = JoyOrange,
+                    color = PrimaryBlue.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
             }
@@ -193,6 +166,7 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 语言选择
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(650, delayMillis = 250)) + slideInVertically(
@@ -205,6 +179,7 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 功能说明卡片
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(700, delayMillis = 300)) + slideInVertically(
@@ -217,6 +192,7 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 权限申请标题
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(800, delayMillis = 400))
@@ -227,32 +203,22 @@ fun OnboardingScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .background(
-                            Brush.linearGradient(listOf(JoyPurple, JoyLavender)),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Security,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.permissions_needed_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp),
-                    color = JoyOnBackground
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
                 )
+                Text(
+                            text = stringResource(R.string.permissions_needed_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 12.dp),
+                            color = PrimaryBlueDark
+                        )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 权限卡片列表
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(900, delayMillis = 500)) + slideInVertically(
@@ -261,6 +227,7 @@ fun OnboardingScreen(
             )
         ) {
             Column {
+                // 位置权限
                 PermissionGuideCard(
                     title = stringResource(R.string.location_permission_title),
                     description = stringResource(R.string.location_permission_desc),
@@ -270,6 +237,7 @@ fun OnboardingScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // 后台位置权限
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     backgroundLocationState?.let { state ->
                         PermissionGuideCard(
@@ -282,6 +250,7 @@ fun OnboardingScreen(
                     }
                 }
 
+                // 通知权限
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     notificationPermissionState?.let { state ->
                         PermissionGuideCard(
@@ -297,6 +266,7 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // 开始按钮
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(1000, delayMillis = 600)) + slideInVertically(
@@ -314,28 +284,28 @@ fun OnboardingScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(58.dp)
+                        .height(56.dp)
                         .shadow(
-                            elevation = 10.dp,
-                            shape = RoundedCornerShape(18.dp),
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(16.dp),
                             spotColor = if (locationPermissionState.status.isGranted) {
-                                JoyOrange.copy(alpha = 0.4f)
-                            } else JoyGray300.copy(alpha = 0.2f)
+                                PrimaryBlue.copy(alpha = 0.4f)
+                            } else Color.Gray.copy(alpha = 0.2f)
                         ),
                     enabled = locationPermissionState.status.isGranted,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = JoyOrange,
-                        disabledContainerColor = JoyGray300
+                        containerColor = PrimaryBlue,
+                        disabledContainerColor = Color.LightGray
                     )
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.RocketLaunch,
                             contentDescription = null,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(24.dp)
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.start_using_button),
                             style = MaterialTheme.typography.titleMedium,
@@ -345,13 +315,13 @@ fun OnboardingScreen(
                 }
 
                 if (!locationPermissionState.status.isGranted) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(LeaveYellow.copy(alpha = 0.15f))
-                            .padding(14.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(WarningYellow.copy(alpha = 0.1f))
+                            .padding(12.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -361,15 +331,14 @@ fun OnboardingScreen(
                             Icon(
                                 imageVector = Icons.Default.Info,
                                 contentDescription = null,
-                                tint = LeaveYellow,
-                                modifier = Modifier.size(18.dp)
+                                tint = WarningYellow,
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.location_permission_required),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = LeaveYellow,
-                                fontWeight = FontWeight.Medium
+                                color = WarningYellow
                             )
                         }
                     }
@@ -387,65 +356,56 @@ private fun FeatureCard() {
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = JoyMint.copy(alpha = 0.2f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
-            .padding(22.dp)
+            .padding(20.dp)
     ) {
         Column {
+            // 标题
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 18.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .background(
-                            Brush.linearGradient(listOf(JoyMint, JoyTeal)),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.main_features_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp),
-                    color = JoyOnBackground
+                        .size(4.dp, 20.dp)
+                        .background(PrimaryBlue, RoundedCornerShape(2.dp))
                 )
+                Text(
+                            text = stringResource(R.string.main_features_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 12.dp),
+                            color = PrimaryBlueDark
+                        )
             }
 
+            // 功能项
             FeatureItem(
                 icon = Icons.Default.LocationOn,
-                gradientColors = JoyGradientPrimary,
+                iconColor = PrimaryBlue,
                 title = stringResource(R.string.auto_detection_title),
                 description = stringResource(R.string.auto_detection_desc, NativeLocationManager.OFFICE_NAME)
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             FeatureItem(
                 icon = Icons.Default.EditCalendar,
-                gradientColors = JoyGradientWFH,
+                iconColor = SuccessGreen,
                 title = stringResource(R.string.manual_recording_title),
                 description = stringResource(R.string.manual_recording_desc)
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             FeatureItem(
                 icon = Icons.Default.Notifications,
-                gradientColors = JoyGradientLeave,
+                iconColor = WarningYellow,
                 title = stringResource(R.string.daily_reminder_title),
                 description = stringResource(R.string.daily_reminder_desc)
             )
@@ -456,7 +416,7 @@ private fun FeatureCard() {
 @Composable
 private fun FeatureItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    gradientColors: List<Color>,
+    iconColor: Color,
     title: String,
     description: String
 ) {
@@ -466,23 +426,20 @@ private fun FeatureItem(
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(44.dp)
                 .shadow(
-                    elevation = 6.dp,
-                    shape = RoundedCornerShape(14.dp),
-                    spotColor = gradientColors.first().copy(alpha = 0.35f)
+                    elevation = 4.dp,
+                    shape = CircleShape,
+                    spotColor = iconColor.copy(alpha = 0.3f)
                 )
-                .background(
-                    Brush.linearGradient(gradientColors),
-                    RoundedCornerShape(14.dp)
-                ),
+                .background(iconColor.copy(alpha = 0.15f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(26.dp)
+                tint = iconColor,
+                modifier = Modifier.size(24.dp)
             )
         }
 
@@ -492,73 +449,72 @@ private fun FeatureItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = JoyOnBackground
+                fontWeight = FontWeight.SemiBold,
+                color = PrimaryBlueDark
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = JoyOnSurfaceVariant
+                color = Color.Gray
             )
         }
     }
 }
 
+/**
+ * 语言选择卡片组件
+ * 允许用户在引导页面选择应用语言
+ */
 @Composable
 private fun LanguageSelectorCard() {
     val context = LocalContext.current
     val activity = context as? android.app.Activity
     
+    // 使用 remember 保存当前语言状态，从 SharedPreferences 读取
     var currentLanguage by remember { 
         mutableStateOf(LanguageManager.getCurrentLanguage(context)) 
     }
 
-    Box(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = JoyPurple.copy(alpha = 0.15f)
-            )
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
-            .padding(18.dp)
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.2f)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // 标题
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 14.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            Brush.linearGradient(listOf(JoyPurple, JoyLavender)),
-                            RoundedCornerShape(10.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Language,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(10.dp))
+                Icon(
+                    imageVector = Icons.Default.Language,
+                    contentDescription = null,
+                    tint = PrimaryBlue,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.language_setting_title),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = JoyOnBackground
+                    fontWeight = FontWeight.SemiBold,
+                    color = PrimaryBlueDark
                 )
             }
 
+            // 语言选项
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // 中文选项
                 LanguageOptionButton(
                     languageCode = LanguageManager.LANG_ZH,
                     displayName = stringResource(R.string.chinese_language),
@@ -566,8 +522,11 @@ private fun LanguageSelectorCard() {
                     modifier = Modifier.weight(1f),
                     onClick = {
                         if (currentLanguage != LanguageManager.LANG_ZH) {
+                            // 先保存语言设置
                             LanguageManager.setLanguage(context, LanguageManager.LANG_ZH)
+                            // 更新本地状态
                             currentLanguage = LanguageManager.LANG_ZH
+                            // 重启 Activity 应用更改
                             activity?.let {
                                 LanguageManager.restartActivitySafely(it)
                             }
@@ -575,6 +534,7 @@ private fun LanguageSelectorCard() {
                     }
                 )
 
+                // 英文选项
                 LanguageOptionButton(
                     languageCode = LanguageManager.LANG_EN,
                     displayName = "English",
@@ -582,8 +542,11 @@ private fun LanguageSelectorCard() {
                     modifier = Modifier.weight(1f),
                     onClick = {
                         if (currentLanguage != LanguageManager.LANG_EN) {
+                            // 先保存语言设置
                             LanguageManager.setLanguage(context, LanguageManager.LANG_EN)
+                            // 更新本地状态
                             currentLanguage = LanguageManager.LANG_EN
+                            // 重启 Activity 应用更改
                             activity?.let {
                                 LanguageManager.restartActivitySafely(it)
                             }
@@ -595,6 +558,9 @@ private fun LanguageSelectorCard() {
     }
 }
 
+/**
+ * 语言选项按钮
+ */
 @Composable
 private fun LanguageOptionButton(
     languageCode: String,
@@ -603,43 +569,27 @@ private fun LanguageOptionButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val gradientColors = if (isSelected) listOf(JoyPurple, JoyLavender) else listOf(JoyGray100, JoyGray50)
-    val textColor = if (isSelected) Color.White else JoyOnBackground
+    val backgroundColor = if (isSelected) PrimaryBlue else PrimaryBlue.copy(alpha = 0.1f)
+    val textColor = if (isSelected) Color.White else PrimaryBlueDark
 
     Button(
         onClick = onClick,
-        modifier = modifier
-            .height(44.dp)
-            .then(
-                if (isSelected) {
-                    Modifier.shadow(
-                        elevation = 6.dp,
-                        shape = RoundedCornerShape(12.dp),
-                        spotColor = JoyPurple.copy(alpha = 0.35f)
-                    )
-                } else Modifier
-            ),
+        modifier = modifier.height(40.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
+            containerColor = backgroundColor,
             contentColor = textColor
         ),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.linearGradient(gradientColors),
-                    RoundedCornerShape(12.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = displayName,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-            )
+        elevation = if (isSelected) {
+            ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+        } else {
+            ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
         }
+    ) {
+        Text(
+            text = displayName,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+        )
     }
 }
