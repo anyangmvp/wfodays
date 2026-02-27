@@ -266,7 +266,7 @@
     <string name="remaining_days_label">还需天数</string>
     <string name="completed">已完成</string>
     <string name="status">状态</string>
-    <string name="congrats_goal_reached">恭喜！本月已满足 60%% WFO 要求</string>
+    <string name="congrats_goal_reached">恭喜！本月已满足 60% WFO</string>
     <string name="no_history_data">暂无历史数据</string>
     
 

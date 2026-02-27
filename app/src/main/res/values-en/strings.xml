@@ -262,7 +262,7 @@
     <string name="remaining_days_label">Remaining</string>
     <string name="completed">Completed</string>
     <string name="status">Status</string>
-    <string name="congrats_goal_reached">Congratulations! You\'ve met the 60%% WFO requirement this month</string>
+    <string name="congrats_goal_reached">Congratulations!\nYou\'ve met the 60% WFO</string>
     <string name="no_history_data">No historical data</string>
     
     <!-- Weekdays -->
