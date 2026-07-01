@@ -108,6 +108,8 @@
     <!-- Permission Guide -->
     <string name="grant_permission_button">授权</string>
     <string name="permission_granted">已授权</string>
+    <string name="open_settings_button">去设置</string>
+    <string name="background_location_settings_hint">已选择"使用时允许"？点击"去设置"改为"始终允许"</string>
     <string name="go_to_settings_button">去设置</string>
     <string name="auto_start_permission_title">自启动权限</string>
     <string name="auto_start_permission_desc">您的设备是 %1$s，建议开启自启动权限，确保App重启后自动恢复地理围栏监听</string>

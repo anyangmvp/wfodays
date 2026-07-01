@@ -1,7 +1,10 @@
 package me.anyang.wfodays.ui.screens
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings as AndroidSettings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -74,6 +77,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
@@ -105,6 +109,15 @@ fun SettingsScreen(
     preferencesManager: PreferencesManager
 ) {
     val context = LocalContext.current
+
+    // 跳转到系统应用详情页，用于权限被永久拒绝时引导用户手动开启
+    val openAppSettings = {
+        val intent = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }
 
     val locationState by locationManager.locationState.collectAsState()
 
@@ -272,7 +285,9 @@ fun SettingsScreen(
                     title = stringResource(R.string.location_permission_title),
                     description = stringResource(R.string.location_permission_desc),
                     isGranted = locationPermissionState.status.isGranted,
+                    shouldShowRationale = (locationPermissionState.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
                     onRequest = { locationPermissionState.launchPermissionRequest() },
+                    onOpenSettings = openAppSettings,
                     icon = Icons.Default.LocationOn
                 )
             }
@@ -293,7 +308,9 @@ fun SettingsScreen(
                             title = stringResource(R.string.background_location_permission_title),
                             description = stringResource(R.string.background_location_permission_desc),
                             isGranted = state.status.isGranted,
+                            shouldShowRationale = (state.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
                             onRequest = { state.launchPermissionRequest() },
+                            onOpenSettings = openAppSettings,
                             icon = Icons.Default.LocationOn
                         )
                     }
@@ -315,7 +332,9 @@ fun SettingsScreen(
                             title = stringResource(R.string.notification_permission_title),
                             description = stringResource(R.string.notification_permission_desc),
                             isGranted = state.status.isGranted,
+                            shouldShowRationale = (state.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
                             onRequest = { state.launchPermissionRequest() },
+                            onOpenSettings = openAppSettings,
                             icon = Icons.Default.Notifications
                         )
                     }
@@ -1000,12 +1019,24 @@ private fun AboutCard() {
                         text = context.applicationInfo.loadLabel(context.packageManager).toString(),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = NeutralGray900
+                        color = NeutralGray900,
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/anyangmvp/wfodays")).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                        }
                     )
                     Text(
                         text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = NeutralGray500
+                        color = NeutralGray500,
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/anyangmvp/wfodays/releases")).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                        }
                     )
                 }
             }

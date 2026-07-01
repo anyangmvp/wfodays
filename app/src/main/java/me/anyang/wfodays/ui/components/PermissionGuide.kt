@@ -24,6 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,17 +45,35 @@ import me.anyang.wfodays.ui.theme.PrimaryBlueDark
 import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 import me.anyang.wfodays.ui.theme.SuccessGreen
 
+/**
+ * 权限引导卡片
+ *
+ * 智能切换按钮行为：
+ * - 第一次点击或系统还会弹窗时（shouldShowRationale=true）→ 调用 onRequest 请求权限
+ * - 已请求过但系统不再弹窗（shouldShowRationale=false）→ 调用 onOpenSettings 跳转系统设置
+ */
 @Composable
 fun PermissionGuideCard(
     title: String,
     description: String,
     isGranted: Boolean,
     onRequest: () -> Unit,
+    onOpenSettings: () -> Unit,
+    shouldShowRationale: Boolean = false,
     icon: ImageVector = Icons.Default.LocationOn,
     modifier: Modifier = Modifier
 ) {
+    // 记录是否已经请求过权限，用于区分"第一次请求"和"被永久拒绝"
+    var hasRequested by rememberSaveable { mutableStateOf(false) }
+
+    // 判断系统是否还会弹出权限选择框
+    // - 未请求过 → true（第一次会弹窗）
+    // - 已请求过 + shouldShowRationale=true → true（系统还会弹窗）
+    // - 已请求过 + shouldShowRationale=false → false（系统不再弹窗，需跳转设置）
+    val willSystemShowDialog = !hasRequested || shouldShowRationale
+
     val iconColor = if (isGranted) SuccessGreen else PrimaryBlue
-    val backgroundColor = if (isGranted) 
+    val backgroundColor = if (isGranted)
         SuccessGreen.copy(alpha = 0.05f) else PrimaryBlue.copy(alpha = 0.05f)
 
     Box(
@@ -110,12 +132,22 @@ fun PermissionGuideCard(
 
                 if (!isGranted) {
                     Button(
-                        onClick = onRequest,
+                        onClick = {
+                            if (willSystemShowDialog) {
+                                hasRequested = true
+                                onRequest()
+                            } else {
+                                onOpenSettings()
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.grant_permission_button),
+                            text = stringResource(
+                                if (willSystemShowDialog) R.string.grant_permission_button
+                                else R.string.open_settings_button
+                            ),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }

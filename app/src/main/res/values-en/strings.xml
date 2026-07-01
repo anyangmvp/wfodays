@@ -108,6 +108,8 @@
     <!-- Permission Guide -->
     <string name="grant_permission_button">Grant</string>
     <string name="permission_granted">Granted</string>
+    <string name="open_settings_button">Open Settings</string>
+    <string name="background_location_settings_hint">Selected "While in use"? Tap "Open Settings" and switch to "Allow all the time"</string>
     <string name="go_to_settings_button">Go to Settings</string>
     <string name="auto_start_permission_title">Auto Start Permission</string>
     <string name="auto_start_permission_desc">Your device is %1$s, it\'s recommended to enable auto start permission to ensure geofence monitoring resumes after app restart</string>

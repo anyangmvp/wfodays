@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
@@ -38,7 +39,10 @@ import me.anyang.wfodays.ui.components.PermissionGuideCard
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.utils.LanguageManager
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings as AndroidSettings
 import androidx.compose.ui.res.stringResource
 import me.anyang.wfodays.R
 
@@ -50,6 +54,15 @@ fun OnboardingScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // 跳转到系统应用详情页，用于权限被永久拒绝时引导用户手动开启
+    val openAppSettings = {
+        val intent = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }
 
     // 权限状态
     val locationPermissionState = rememberPermissionState(
@@ -232,7 +245,9 @@ fun OnboardingScreen(
                     title = stringResource(R.string.location_permission_title),
                     description = stringResource(R.string.location_permission_desc),
                     isGranted = locationPermissionState.status.isGranted,
-                    onRequest = { locationPermissionState.launchPermissionRequest() }
+                    shouldShowRationale = (locationPermissionState.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
+                    onRequest = { locationPermissionState.launchPermissionRequest() },
+                    onOpenSettings = openAppSettings
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -244,7 +259,9 @@ fun OnboardingScreen(
                             title = stringResource(R.string.background_location_permission_title),
                             description = stringResource(R.string.background_location_permission_desc),
                             isGranted = state.status.isGranted,
-                            onRequest = { state.launchPermissionRequest() }
+                            shouldShowRationale = (state.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
+                            onRequest = { state.launchPermissionRequest() },
+                            onOpenSettings = openAppSettings
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                     }
@@ -257,7 +274,9 @@ fun OnboardingScreen(
                             title = stringResource(R.string.notification_permission_title),
                             description = stringResource(R.string.notification_permission_desc),
                             isGranted = state.status.isGranted,
-                            onRequest = { state.launchPermissionRequest() }
+                            shouldShowRationale = (state.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false,
+                            onRequest = { state.launchPermissionRequest() },
+                            onOpenSettings = openAppSettings
                         )
                     }
                 }
