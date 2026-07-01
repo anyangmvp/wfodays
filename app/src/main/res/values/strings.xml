@@ -40,7 +40,7 @@
     <string name="monthly_progress">本月出勤进度</string>
     <string name="progress_format">%1$d / %2$d 天 (%3$d%%)</string>
     <string name="required_days_remaining">还需去公司 %1$d 天即可达标 (已扣除%2$d天休假)</string>
-    <string name="goal_reached">🎉 恭喜！本月已满足60%% WFO要求</string>
+    <string name="goal_reached">🎉 恭喜！本月已满足%1$d%% WFO要求</string>
     <string name="recent_records">最近记录</string>
     <string name="no_records">暂无记录</string>
     
@@ -55,7 +55,7 @@
     <string name="wfh_days">WFH天数</string>
     <string name="required_days">需WFO天数</string>
     <string name="remaining_days">还需WFO</string>
-    <string name="calculation_formula">计算公式: (总工作日 %1$d - 休假 %2$d) × 60%% = 需WFO %3$d 天</string>
+    <string name="calculation_formula">计算公式: (总工作日 %1$d - 休假 %2$d) × %4$d%% = 需WFO %3$d 天</string>
     <string name="days_remaining_format">还需%d天</string>
     
     <!-- Calendar -->
@@ -108,6 +108,8 @@
     <!-- Permission Guide -->
     <string name="grant_permission_button">授权</string>
     <string name="permission_granted">已授权</string>
+    <string name="open_settings_button">去设置</string>
+    <string name="background_location_settings_hint">已选择"使用时允许"？点击"去设置"改为"始终允许"</string>
     <string name="go_to_settings_button">去设置</string>
     <string name="auto_start_permission_title">自启动权限</string>
     <string name="auto_start_permission_desc">您的设备是 %1$s，建议开启自启动权限，确保App重启后自动恢复地理围栏监听</string>
@@ -262,11 +264,11 @@
     <!-- Statistics Screen -->
     <string name="attendance_statistics">出勤统计</string>
     <string name="monthly_wfo_statistics">本月 WFO 统计</string>
-    <string name="goal_formula">目标: (总工作日 %1$d - 休假 %2$d) × 60%% = 需WFO %3$d 天</string>
+    <string name="goal_formula">目标: (总工作日 %1$d - 休假 %2$d) × %4$d%% = 需WFO %3$d 天</string>
     <string name="remaining_days_label">还需天数</string>
     <string name="completed">已完成</string>
     <string name="status">状态</string>
-    <string name="congrats_goal_reached">恭喜！本月已满足 60% WFO</string>
+    <string name="congrats_goal_reached">恭喜！本月已满足 %1$d%% WFO</string>
     <string name="no_history_data">暂无历史数据</string>
     
 
@@ -338,4 +340,14 @@
     <string name="custom_interval">自定义</string>
     <string name="input_hint">输入</string>
     <string name="minutes_unit">分钟</string>
+
+    <!-- Attendance Rate Setting -->
+    <string name="attendance_setting_group_title">出勤设置</string>
+    <string name="attendance_rate_setting_title">WFO 出勤率</string>
+    <string name="attendance_rate_setting_desc">设置每月 WFO 目标百分比</string>
+    <string name="attendance_rate_current_value">当前: %1$d%%</string>
+    <string name="attendance_rate_dialog_title">设置 WFO 出勤率</string>
+    <string name="attendance_rate_dialog_message">输入出勤率百分比 (1-100)，默认为 60</string>
+    <string name="attendance_rate_invalid_input">请输入 1-100 之间的有效整数</string>
+    <string name="attendance_rate_percent_format">%d%%</string>
 </resources>

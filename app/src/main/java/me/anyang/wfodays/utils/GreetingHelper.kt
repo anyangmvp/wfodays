@@ -24,7 +24,8 @@ object GreetingHelper {
         "早上好！保持微笑面对挑战",
         "新的一天，愿你能量满满",
         "早安！今天也要全力以赴",
-        "美好的一天从早安开始"
+        "美好的一天从早安开始",
+        "开始向200万进发！加油！"
     )
 
     // 中午问候语 (12:00 - 13:59)
@@ -38,7 +39,8 @@ object GreetingHelper {
         "午安！愿你下午工作顺利",
         "午餐愉快！保持好心情",
         "中午好！休息是为了更好的出发",
-        "午间时光，享受片刻宁静"
+        "午间时光，享受片刻宁静",
+        "吃饱喝足，向200万再进一步！"
     )
 
     // 下午问候语 (14:00 - 17:59)
@@ -52,7 +54,8 @@ object GreetingHelper {
         "下午好！离下班又近了一步",
         "保持节奏，下午也要精彩",
         "下午好！愿你事事顺心",
-        "午后时光，不负韶华"
+        "午后时光，不负韶华",
+        "每一份努力都是通往200万的阶梯"
     )
 
     // 晚上问候语 (18:00 - 23:59)
@@ -66,7 +69,8 @@ object GreetingHelper {
         "晚上好！明天又是新的一天",
         "夜色温柔，愿你心情愉快",
         "晚上好！感谢今天的努力",
-        "夜幕降临，愿你安然入梦"
+        "夜幕降临，愿你安然入梦",
+        "今日的辛勤是明日200万的种子"
     )
 
     // 凌晨问候语 (00:00 - 5:59)
@@ -80,7 +84,8 @@ object GreetingHelper {
         "深夜工作也要注意身体",
         "凌晨问候，愿你不负时光",
         "夜深人静，愿你心境平和",
-        "凌晨时分，注意休息"
+        "凌晨时分，注意休息",
+        "夜深了，200万明天再战"
     )
 
     // 周末问候语
@@ -94,7 +99,8 @@ object GreetingHelper {
         "周末快乐！享受生活的美好",
         "周末时光，愿你充电满满",
         "周末愉快！愿你笑口常开",
-        "周末到了，愿你不负好时光"
+        "周末到了，愿你不负好时光",
+        "休息之余，离200万又近一步！"
     )
 
     // English Morning Greetings (6:00 - 11:59)
@@ -108,7 +114,8 @@ object GreetingHelper {
         "Rise and grind! Success awaits.",
         "Morning! Today is full of possibilities.",
         "Good morning! Stay positive and focused.",
-        "A fresh morning brings fresh chances."
+        "A fresh morning brings fresh chances.",
+        "One step closer to 2 million today!"
     )
 
     // English Noon Greetings (12:00 - 13:59)
@@ -122,7 +129,8 @@ object GreetingHelper {
         "Take a breath. You're doing great.",
         "Lunch break! Fuel up for later.",
         "Midday moment. Reflect and continue.",
-        "Good afternoon! Keep the momentum."
+        "Good afternoon! Keep the momentum.",
+        "Refuel and chase that 2 million."
     )
 
     // English Afternoon Greetings (14:00 - 17:59)
@@ -136,7 +144,8 @@ object GreetingHelper {
         "The day's not over. Keep shining.",
         "Afternoon energy! Let's get things done.",
         "Stay focused. Success is near.",
-        "Good afternoon! Make every minute count."
+        "Good afternoon! Make every minute count.",
+        "Every effort leads to 2 million."
     )
 
     // English Evening Greetings (18:00 - 23:59)
@@ -150,7 +159,8 @@ object GreetingHelper {
         "Evening! Time for yourself now.",
         "Good evening! Reflect on today's wins.",
         "Relax and enjoy. Tomorrow's a new day.",
-        "Evening! Peaceful moments ahead."
+        "Evening! Peaceful moments ahead.",
+        "Today's work seeds tomorrow's 2 million."
     )
 
     // English Night Greetings (00:00 - 5:59)
@@ -164,7 +174,8 @@ object GreetingHelper {
         "Rest well. You deserve it.",
         "Night time. Let go of today's stress.",
         "Sleep tight. See you tomorrow.",
-        "Late hours. Prioritize your rest."
+        "Late hours. Prioritize your rest.",
+        "2 million can wait. Rest up."
     )
 
     // English Weekend Greetings
@@ -178,7 +189,8 @@ object GreetingHelper {
         "Weekend! Time for fun and rest.",
         "It's the weekend. Live in the moment.",
         "Happy weekend! Create great memories.",
-        "Weekend joy! Embrace the freedom."
+        "Weekend joy! Embrace the freedom.",
+        "Rest and edge closer to 2 million!"
     )
 
     /**

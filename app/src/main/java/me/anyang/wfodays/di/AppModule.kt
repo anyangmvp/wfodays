@@ -36,9 +36,10 @@ object AppModule {
     @Singleton
     fun provideAttendanceRepository(
         attendanceDao: AttendanceDao,
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        preferencesManager: PreferencesManager
     ): AttendanceRepository {
-        return AttendanceRepository(attendanceDao, context)
+        return AttendanceRepository(attendanceDao, context, preferencesManager)
     }
 
     @Provides

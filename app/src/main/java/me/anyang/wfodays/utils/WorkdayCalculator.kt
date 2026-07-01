@@ -77,7 +77,7 @@ object WorkdayCalculator {
         return count
     }
     
-    fun calculateRequiredDays(yearMonth: YearMonth, rate: Double = 0.6): Int {
+    fun calculateRequiredDays(yearMonth: YearMonth, rate: Double = me.anyang.wfodays.utils.Constants.DEFAULT_REQUIRED_ATTENDANCE_RATE): Int {
         val totalWorkdays = calculateWorkdays(yearMonth)
         return kotlin.math.ceil(totalWorkdays * rate).toInt()
     }

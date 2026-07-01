@@ -19,38 +19,51 @@ class PreferencesManager(private val context: Context) {
         val IS_WFO_MODE = booleanPreferencesKey("is_wfo_mode")
         val DEBUG_NOTIFICATION_MODE = booleanPreferencesKey("debug_notification_mode")
         val DEBUG_NOTIFICATION_INTERVAL = intPreferencesKey("debug_notification_interval")
+        val REQUIRED_ATTENDANCE_RATE_PERCENT = intPreferencesKey("required_attendance_rate_percent")
     }
-    
+
     val isFirstLaunch: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[IS_FIRST_LAUNCH] ?: true
         }
-    
+
     val debugNotificationMode: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[DEBUG_NOTIFICATION_MODE] ?: false
         }
-    
+
     val debugNotificationInterval: Flow<Int> = context.dataStore.data
         .map { preferences ->
             preferences[DEBUG_NOTIFICATION_INTERVAL] ?: 10  // 默认10分钟
         }
-    
+
+    val requiredAttendanceRatePercent: Flow<Int> = context.dataStore.data
+        .map { preferences ->
+            preferences[REQUIRED_ATTENDANCE_RATE_PERCENT] ?: me.anyang.wfodays.utils.Constants.DEFAULT_REQUIRED_ATTENDANCE_RATE_PERCENT
+        }
+
     suspend fun setFirstLaunchComplete() {
         context.dataStore.edit { preferences ->
             preferences[IS_FIRST_LAUNCH] = false
         }
     }
-    
+
     suspend fun setDebugNotificationMode(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[DEBUG_NOTIFICATION_MODE] = enabled
         }
     }
-    
+
     suspend fun setDebugNotificationInterval(minutes: Int) {
         context.dataStore.edit { preferences ->
             preferences[DEBUG_NOTIFICATION_INTERVAL] = minutes
+        }
+    }
+
+    suspend fun setRequiredAttendanceRatePercent(percent: Int) {
+        val clamped = percent.coerceIn(1, 100)
+        context.dataStore.edit { preferences ->
+            preferences[REQUIRED_ATTENDANCE_RATE_PERCENT] = clamped
         }
     }
 }

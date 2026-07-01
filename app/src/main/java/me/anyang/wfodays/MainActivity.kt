@@ -108,7 +108,8 @@ fun WFOApp(
         composable("settings") {
             SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
-                locationManager = locationManager
+                locationManager = locationManager,
+                preferencesManager = preferencesManager
             )
         }
     }
