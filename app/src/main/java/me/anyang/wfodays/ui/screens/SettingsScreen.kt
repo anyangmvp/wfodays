@@ -811,7 +811,7 @@ private fun AboutCard() {
                         color = NeutralGray900
                     )
                     Text(
-                        text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName),
+                        text = stringResource(R.string.version_info, context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""),
                         style = MaterialTheme.typography.bodyMedium,
                         color = NeutralGray500
                     )
