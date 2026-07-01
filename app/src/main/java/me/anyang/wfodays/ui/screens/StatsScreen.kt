@@ -284,7 +284,8 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                     R.string.goal_formula,
                     stats.totalWorkdays,
                     stats.leaveDays,
-                    stats.requiredDays
+                    stats.requiredDays,
+                    stats.requiredRatePercent
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
@@ -381,7 +382,7 @@ private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
                             tint = Color.White
                         )
                         Text(
-                            text = stringResource(R.string.congrats_goal_reached),
+                            text = stringResource(R.string.congrats_goal_reached, stats.requiredRatePercent),
                             modifier = Modifier.padding(start = 8.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,

@@ -40,7 +40,7 @@
     <string name="monthly_progress">Monthly Attendance Progress</string>
     <string name="progress_format">%1$d / %2$d days (%3$d%%)</string>
     <string name="required_days_remaining">Need to go to office %1$d more days to meet target (excluding %2$d leave days)</string>
-    <string name="goal_reached">Congratulations! You\'ve met the 60%% WFO requirement this month</string>
+    <string name="goal_reached">Congratulations! You\'ve met the %1$d%% WFO requirement this month</string>
     <string name="recent_records">Recent Records</string>
     <string name="no_records">No Records</string>
     
@@ -55,7 +55,7 @@
     <string name="wfh_days">WFH Days</string>
     <string name="required_days">Required Days</string>
     <string name="remaining_days">Remaining</string>
-    <string name="calculation_formula">Calculation: (Total workdays %1$d - Leave %2$d) × 60%% = Required WFO %3$d days</string>
+    <string name="calculation_formula">Calculation: (Total workdays %1$d - Leave %2$d) × %4$d%% = Required WFO %3$d days</string>
     <string name="days_remaining_format">%d days remaining</string>
     
     <!-- Calendar -->
@@ -258,11 +258,11 @@
     <!-- Statistics Screen -->
     <string name="attendance_statistics">Attendance Statistics</string>
     <string name="monthly_wfo_statistics">Monthly WFO Statistics</string>
-    <string name="goal_formula">Goal: (Total workdays %1$d - Leave %2$d) × 60%% = Required WFO %3$d days</string>
+    <string name="goal_formula">Goal: (Total workdays %1$d - Leave %2$d) × %4$d%% = Required WFO %3$d days</string>
     <string name="remaining_days_label">Remaining</string>
     <string name="completed">Completed</string>
     <string name="status">Status</string>
-    <string name="congrats_goal_reached">Congratulations!\nYou\'ve met the 60% WFO</string>
+    <string name="congrats_goal_reached">Congratulations!\nYou\'ve met the %1$d%% WFO</string>
     <string name="no_history_data">No historical data</string>
     
     <!-- Weekdays -->
@@ -336,4 +336,14 @@
     <string name="custom_interval">Custom</string>
     <string name="input_hint">Input</string>
     <string name="minutes_unit">min</string>
+
+    <!-- Attendance Rate Setting -->
+    <string name="attendance_setting_group_title">Attendance Settings</string>
+    <string name="attendance_rate_setting_title">WFO Attendance Rate</string>
+    <string name="attendance_rate_setting_desc">Set the monthly WFO target percentage. Affects all goal calculations and displays</string>
+    <string name="attendance_rate_current_value">Current: %1$d%%</string>
+    <string name="attendance_rate_dialog_title">Set Attendance Rate</string>
+    <string name="attendance_rate_dialog_message">Enter the WFO attendance rate percentage (1-100). Default is 60</string>
+    <string name="attendance_rate_invalid_input">Please enter a valid integer between 1 and 100</string>
+    <string name="attendance_rate_percent_format">%d%%</string>
 </resources>

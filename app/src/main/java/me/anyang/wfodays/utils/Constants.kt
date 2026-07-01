@@ -10,8 +10,9 @@ object Constants {
     const val OFFICE_RADIUS_METERS = 800f
     const val OFFICE_NAME = "环普产业园"
     
-    // 出勤率要求
-    const val REQUIRED_ATTENDANCE_RATE = 0.6
+    // 出勤率要求（默认百分比，用户可在设置中修改）
+    const val DEFAULT_REQUIRED_ATTENDANCE_RATE_PERCENT = 60
+    const val DEFAULT_REQUIRED_ATTENDANCE_RATE: Double = DEFAULT_REQUIRED_ATTENDANCE_RATE_PERCENT / 100.0
     
     // 通知相关
     const val NOTIFICATION_CHANNEL_ID = "attendance_channel"

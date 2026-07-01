@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,9 +32,11 @@ import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,15 +46,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +76,9 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 import me.anyang.wfodays.R
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.location.NativeLocationManager
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.components.PermissionGuideCard
@@ -91,7 +101,8 @@ import java.time.LocalDate
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
-    locationManager: NativeLocationManager
+    locationManager: NativeLocationManager,
+    preferencesManager: PreferencesManager
 ) {
     val context = LocalContext.current
 
@@ -200,6 +211,35 @@ fun SettingsScreen(
                     onRequestPermission = { locationPermissionState.launchPermissionRequest() },
                     hasPermission = locationPermissionState.status.isGranted
                 )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 出勤设置分组
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(450)) + slideInVertically(
+                    initialOffsetY = { 30 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                SettingsGroupTitle(
+                    icon = Icons.Default.Percent,
+                    title = stringResource(R.string.attendance_setting_group_title)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // WFO 出勤率设置
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(500)) + slideInVertically(
+                    initialOffsetY = { 30 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                AttendanceRateSettingCard(preferencesManager = preferencesManager)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -672,6 +712,158 @@ private fun EmptyLocationState(
             }
         }
     }
+}
+
+@Composable
+private fun AttendanceRateSettingCard(preferencesManager: PreferencesManager) {
+    val ratePercent by preferencesManager.requiredAttendanceRatePercent.collectAsState(initial = me.anyang.wfodays.utils.Constants.DEFAULT_REQUIRED_ATTENDANCE_RATE_PERCENT)
+    val scope = rememberCoroutineScope()
+    var showEditDialog by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = PrimaryBlue.copy(alpha = 0.15f)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .clickable { showEditDialog = true }
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(PrimaryBlue.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Percent,
+                        contentDescription = null,
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.attendance_rate_setting_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlueDark
+                    )
+                    Text(
+                        text = stringResource(R.string.attendance_rate_setting_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+                // 当前百分比显示
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(PrimaryBlue.copy(alpha = 0.1f))
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.attendance_rate_percent_format, ratePercent),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
+                }
+            }
+        }
+    }
+
+    if (showEditDialog) {
+        AttendanceRateDialog(
+            currentRate = ratePercent,
+            onDismiss = { showEditDialog = false },
+            onConfirm = { newRate ->
+                scope.launch {
+                    preferencesManager.setRequiredAttendanceRatePercent(newRate)
+                }
+                showEditDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun AttendanceRateDialog(
+    currentRate: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    var sliderValue by remember { mutableFloatStateOf(currentRate.toFloat()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.attendance_rate_dialog_title),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.attendance_rate_dialog_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                // 当前选中值显示
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.attendance_rate_percent_format, sliderValue.toInt()),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { sliderValue = it },
+                    valueRange = 1f..100f,
+                    steps = 99,
+                    colors = SliderDefaults.colors(
+                        thumbColor = PrimaryBlue,
+                        activeTrackColor = PrimaryBlue,
+                        inactiveTrackColor = PrimaryBlue.copy(alpha = 0.2f)
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(sliderValue.toInt()) }) {
+                Text(
+                    text = stringResource(R.string.confirm),
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlue
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    color = NeutralGray600
+                )
+            }
+        }
+    )
 }
 
 @Composable

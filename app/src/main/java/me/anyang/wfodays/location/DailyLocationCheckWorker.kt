@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.database.AppDatabase
 import me.anyang.wfodays.data.entity.WorkMode
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.utils.LanguageManager
@@ -40,7 +41,8 @@ class DailyLocationCheckWorker(
         return try {
             // 创建必要的实例
             val database = AppDatabase.getDatabase(applicationContext)
-            val repository = AttendanceRepository(database.attendanceDao(), applicationContext)
+            val preferencesManager = PreferencesManager(applicationContext)
+            val repository = AttendanceRepository(database.attendanceDao(), applicationContext, preferencesManager)
             val locationManager = NativeLocationManager(applicationContext)
             val locationRecorder = LocationBasedAttendanceRecorder(localizedContext, repository, locationManager)
 
