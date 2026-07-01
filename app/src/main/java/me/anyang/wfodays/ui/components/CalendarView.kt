@@ -104,7 +104,7 @@ fun CalendarView(
                             text = day,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isWeekend) WarningYellow else PrimaryBlueDark
+                            color = if (isWeekend) WarningOrange else PrimaryBlueDark
                         )
                     }
                 }
@@ -176,7 +176,7 @@ private fun CalendarDayCell(
             showBorder = false
         )
         WorkMode.LEAVE -> CellState(
-            backgroundColor = WarningYellow,
+            backgroundColor = WarningOrange,
             icon = Icons.Default.BeachAccess,
             iconColor = Color.White,
             showBorder = false
@@ -192,7 +192,7 @@ private fun CalendarDayCell(
     val textColor = when {
         record != null -> Color.White
         isToday -> PrimaryBlue
-        isWeekend -> WarningYellow.copy(alpha = 0.8f)
+        isWeekend -> WarningOrange.copy(alpha = 0.8f)
         else -> PrimaryBlueDark
     }
 
@@ -263,7 +263,7 @@ private fun CalendarDayCell(
                     modifier = Modifier
                         .padding(top = 2.dp)
                         .size(4.dp)
-                        .background(WarningYellow.copy(alpha = 0.5f), CircleShape)
+                        .background(WarningOrange.copy(alpha = 0.5f), CircleShape)
                 )
             } else if (isToday) {
                 // 今天标记点

@@ -11,6 +11,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") } // MPAndroidChart
         // 百度地图仓库
         maven { url = uri("https://raw.github.com/baidumapapi/BaiduMap_AndroidSDK/master") }
     }

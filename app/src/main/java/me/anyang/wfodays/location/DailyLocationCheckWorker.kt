@@ -7,9 +7,9 @@ import androidx.work.WorkerParameters
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.database.AppDatabase
 import me.anyang.wfodays.data.entity.WorkMode
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
-import me.anyang.wfodays.utils.LanguageManager
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,12 +35,13 @@ class DailyLocationCheckWorker(
         Log.d(TAG, "[$timeStr] 定时任务开始执行")
 
         // 获取配置好语言的 Context，确保通知显示正确的语言
-        val localizedContext = LanguageManager.getLocalizedContext(applicationContext)
+        val localizedContext = applicationContext
 
         return try {
             // 创建必要的实例
             val database = AppDatabase.getDatabase(applicationContext)
-            val repository = AttendanceRepository(database.attendanceDao(), applicationContext)
+            val preferencesManager = PreferencesManager(applicationContext)
+            val repository = AttendanceRepository(database.attendanceDao(), applicationContext, preferencesManager)
             val locationManager = NativeLocationManager(applicationContext)
             val locationRecorder = LocationBasedAttendanceRecorder(localizedContext, repository, locationManager)
 
@@ -102,7 +103,7 @@ class DailyLocationCheckWorker(
                 is LocationBasedAttendanceRecorder.RecordResult.Skipped -> {
                     Log.d(TAG, "[$timeStr] 跳过记录: ${result.reason}")
                     // 位置获取失败时显示重试通知
-                    if (result.reason == "位置获取失败") {
+                    if (result.reason == LocationBasedAttendanceRecorder.SKIP_REASON_LOCATION_FAILED) {
                         NotificationHelper.showAttendanceNotification(
                             localizedContext,
                             LocalDate.now(),

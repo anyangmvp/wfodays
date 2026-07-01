@@ -10,8 +10,12 @@ import android.os.Bundle
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import me.anyang.wfodays.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.utils.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,11 +36,19 @@ class NativeLocationManager @Inject constructor(
     }
 
     private val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    
+    private val preferencesManager = PreferencesManager(context)
+
     private val _locationState = MutableStateFlow<LocationState>(LocationState.Idle)
     val locationState: StateFlow<LocationState> = _locationState
 
     private var locationListener: LocationListener? = null
+
+    // Get office radius from preferences
+    fun getOfficeRadius(): Float {
+        return runBlocking {
+            preferencesManager.officeRadius.first()
+        }
+    }
 
     fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
@@ -44,7 +56,7 @@ class NativeLocationManager @Inject constructor(
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            _locationState.value = LocationState.Error("定位权限未授权")
+            _locationState.value = LocationState.Error(context.getString(R.string.error_location_permission_not_granted))
             return
         }
 
@@ -154,7 +166,7 @@ class NativeLocationManager @Inject constructor(
     }
 
     fun isWithinOfficeRadius(latitude: Double, longitude: Double): Boolean {
-        return calculateDistanceToOffice(latitude, longitude) <= OFFICE_RADIUS_METERS
+        return calculateDistanceToOffice(latitude, longitude) <= getOfficeRadius()
     }
 
     // Haversine公式计算地球表面两点距离

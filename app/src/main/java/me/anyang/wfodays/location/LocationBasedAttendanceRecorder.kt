@@ -10,7 +10,6 @@ import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
-import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 
 /**
@@ -25,6 +24,8 @@ class LocationBasedAttendanceRecorder(
     companion object {
         private const val TAG = "LocationRecorder"
         private const val LOCATION_TIMEOUT_MS = 3000L
+        const val SKIP_REASON_LOCATION_FAILED = "location_fetch_failed"
+        const val SKIP_REASON_ALREADY_RECORDED = "already_recorded"
     }
 
     /**
@@ -53,7 +54,7 @@ class LocationBasedAttendanceRecorder(
 
             if (locationResult == null) {
                 Log.d(TAG, "位置获取失败")
-                return RecordResult.Skipped("位置获取失败")
+                return RecordResult.Skipped(SKIP_REASON_LOCATION_FAILED)
             }
 
             val (latitude, longitude) = locationResult
@@ -79,7 +80,7 @@ class LocationBasedAttendanceRecorder(
                     }
                     RecordResult.Success(WorkMode.WFH, distance)
                 } else {
-                    RecordResult.Skipped("已有记录且非强制更新")
+                    RecordResult.Skipped(SKIP_REASON_ALREADY_RECORDED)
                 }
             }
         } catch (e: Exception) {
@@ -153,14 +154,13 @@ class LocationBasedAttendanceRecorder(
      * 显示WFO通知
      */
     private fun showWfoNotification(distance: Float) {
-        val localizedContext = LanguageManager.getLocalizedContext(context)
         val distanceDisplay = formatDistance(distance)
 
         NotificationHelper.showAttendanceNotification(
-            localizedContext,
+            context,
             LocalDate.now(),
-            localizedContext.getString(R.string.notification_title_wfo_success),
-            localizedContext.getString(R.string.notification_message_office_distance, distanceDisplay)
+            context.getString(R.string.notification_title_wfo_success),
+            context.getString(R.string.notification_message_office_distance, distanceDisplay)
         )
     }
 
@@ -168,14 +168,13 @@ class LocationBasedAttendanceRecorder(
      * 显示WFH通知
      */
     private fun showWfhNotification(distance: Float) {
-        val localizedContext = LanguageManager.getLocalizedContext(context)
         val distanceDisplay = formatDistance(distance)
 
         NotificationHelper.showAttendanceNotification(
-            localizedContext,
+            context,
             LocalDate.now(),
-            localizedContext.getString(R.string.notification_title_wfh_recorded),
-            localizedContext.getString(R.string.notification_message_home_distance, distanceDisplay)
+            context.getString(R.string.notification_title_wfh_recorded),
+            context.getString(R.string.notification_message_home_distance, distanceDisplay)
         )
     }
 

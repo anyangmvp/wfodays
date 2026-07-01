@@ -2,11 +2,13 @@ package me.anyang.wfodays.data.repository
 
 import android.content.Context
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.database.AttendanceDao
 import me.anyang.wfodays.data.entity.AttendanceRecord
 import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.utils.DateUtils
 import me.anyang.wfodays.utils.WorkdayCalculator
 import java.time.LocalDate
@@ -17,7 +19,8 @@ import javax.inject.Singleton
 @Singleton
 class AttendanceRepository @Inject constructor(
     private val attendanceDao: AttendanceDao,
-    private val context: Context
+    private val context: Context,
+    private val preferencesManager: PreferencesManager
 ) {
 
     suspend fun recordAttendance(
@@ -82,23 +85,27 @@ class AttendanceRepository @Inject constructor(
     suspend fun getMonthlyStatistics(yearMonth: YearMonth): MonthlyStatistics {
         val start = DateUtils.toEpochMillis(yearMonth.atDay(1))
         val end = DateUtils.toEpochMillis(yearMonth.atEndOfMonth())
-        
+
         val records = attendanceDao.getPresentRecordsBetween(start, end)
-        
+
         val wfoDays = records.count { it.workMode == WorkMode.WFO }
+        val wfhDays = records.count { it.workMode == WorkMode.WFH }
         val leaveDays = records.count { it.workMode == WorkMode.LEAVE }
         val totalWorkdays = WorkdayCalculator.calculateWorkdays(yearMonth)
         val effectiveWorkdays = totalWorkdays - leaveDays
-        val requiredDays = kotlin.math.ceil(effectiveWorkdays * 0.6).toInt()
+
+        // Get target percentage from preferences (default 30%)
+        val targetPercentage = preferencesManager.wfoTargetPercentage.first()
+        val requiredDays = kotlin.math.ceil(effectiveWorkdays * (targetPercentage / 100.0)).toInt()
         val remainingDays = kotlin.math.max(0, requiredDays - wfoDays)
-        
+
         val today = LocalDate.now()
         val remainingWorkdays = if (yearMonth == YearMonth.from(today)) {
             WorkdayCalculator.getRemainingWorkdaysExcludingLeaves(yearMonth, today, records)
         } else {
             0
         }
-        
+
         val currentRate = if (effectiveWorkdays > 0) wfoDays.toFloat() / effectiveWorkdays else 0f
 
         return MonthlyStatistics(
@@ -107,7 +114,7 @@ class AttendanceRepository @Inject constructor(
             effectiveWorkdays = effectiveWorkdays,
             leaveDays = leaveDays,
             wfoDays = wfoDays,
-            wfhDays = records.count { it.workMode == WorkMode.WFH },
+            wfhDays = wfhDays,
             requiredDays = requiredDays,
             remainingDays = remainingDays,
             remainingWorkdays = remainingWorkdays,
@@ -118,13 +125,13 @@ class AttendanceRepository @Inject constructor(
     suspend fun getAllMonthlyStatistics(): List<MonthlyStatistics> {
         val currentMonth = YearMonth.now()
         val statistics = mutableListOf<MonthlyStatistics>()
-        
+
         // 显示最近6个月的数据
         for (i in 0..5) {
             val month = currentMonth.minusMonths(i.toLong())
             statistics.add(getMonthlyStatistics(month))
         }
-        
+
         return statistics.reversed()
     }
 }

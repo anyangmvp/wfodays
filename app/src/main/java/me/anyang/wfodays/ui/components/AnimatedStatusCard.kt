@@ -40,12 +40,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.HSBCRedLight
+import me.anyang.wfodays.ui.theme.PrimaryBlue
+import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 import me.anyang.wfodays.ui.theme.SuccessGreen
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -67,28 +69,28 @@ fun AnimatedStatusCard(
 
     val (backgroundBrush, icon, title, subtitle) = when (workMode) {
         WorkMode.WFO -> Quad(
-            Brush.verticalGradient(colors = listOf(HSBCRed.copy(alpha = 0.9f), HSBCRed)),
+            Brush.verticalGradient(colors = listOf(PrimaryBlue.copy(alpha = 0.9f), PrimaryBlue)),
             Icons.Default.Home,
-            "今日 WFO",
-            "在公司办公"
+            stringResource(R.string.today_wfo),
+            stringResource(R.string.work_from_office)
         )
         WorkMode.WFH -> Quad(
             Brush.verticalGradient(colors = listOf(SuccessGreen.copy(alpha = 0.9f), SuccessGreen)),
             Icons.Default.LocationOn,
-            "今日 WFH",
-            "在家办公"
+            stringResource(R.string.today_wfh),
+            stringResource(R.string.work_from_home)
         )
         WorkMode.LEAVE -> Quad(
             Brush.verticalGradient(colors = listOf(Color(0xFFFFB800).copy(alpha = 0.9f), Color(0xFFFFB800))),
             Icons.Default.BeachAccess,
-            "今日休假",
-            "享受假期"
+            stringResource(R.string.today_leave),
+            stringResource(R.string.enjoy_holiday)
         )
         else -> Quad(
-            Brush.verticalGradient(colors = listOf(HSBCRedLight.copy(alpha = 0.9f), HSBCRedLight)),
+            Brush.verticalGradient(colors = listOf(PrimaryBlueLight.copy(alpha = 0.9f), PrimaryBlueLight)),
             Icons.Default.Home,
-            "今日未记录",
-            "请选择工作模式"
+            stringResource(R.string.not_recorded),
+            stringResource(R.string.select_work_mode)
         )
     }
 
@@ -145,8 +147,8 @@ fun AnimatedStatusCard(
                 if (recordType != null && workMode != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     val typeText = when (recordType) {
-                        RecordType.AUTO -> "自动检测"
-                        RecordType.MANUAL -> "手动记录"
+                        RecordType.AUTO -> stringResource(R.string.auto_detected)
+                        RecordType.MANUAL -> stringResource(R.string.manually_recorded)
                     }
 
                     Row(
@@ -166,10 +168,9 @@ fun AnimatedStatusCard(
                         )
                     }
 
-                    // 长按提示
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "长按可切换状态",
+                        text = stringResource(R.string.long_press_to_change_status),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.6f)
                     )
@@ -177,24 +178,24 @@ fun AnimatedStatusCard(
 
                 if (workMode == null) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
                     // Three buttons for WFO, WFH, LEAVE
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ActionButton(
-                            text = "WFO",
+                            text = stringResource(R.string.wfo),
                             onClick = onWFOClick,
-                            color = HSBCRed
+                            color = PrimaryBlue
                         )
                         ActionButton(
-                            text = "WFH",
+                            text = stringResource(R.string.wfh),
                             onClick = onWFHClick,
                             color = SuccessGreen
                         )
                         ActionButton(
-                            text = "休假",
+                            text = stringResource(R.string.leave),
                             onClick = onLeaveClick,
                             color = Color(0xFFFFB800)
                         )
