@@ -56,18 +56,31 @@ class HomeViewModel @Inject constructor(
                 // Get target percentage from preferences
                 val targetPercentage = preferencesManager.wfoTargetPercentage.first()
 
+                // Load today's record and monthly stats first so all sections show immediately
                 val todayRecord = repository.getTodayRecord()
+                val currentMonthStats = repository.getMonthlyStatistics(YearMonth.now())
+
+                // Update UI state immediately with available data
+                _uiState.value = _uiState.value.copy(
+                    todayRecord = todayRecord,
+                    currentMonthStats = currentMonthStats,
+                    targetPercentage = targetPercentage,
+                    isLoading = false
+                )
+
+                // Auto-detect location and record if no record exists for today
                 if (todayRecord == null) {
                     autoDetectLocationAndRecord()
                 }
 
-                val updatedTodayRecord = repository.getTodayRecord()
-                val currentMonthStats = repository.getMonthlyStatistics(YearMonth.now())
-
+                // Collect recent records for reactive updates.
+                // Re-fetch today's record and monthly stats on each emission to keep them in sync.
                 repository.getRecentRecords(10).collect { records ->
+                    val updatedTodayRecord = repository.getTodayRecord()
+                    val updatedStats = repository.getMonthlyStatistics(YearMonth.now())
                     _uiState.value = _uiState.value.copy(
                         todayRecord = updatedTodayRecord,
-                        currentMonthStats = currentMonthStats,
+                        currentMonthStats = updatedStats,
                         recentRecords = records,
                         targetPercentage = targetPercentage,
                         isLoading = false
@@ -108,10 +121,9 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val result = locationRecorder.detectAndRecord(skipExistingCheck = false)
-        if (result is LocationBasedAttendanceRecorder.RecordResult.Success) {
-            loadData()
-        }
+        // detectAndRecord may insert a record; the collect block in loadData()
+        // will re-fetch today's record and monthly stats to reflect the change.
+        locationRecorder.detectAndRecord(skipExistingCheck = false)
     }
 
     fun manualCheckIn() {

@@ -36,7 +36,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.location.NativeLocationManager
@@ -56,7 +58,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     var isVisible by remember { mutableStateOf(false) }
     var targetPercentage by remember { mutableFloatStateOf(30f) }
-    var officeRadius by remember { mutableFloatStateOf(500f) }
+    var officeRadius by remember { mutableFloatStateOf(800f) }
     var showPercentageDialog by remember { mutableStateOf(false) }
 
     val locationPermissionState = rememberPermissionState(
@@ -177,14 +179,61 @@ fun SettingsScreen(
                         icon = Icons.Default.Notifications,
                         iconColor = WarningOrange,
                         title = "Test Notification",
-                        subtitle = "Send a test notification",
+                        subtitle = "Simulate a check-in to test notifications",
                         onClick = {
-                            NotificationHelper.showAttendanceNotification(
-                                context,
-                                LocalDate.now(),
-                                "Test Notification",
-                                "This is a test notification from WFO Days"
-                            )
+                            scope.launch {
+                                if (!locationPermissionState.status.isGranted) {
+                                    NotificationHelper.showAttendanceNotification(
+                                        context,
+                                        LocalDate.now(),
+                                        "Test Check-in",
+                                        "Location permission required to test check-in notifications."
+                                    )
+                                    return@launch
+                                }
+
+                                // Try to use existing location state first
+                                var location = locationManager.locationState.value
+                                        as? NativeLocationManager.LocationState.Success
+
+                                if (location == null) {
+                                    // Start location updates to get fresh location
+                                    locationManager.startLocationUpdates()
+                                    location = withTimeoutOrNull(5000L) {
+                                        locationManager.locationState.first {
+                                            it is NativeLocationManager.LocationState.Success
+                                        }
+                                    } as? NativeLocationManager.LocationState.Success
+                                }
+
+                                if (location != null) {
+                                    val distance = locationManager.calculateDistanceToOffice(
+                                        location.latitude, location.longitude
+                                    )
+                                    val distanceDisplay =
+                                        if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
+                                            "${distance.toInt()} m"
+                                        } else {
+                                            String.format("%.1f km", distance / 1000)
+                                        }
+                                    val isInRange =
+                                        distance <= NativeLocationManager.OFFICE_RADIUS_METERS
+
+                                    NotificationHelper.showAttendanceNotification(
+                                        context,
+                                        LocalDate.now(),
+                                        if (isInRange) "Test Check-in: WFO" else "Test Check-in: WFH",
+                                        "Distance to office: $distanceDisplay"
+                                    )
+                                } else {
+                                    NotificationHelper.showAttendanceNotification(
+                                        context,
+                                        LocalDate.now(),
+                                        "Test Check-in",
+                                        "Unable to get current location. Please try again."
+                                    )
+                                }
+                            }
                         }
                     )
                 }

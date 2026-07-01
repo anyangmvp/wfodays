@@ -46,7 +46,7 @@ class PreferencesManager(private val context: Context) {
 
     val officeRadius: Flow<Float> = context.dataStore.data
         .map { preferences ->
-            preferences[OFFICE_RADIUS] ?: 500f  // 默认500米
+            preferences[OFFICE_RADIUS] ?: 800f  // 默认800米
         }
 
     suspend fun setFirstLaunchComplete() {

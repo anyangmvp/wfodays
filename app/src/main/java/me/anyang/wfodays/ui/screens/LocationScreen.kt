@@ -1,6 +1,5 @@
 package me.anyang.wfodays.ui.screens
 
-import android.content.Context
 import android.Manifest
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -43,7 +42,6 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -78,7 +76,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import me.anyang.wfodays.R
 import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.location.NativeLocationManager
-import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.theme.BackgroundLight
 import me.anyang.wfodays.ui.theme.BackgroundWhite
 import me.anyang.wfodays.ui.theme.Gray100
@@ -97,7 +94,6 @@ import me.anyang.wfodays.ui.theme.WarningOrange
 fun LocationScreen(
     locationManager: NativeLocationManager
 ) {
-    val context = LocalContext.current
     val locationState by locationManager.locationState.collectAsState()
 
     var currentLat by remember { mutableStateOf(0.0) }
@@ -202,24 +198,6 @@ fun LocationScreen(
                 )
             ) {
                 OfficeRadiusCard()
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Test Check-in Card
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(tween(700)) + slideInVertically(
-                    initialOffsetY = { 30 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                )
-            ) {
-                TestCheckinCard(
-                    isInRange = distanceToOffice <= NativeLocationManager.OFFICE_RADIUS_METERS,
-                    distance = distanceToOffice,
-                    context = context,
-                    locationManager = locationManager
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -568,89 +546,4 @@ private fun OfficeRadiusCard() {
     }
 }
 
-@Composable
-private fun TestCheckinCard(
-    isInRange: Boolean,
-    distance: Float,
-    context: Context,
-    locationManager: NativeLocationManager
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 2.dp,
-                shape = RoundedCornerShape(12.dp),
-                spotColor = Color.Black.copy(alpha = 0.05f)
-            )
-            .clip(RoundedCornerShape(12.dp))
-            .background(BackgroundWhite)
-            .padding(12.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(PrimaryBlue.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = PrimaryBlue,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Test Check-in",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Simulate a check-in to verify your current location.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary
-                )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        OutlinedButton(
-            onClick = {
-                val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
-                    "${distance.toInt()} m"
-                } else {
-                    String.format("%.1f km", distance / 1000)
-                }
-
-                if (isInRange) {
-                    NotificationHelper.showAttendanceNotification(
-                        context,
-                        java.time.LocalDate.now(),
-                        "Office Check-in Successful",
-                        "Distance to office: $distanceDisplay - WFO"
-                    )
-                } else {
-                    NotificationHelper.showAttendanceNotification(
-                        context,
-                        java.time.LocalDate.now(),
-                        "Remote Work Recorded",
-                        "Distance to office: $distanceDisplay - WFH"
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = PrimaryBlue
-            )
-        ) {
-            Text("Test Now")
-        }
-    }
-}
