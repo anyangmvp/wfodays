@@ -6,14 +6,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.data.repository.MonthlyStatistics
 import javax.inject.Inject
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val repository: AttendanceRepository
+    private val repository: AttendanceRepository,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StatsUiState())
@@ -22,16 +25,18 @@ class StatsViewModel @Inject constructor(
     fun loadStatistics() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             try {
+                val targetPercentage = preferencesManager.wfoTargetPercentage.first()
                 val currentStats = repository.getMonthlyStatistics(
                     java.time.YearMonth.now()
                 )
                 val allStats = repository.getAllMonthlyStatistics()
-                
+
                 _uiState.value = _uiState.value.copy(
                     currentMonthStats = currentStats,
                     allStats = allStats,
+                    targetPercentage = targetPercentage,
                     isLoading = false
                 )
             } catch (e: Exception) {
@@ -47,6 +52,7 @@ class StatsViewModel @Inject constructor(
 data class StatsUiState(
     val currentMonthStats: MonthlyStatistics? = null,
     val allStats: List<MonthlyStatistics> = emptyList(),
+    val targetPercentage: Float = 30f,
     val isLoading: Boolean = false,
     val error: String? = null
 )

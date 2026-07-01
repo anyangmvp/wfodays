@@ -2,37 +2,44 @@ package me.anyang.wfodays.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.repository.MonthlyStatistics
+import me.anyang.wfodays.ui.components.DonutChart
+import me.anyang.wfodays.ui.components.MultiSegmentDonutChart
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.StatsViewModel
-import androidx.compose.ui.res.stringResource
-import me.anyang.wfodays.R
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +49,7 @@ fun StatsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var isVisible by remember { mutableStateOf(false) }
+    var selectedMonthStats by remember { mutableStateOf<MonthlyStatistics?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.loadStatistics()
@@ -49,556 +57,284 @@ fun StatsScreen(
         isVisible = true
     }
 
+    // Update selected month when data loads
+    LaunchedEffect(uiState.currentMonthStats) {
+        if (selectedMonthStats == null) {
+            selectedMonthStats = uiState.currentMonthStats
+        }
+    }
+
+    val displayStats = selectedMonthStats ?: uiState.currentMonthStats
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.attendance_statistics),
-                        style = MaterialTheme.typography.titleLarge,
+                        text = "Trends",
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = TextPrimary
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            tint = Color.White
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = PrimaryBlue,
-                    titleContentColor = Color.White
+                    containerColor = BackgroundWhite
                 )
             )
-        }
+        },
+        containerColor = BackgroundLight
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            PrimaryBlue.copy(alpha = 0.05f),
-                            Color.White
-                        )
-                    )
-                )
                 .padding(padding)
-                .padding(16.dp)
                 .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
         ) {
-            // 当前月统计卡片 - 带渐变和动画
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Office Compliance with Donut Chart
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(tween(400)) + slideInVertically(
-                    initialOffsetY = { -50 },
+                enter = fadeIn(tween(500)) + slideInVertically(
+                    initialOffsetY = { 20 },
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
             ) {
-                uiState.currentMonthStats?.let { stats ->
-                    CurrentMonthStatsCard(stats = stats)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 历史统计标题
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(tween(600)) + slideInVertically(
-                    initialOffsetY = { 30 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                )
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(PrimaryBlue.copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.History,
-                            contentDescription = null,
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                    Text(
-                    text = stringResource(R.string.history),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp),
-                    color = PrimaryBlueDark
-                )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 历史统计列表
-            if (uiState.allStats.isEmpty()) {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = fadeIn(tween(700))
-                ) {
-                    EmptyHistoryCard()
-                }
-            } else {
-                uiState.allStats.reversed().forEachIndexed { index, stats ->
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(tween(700 + index * 100)) + slideInVertically(
-                            initialOffsetY = { 30 },
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                        )
-                    ) {
-                        HistoryStatsItem(stats = stats, index = index)
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
-}
-
-@Composable
-private fun CurrentMonthStatsCard(stats: MonthlyStatistics) {
-    val progress = if (stats.requiredDays > 0) {
-        (stats.wfoDays.toFloat() / stats.requiredDays).coerceIn(0f, 1.2f)
-    } else 0f
-
-    val isGoalReached = stats.remainingDays <= 0
-
-    var cardVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(200)
-        cardVisible = true
-    }
-
-    val scale by animateFloatAsState(
-        targetValue = if (cardVisible) 1f else 0.9f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "card_scale"
-    )
-
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (cardVisible) 1f else 0f,
-        animationSpec = tween(600),
-        label = "card_alpha"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(scale)
-            .alpha(animatedAlpha)
-            .shadow(
-                elevation = 12.dp,
-                shape = RoundedCornerShape(24.dp),
-                spotColor = if (isGoalReached) SuccessGreen.copy(alpha = 0.3f)
-                else PrimaryBlue.copy(alpha = 0.3f)
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = if (isGoalReached) {
-                        listOf(SuccessGreen, SuccessGreen.copy(green = 0.8f))
-                    } else {
-                        listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
-                    }
-                )
-            )
-            .padding(24.dp)
-    ) {
-        Column {
-            // 标题行
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.monthly_wfo_statistics),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                displayStats?.let { stats ->
+                    OfficeComplianceSection(
+                        stats = stats,
+                        targetPercentage = uiState.targetPercentage
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = buildString {
-                            append(stats.yearMonth.year)
-                            append(stringResource(R.string.year_format, 2024).replace("2024", ""))
-                            append(getMonthName(stats.yearMonth.monthValue))
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
-
-                // 完成状态图标
-                if (isGoalReached) {
-                    val infiniteScale by rememberInfiniteTransition(label = "check").animateFloat(
-                        initialValue = 1f,
-                        targetValue = 1.2f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(800, easing = EaseInOutSine),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "check_scale"
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .scale(infiniteScale)
-                            .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 计算公式
-            Text(
-                text = stringResource(
-                    R.string.goal_formula,
-                    stats.totalWorkdays,
-                    stats.leaveDays,
-                    stats.requiredDays
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.8f)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 环形进度条
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    progress = { progress.coerceAtMost(1f) },
-                    modifier = Modifier.size(140.dp),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.2f),
-                    strokeWidth = 12.dp,
-                    strokeCap = StrokeCap.Round
+            // Monthly Trend Chart
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(600)) + slideInVertically(
+                    initialOffsetY = { 20 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "${stats.wfoDays}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "/ ${stats.requiredDays} ${stringResource(R.string.days_unit)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                    Text(
-                        text = "${(stats.currentRate * 100).toInt()}%",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
+            ) {
+                MonthlyTrendChart(stats = uiState.allStats)
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 统计详情网格
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // History Section
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(700)) + slideInVertically(
+                    initialOffsetY = { 20 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
             ) {
-                StatsGridItem(
-                    value = stats.totalWorkdays.toString(),
-                    label = stringResource(R.string.total_workdays_label),
-                    icon = Icons.Default.CalendarToday,
-                    delayMillis = 300
-                )
-                StatsGridItem(
-                    value = stats.leaveDays.toString(),
-                    label = stringResource(R.string.leave_days_label),
-                    icon = Icons.Default.BeachAccess,
-                    delayMillis = 400
-                )
-                StatsGridItem(
-                    value = stats.effectiveWorkdays.toString(),
-                    label = stringResource(R.string.effective_workdays),
-                    icon = Icons.Default.Work,
-                    delayMillis = 500
-                )
-                StatsGridItem(
-                    value = if (stats.remainingDays > 0) "${stats.remainingDays}" else stringResource(R.string.completed),
-                    label = if (stats.remainingDays > 0) stringResource(R.string.remaining_days_label) else stringResource(R.string.status),
-                    icon = if (stats.remainingDays > 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.Default.CheckCircle,
-                    delayMillis = 600,
-                    isSuccess = isGoalReached
-                )
-            }
-
-            // 目标达成提示
-            if (isGoalReached) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White.copy(alpha = 0.2f))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.EmojiEvents,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                        Text(
-                            text = stringResource(R.string.congrats_goal_reached),
-                            modifier = Modifier.padding(start = 8.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                HistorySection(
+                    stats = uiState.allStats,
+                    onMonthClick = { stats ->
+                        selectedMonthStats = stats
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatsGridItem(
-    value: String,
-    label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    delayMillis: Int = 0,
-    isSuccess: Boolean = false
-) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(delayMillis.toLong())
-        isVisible = true
-    }
-
-    val scale by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0.8f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "item_scale"
-    )
-
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(400),
-        label = "item_alpha"
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .scale(scale)
-            .alpha(animatedAlpha)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .background(
-                    Color.White.copy(alpha = 0.2f),
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.8f)
-        )
-    }
-}
-
-@Composable
-private fun EmptyHistoryCard() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFF1F5F9))
-            .padding(32.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.History,
-                contentDescription = null,
-                tint = Color.Gray.copy(alpha = 0.5f),
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                    text = stringResource(R.string.no_history_data),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Gray
                 )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
 @Composable
-private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
-    val monthStr = buildString {
-        append(stats.yearMonth.year)
-        append(stringResource(R.string.year_format, 2024).replace("2024", ""))
-        append(getMonthName(stats.yearMonth.monthValue))
-    }
-    val progress = stats.wfoDays.toFloat() / stats.effectiveWorkdays.coerceAtLeast(1)
-    val isGoalReached = stats.remainingDays <= 0
+private fun OfficeComplianceSection(stats: MonthlyStatistics, targetPercentage: Float) {
+    val percentage = (stats.currentRate * 100).toFloat()
+    val monthName = formatMonth(stats.yearMonth)
 
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(200 + index * 100L)
-        isVisible = true
-    }
-
-    val scale by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0.95f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "history_scale"
-    )
-
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(500),
-        label = "history_alpha"
-    )
-
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale)
-            .alpha(animatedAlpha)
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = if (isGoalReached) SuccessGreen.copy(alpha = 0.2f)
-                else PrimaryBlue.copy(alpha = 0.2f)
+                spotColor = Color.Black.copy(alpha = 0.08f)
             )
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(BackgroundWhite)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Left side - Text info
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = "Office Compliance",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPrimary
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = "${percentage.toInt()}",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "%",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            Text(
+                text = monthName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "${stats.wfoDays} / ${stats.effectiveWorkdays} days",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextPrimary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Target: ${targetPercentage.toInt()}%",
+                style = MaterialTheme.typography.bodySmall,
+                color = WarningOrange
+            )
+        }
+
+        // Right side - Donut chart (empty inside)
+        MultiSegmentDonutChart(
+            wfoDays = stats.wfoDays,
+            wfhDays = stats.wfhDays,
+            leaveDays = stats.leaveDays,
+            totalDays = stats.effectiveWorkdays,
+            size = 120.dp,
+            strokeWidth = 14f,
+            showText = false
+        )
+    }
+}
+
+@Composable
+private fun MonthlyTrendChart(stats: List<MonthlyStatistics>) {
+    val density = LocalDensity.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color.Black.copy(alpha = 0.08f)
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .background(BackgroundWhite)
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // 月份图标
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            if (isGoalReached) SuccessGreen.copy(alpha = 0.1f)
-                            else PrimaryBlue.copy(alpha = 0.1f)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        tint = if (isGoalReached) SuccessGreen else PrimaryBlue,
-                        modifier = Modifier.size(24.dp)
+        Text(
+            text = "Monthly Trend",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = TextPrimary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Simple trend visualization using Canvas
+        if (stats.isNotEmpty()) {
+            val maxPercentage = 100f
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            ) {
+                val strokeWidthPx = with(density) { 3.dp.toPx() }
+                val paddingPx = with(density) { 8.dp.toPx() }
+                val width = size.width - paddingPx * 2
+                val height = size.height - paddingPx * 2
+                val stepX = if (stats.size > 1) width / (stats.size - 1) else width
+
+                // Draw grid lines
+                drawLine(
+                    color = Color(0xFFE2E8F0),
+                    start = Offset(paddingPx, paddingPx + height * 0.25f),
+                    end = Offset(size.width - paddingPx, paddingPx + height * 0.25f),
+                    strokeWidth = with(density) { 1.dp.toPx() }
+                )
+                drawLine(
+                    color = Color(0xFFE2E8F0),
+                    start = Offset(paddingPx, paddingPx + height * 0.5f),
+                    end = Offset(size.width - paddingPx, paddingPx + height * 0.5f),
+                    strokeWidth = with(density) { 1.dp.toPx() }
+                )
+                drawLine(
+                    color = Color(0xFFE2E8F0),
+                    start = Offset(paddingPx, paddingPx + height * 0.75f),
+                    end = Offset(size.width - paddingPx, paddingPx + height * 0.75f),
+                    strokeWidth = with(density) { 1.dp.toPx() }
+                )
+
+                // Draw line chart
+                val points = stats.mapIndexed { index, stat ->
+                    val x = paddingPx + index * stepX
+                    val percentage = (stat.currentRate * 100).coerceIn(0f, maxPercentage)
+                    val y = paddingPx + height - (percentage / maxPercentage * height)
+                    Offset(x, y)
+                }
+
+                // Draw connecting lines
+                for (i in 0 until points.size - 1) {
+                    drawLine(
+                        color = PrimaryBlue,
+                        start = points[i],
+                        end = points[i + 1],
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.Round
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    Text(
-                        text = monthStr,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryBlueDark
+                // Draw dots
+                points.forEach { point ->
+                    drawCircle(
+                        color = PrimaryBlue,
+                        radius = with(density) { 5.dp.toPx() },
+                        center = point
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.wfo_stats_format, stats.wfoDays, stats.effectiveWorkdays, (progress * 100).toInt()),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                    drawCircle(
+                        color = Color.White,
+                        radius = with(density) { 3.dp.toPx() },
+                        center = point
                     )
                 }
             }
 
-            // 状态指示
-            if (isGoalReached) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(SuccessGreen.copy(alpha = 0.1f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = SuccessGreen,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(WarningYellow.copy(alpha = 0.1f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
+            // Month labels
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                stats.takeLast(6).forEach { stat ->
                     Text(
-                        text = stringResource(R.string.days_remaining_format, stats.remainingDays),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = WarningYellow,
-                        fontWeight = FontWeight.Medium
+                        text = formatMonthShort(stat.yearMonth),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray400
                     )
                 }
             }
@@ -606,24 +342,118 @@ private fun HistoryStatsItem(stats: MonthlyStatistics, index: Int) {
     }
 }
 
-// 缓动函数
-private val EaseInOutSine = CubicBezierEasing(0.37f, 0f, 0.63f, 1f)
+@Composable
+private fun HistorySection(
+    stats: List<MonthlyStatistics>,
+    onMonthClick: (MonthlyStatistics) -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color.Black.copy(alpha = 0.08f)
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .background(BackgroundWhite)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "History",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = TextPrimary
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (stats.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No history data yet",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray400
+                )
+            }
+        } else {
+            stats.reversed().forEach { monthStats ->
+                HistoryItem(
+                    stats = monthStats,
+                    onClick = { onMonthClick(monthStats) }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
 
 @Composable
-private fun getMonthName(monthValue: Int): String {
-    return when (monthValue) {
-        1 -> stringResource(R.string.month_abbr_jan)
-        2 -> stringResource(R.string.month_abbr_feb)
-        3 -> stringResource(R.string.month_abbr_mar)
-        4 -> stringResource(R.string.month_abbr_apr)
-        5 -> stringResource(R.string.month_abbr_may)
-        6 -> stringResource(R.string.month_abbr_jun)
-        7 -> stringResource(R.string.month_abbr_jul)
-        8 -> stringResource(R.string.month_abbr_aug)
-        9 -> stringResource(R.string.month_abbr_sep)
-        10 -> stringResource(R.string.month_abbr_oct)
-        11 -> stringResource(R.string.month_abbr_nov)
-        12 -> stringResource(R.string.month_abbr_dec)
-        else -> monthValue.toString()
+private fun HistoryItem(
+    stats: MonthlyStatistics,
+    onClick: () -> Unit = {}
+) {
+    val percentage = (stats.currentRate * 100).toInt()
+    val isGoalReached = stats.remainingDays <= 0
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(BackgroundLight)
+            .clickable { onClick() }
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = formatMonth(stats.yearMonth),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = TextPrimary
+        )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "$percentage%",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isGoalReached) SuccessGreen else PrimaryBlue
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "${stats.wfoDays} / ${stats.effectiveWorkdays}",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                contentDescription = null,
+                tint = if (isGoalReached) SuccessGreen else Gray400,
+                modifier = Modifier.size(16.dp)
+            )
+        }
     }
+}
+
+private fun formatMonth(yearMonth: YearMonth): String {
+    val monthNames = listOf(
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    )
+    return "${monthNames[yearMonth.monthValue - 1]} ${yearMonth.year}"
+}
+
+private fun formatMonthShort(yearMonth: YearMonth): String {
+    val monthAbbrevs = listOf(
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    )
+    return monthAbbrevs[yearMonth.monthValue - 1]
 }

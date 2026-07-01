@@ -10,46 +10,43 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// 办公专业主题 - 深色模式
-private val OfficeDarkColorScheme = darkColorScheme(
-    primary = JoyCoral,
-    secondary = JoyMint,
-    tertiary = JoyPurple,
-    background = JoyGray900,
-    surface = JoyGray800,
-    onPrimary = JoyGray900,
-    onSecondary = JoyGray900,
-    onTertiary = JoyGray900,
-    onBackground = JoyGray100,
-    onSurface = JoyGray100,
-    error = JoyError,
-    onError = JoyGray900
+// WFO Days Dark Theme
+private val DarkColorScheme = darkColorScheme(
+    primary = PrimaryBlueLight,
+    secondary = WFHGreen,
+    tertiary = PrimaryBlue,
+    background = Gray900,
+    surface = Gray800,
+    onPrimary = Gray900,
+    onSecondary = Gray900,
+    onTertiary = Gray900,
+    onBackground = Gray100,
+    onSurface = Gray100,
+    error = ErrorRed,
+    onError = Gray900
 )
 
-// 办公专业主题 - 浅色模式
-private val OfficeLightColorScheme = lightColorScheme(
-    primary = JoyOrange,
-    secondary = JoyMint,
-    tertiary = JoyPurple,
-    background = JoyBackground,
-    surface = JoySurface,
-    onPrimary = JoyOnPrimary,
-    onSecondary = JoyGray900,
-    onTertiary = JoyOnPrimary,
-    onBackground = JoyOnBackground,
-    onSurface = JoyOnSurface,
-    error = JoyError,
-    onError = JoyOnPrimary
+// WFO Days Light Theme
+private val LightColorScheme = lightColorScheme(
+    primary = PrimaryBlue,
+    secondary = WFHGreen,
+    tertiary = PrimaryBlue,
+    background = BackgroundLight,
+    surface = SurfaceWhite,
+    onPrimary = TextOnPrimary,
+    onSecondary = Gray900,
+    onTertiary = TextOnPrimary,
+    onBackground = TextPrimary,
+    onSurface = TextPrimary,
+    error = ErrorRed,
+    onError = TextOnPrimary
 )
-
-// 向后兼容的别名
-private val DarkColorScheme = OfficeDarkColorScheme
-private val LightColorScheme = OfficeLightColorScheme
 
 @Composable
 fun WFODaysTheme(
@@ -65,7 +62,7 @@ fun WFODaysTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
