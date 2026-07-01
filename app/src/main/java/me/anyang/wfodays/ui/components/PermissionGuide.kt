@@ -103,13 +103,13 @@ fun PermissionGuideCard(
             // Status or Button
             if (isGranted) {
                 Text(
-                    text = "Allowed",
+                    text = stringResource(R.string.allowed),
                     fontSize = 14.sp,
                     color = SuccessGreen
                 )
             } else {
                 Text(
-                    text = "Allow",
+                    text = stringResource(R.string.allow),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = PrimaryBlue

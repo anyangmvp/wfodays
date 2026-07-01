@@ -132,7 +132,7 @@ fun LocationScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Location",
+                        text = stringResource(R.string.title_location),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
@@ -239,14 +239,14 @@ private fun CurrentLocationCard(
             ) {
                 Column {
                     Text(
-                        text = "Current Location",
+                        text = stringResource(R.string.current_location),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = TextPrimary
                     )
                     if (currentLat != 0.0 && currentLon != 0.0) {
                         Text(
-                            text = "Updated now",
+                            text = stringResource(R.string.updated_now),
                             style = MaterialTheme.typography.bodySmall,
                             color = Gray500
                         )
@@ -255,7 +255,7 @@ private fun CurrentLocationCard(
                 IconButton(onClick = onRefresh) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh",
+                        contentDescription = stringResource(R.string.refresh_location_content_desc),
                         tint = if (isLoading) Gray400 else PrimaryBlue
                     )
                 }
@@ -288,7 +288,7 @@ private fun CurrentLocationCard(
                         color = TextPrimary
                     )
                     Text(
-                        text = " m",
+                        text = stringResource(R.string.meter_unit_short),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = TextSecondary,
@@ -307,7 +307,7 @@ private fun CurrentLocationCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = if (isInRange) "Inside Office Area" else "Outside Office Area",
+                        text = if (isInRange) stringResource(R.string.inside_office_area) else stringResource(R.string.outside_office_area),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
                         color = if (isInRange) SuccessGreen else WarningOrange
@@ -318,7 +318,7 @@ private fun CurrentLocationCard(
 
                 // Coordinates
                 Text(
-                    text = "${String.format("%.4f", currentLat)}° N, ${String.format("%.4f", currentLon)}° E",
+                    text = stringResource(R.string.coordinates_format, currentLat, currentLon),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray500
                 )
@@ -338,7 +338,7 @@ private fun CurrentLocationCard(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = if (hasPermission) "Tap refresh to get location" else "Location permission required",
+                        text = if (hasPermission) stringResource(R.string.tap_refresh_to_get_location) else stringResource(R.string.need_location_permission),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Gray500
                     )
@@ -349,7 +349,7 @@ private fun CurrentLocationCard(
                             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("Grant Permission")
+                            Text(stringResource(R.string.grant_permission_button))
                         }
                     }
                 }
@@ -390,7 +390,7 @@ private fun OfficeCenterCard() {
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "Office Center",
+                    text = stringResource(R.string.office_center),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary
@@ -406,7 +406,11 @@ private fun OfficeCenterCard() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "${String.format("%.4f", NativeLocationManager.OFFICE_LATITUDE)}° N, ${String.format("%.4f", NativeLocationManager.OFFICE_LONGITUDE)}° E",
+            text = stringResource(
+                R.string.coordinates_format,
+                NativeLocationManager.OFFICE_LATITUDE,
+                NativeLocationManager.OFFICE_LONGITUDE
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = Gray500
         )
@@ -450,19 +454,19 @@ private fun OfficeRadiusCard() {
         ) {
             Column {
                 Text(
-                    text = "Office Radius",
+                    text = stringResource(R.string.office_radius),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = TextPrimary
                 )
                 Text(
-                    text = "Detection range for auto check-in",
+                    text = stringResource(R.string.detection_range_for_auto_checkin),
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary
                 )
             }
             Text(
-                text = "${selectedRadius.toInt()} m",
+                text = stringResource(R.string.meters_format, selectedRadius.toInt()),
                 fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = PrimaryBlue
@@ -504,7 +508,7 @@ private fun OfficeRadiusCard() {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "${radius.toInt()} m",
+                            text = stringResource(R.string.meters_format, radius.toInt()),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             color = if (selectedRadius == radius) Color.White else TextSecondary
@@ -540,8 +544,8 @@ private fun OfficeRadiusCard() {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("100 m", style = MaterialTheme.typography.labelSmall, color = Gray400)
-            Text("2000 m", style = MaterialTheme.typography.labelSmall, color = Gray400)
+            Text(stringResource(R.string.min_radius_label), style = MaterialTheme.typography.labelSmall, color = Gray400)
+            Text(stringResource(R.string.max_radius_label), style = MaterialTheme.typography.labelSmall, color = Gray400)
         }
     }
 }

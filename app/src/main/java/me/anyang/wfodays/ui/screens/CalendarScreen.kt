@@ -59,7 +59,7 @@ fun CalendarScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Calendar",
+                        text = stringResource(R.string.title_calendar),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
@@ -182,7 +182,7 @@ private fun MonthNavigation(
         IconButton(onClick = onPreviousMonth) {
             Icon(
                 imageVector = Icons.Default.ChevronLeft,
-                contentDescription = "Previous",
+                contentDescription = stringResource(R.string.previous_month),
                 tint = PrimaryBlue,
                 modifier = Modifier.size(28.dp)
             )
@@ -200,7 +200,7 @@ private fun MonthNavigation(
         IconButton(onClick = onNextMonth) {
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Next",
+                contentDescription = stringResource(R.string.next_month),
                 tint = PrimaryBlue,
                 modifier = Modifier.size(28.dp)
             )
@@ -237,7 +237,16 @@ private fun CalendarGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT").forEach { day ->
+            val dayHeaders = listOf(
+                stringResource(R.string.weekday_sun),
+                stringResource(R.string.weekday_mon),
+                stringResource(R.string.weekday_tue),
+                stringResource(R.string.weekday_wed),
+                stringResource(R.string.weekday_thu),
+                stringResource(R.string.weekday_fri),
+                stringResource(R.string.weekday_sat)
+            )
+            dayHeaders.forEach { day ->
                 Text(
                     text = day,
                     style = MaterialTheme.typography.bodySmall,
@@ -369,10 +378,10 @@ private fun LegendSection() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            LegendItem(color = PrimaryBlue, label = "WFO")
-            LegendItem(color = SuccessGreen, label = "WFH")
-            LegendItem(color = WarningOrange, label = "Leave")
-            LegendItem(color = Gray300, label = "No Record")
+            LegendItem(color = PrimaryBlue, label = stringResource(R.string.wfo))
+            LegendItem(color = SuccessGreen, label = stringResource(R.string.wfh))
+            LegendItem(color = WarningOrange, label = stringResource(R.string.leave))
+            LegendItem(color = Gray300, label = stringResource(R.string.no_record))
         }
     }
 }
@@ -485,7 +494,10 @@ private fun DateDetailCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Checked in at 09:03",
+                            text = stringResource(
+                                R.string.checked_in_at_time,
+                                stringResource(R.string.checked_in_default_time)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
@@ -502,25 +514,25 @@ private fun DateDetailCard(
             ) {
                 QuickActionIcon(
                     icon = Icons.Default.Business,
-                    label = "WFO",
+                    label = stringResource(R.string.wfo),
                     color = PrimaryBlue,
                     onClick = onMarkWFO
                 )
                 QuickActionIcon(
                     icon = Icons.Default.HomeWork,
-                    label = "WFH",
+                    label = stringResource(R.string.wfh),
                     color = SuccessGreen,
                     onClick = onMarkWFH
                 )
                 QuickActionIcon(
                     icon = Icons.Default.BeachAccess,
-                    label = "Leave",
+                    label = stringResource(R.string.leave),
                     color = WarningOrange,
                     onClick = onMarkLeave
                 )
                 QuickActionIcon(
                     icon = Icons.Default.Delete,
-                    label = "Delete",
+                    label = stringResource(R.string.delete),
                     color = ErrorRed,
                     onClick = onDelete
                 )
@@ -533,19 +545,19 @@ private fun DateDetailCard(
             ) {
                 QuickActionIcon(
                     icon = Icons.Default.Business,
-                    label = "WFO",
+                    label = stringResource(R.string.wfo),
                     color = PrimaryBlue,
                     onClick = onMarkWFO
                 )
                 QuickActionIcon(
                     icon = Icons.Default.HomeWork,
-                    label = "WFH",
+                    label = stringResource(R.string.wfh),
                     color = SuccessGreen,
                     onClick = onMarkWFH
                 )
                 QuickActionIcon(
                     icon = Icons.Default.BeachAccess,
-                    label = "Leave",
+                    label = stringResource(R.string.leave),
                     color = WarningOrange,
                     onClick = onMarkLeave
                 )

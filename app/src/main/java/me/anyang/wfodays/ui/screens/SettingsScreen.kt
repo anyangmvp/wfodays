@@ -44,7 +44,6 @@ import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.location.NativeLocationManager
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.theme.*
-import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -97,7 +96,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
@@ -124,7 +123,7 @@ fun SettingsScreen(
                 visible = isVisible,
                 enter = fadeIn(tween(400))
             ) {
-                SettingsSection(title = "TARGET") {
+                SettingsSection(title = stringResource(R.string.settings_section_target)) {
                     TargetPercentageItem(
                         percentage = targetPercentage,
                         onClick = { showPercentageDialog = true }
@@ -139,11 +138,11 @@ fun SettingsScreen(
                 visible = isVisible,
                 enter = fadeIn(tween(500))
             ) {
-                SettingsSection(title = "LOCATION") {
+                SettingsSection(title = stringResource(R.string.settings_section_location)) {
                     SettingsItem(
                         icon = Icons.Default.Business,
                         iconColor = PrimaryBlue,
-                        title = "Office Location",
+                        title = stringResource(R.string.office_location),
                         subtitle = NativeLocationManager.OFFICE_NAME,
                         showArrow = false,
                         onClick = { }
@@ -151,16 +150,8 @@ fun SettingsScreen(
                     SettingsItem(
                         icon = Icons.Default.MyLocation,
                         iconColor = PrimaryBlue,
-                        title = "Office Radius",
-                        subtitle = "${officeRadius.toInt()} m",
-                        showArrow = false,
-                        onClick = { }
-                    )
-                    SettingsItem(
-                        icon = Icons.Default.LocationOn,
-                        iconColor = PrimaryBlue,
-                        title = "Calibrate Office Location",
-                        subtitle = null,
+                        title = stringResource(R.string.office_radius),
+                        subtitle = stringResource(R.string.meters_format, officeRadius.toInt()),
                         showArrow = false,
                         onClick = { }
                     )
@@ -174,20 +165,20 @@ fun SettingsScreen(
                 visible = isVisible,
                 enter = fadeIn(tween(600))
             ) {
-                SettingsSection(title = "NOTIFICATIONS") {
+                SettingsSection(title = stringResource(R.string.settings_section_notifications)) {
                     SettingsItem(
                         icon = Icons.Default.Notifications,
                         iconColor = WarningOrange,
-                        title = "Test Notification",
-                        subtitle = "Simulate a check-in to test notifications",
+                        title = stringResource(R.string.test_notification),
+                        subtitle = stringResource(R.string.test_notification_subtitle),
                         onClick = {
                             scope.launch {
                                 if (!locationPermissionState.status.isGranted) {
                                     NotificationHelper.showAttendanceNotification(
                                         context,
                                         LocalDate.now(),
-                                        "Test Check-in",
-                                        "Location permission required to test check-in notifications."
+                                        context.getString(R.string.test_check_in),
+                                        context.getString(R.string.test_checkin_permission_required)
                                     )
                                     return@launch
                                 }
@@ -212,9 +203,9 @@ fun SettingsScreen(
                                     )
                                     val distanceDisplay =
                                         if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
-                                            "${distance.toInt()} m"
+                                            context.getString(R.string.meters_format, distance.toInt())
                                         } else {
-                                            String.format("%.1f km", distance / 1000)
+                                            context.getString(R.string.distance_kilometer_format, distance / 1000)
                                         }
                                     val isInRange =
                                         distance <= NativeLocationManager.OFFICE_RADIUS_METERS
@@ -222,15 +213,15 @@ fun SettingsScreen(
                                     NotificationHelper.showAttendanceNotification(
                                         context,
                                         LocalDate.now(),
-                                        if (isInRange) "Test Check-in: WFO" else "Test Check-in: WFH",
-                                        "Distance to office: $distanceDisplay"
+                                        if (isInRange) context.getString(R.string.test_check_in_wfo) else context.getString(R.string.test_check_in_wfh),
+                                        context.getString(R.string.distance_to_office_format, distanceDisplay)
                                     )
                                 } else {
                                     NotificationHelper.showAttendanceNotification(
                                         context,
                                         LocalDate.now(),
-                                        "Test Check-in",
-                                        "Unable to get current location. Please try again."
+                                        context.getString(R.string.test_check_in),
+                                        context.getString(R.string.unable_to_get_location)
                                     )
                                 }
                             }
@@ -246,11 +237,11 @@ fun SettingsScreen(
                 visible = isVisible,
                 enter = fadeIn(tween(700))
             ) {
-                SettingsSection(title = "PERMISSIONS") {
+                SettingsSection(title = stringResource(R.string.settings_section_permissions)) {
                     PermissionItem(
                         icon = Icons.Default.LocationOn,
                         iconColor = SuccessGreen,
-                        title = "Location Permission",
+                        title = stringResource(R.string.location_permission_title),
                         isGranted = locationPermissionState.status.isGranted,
                         onClick = { locationPermissionState.launchPermissionRequest() }
                     )
@@ -258,7 +249,7 @@ fun SettingsScreen(
                         PermissionItem(
                             icon = Icons.Default.LocationOn,
                             iconColor = SuccessGreen,
-                            title = "Background Location",
+                            title = stringResource(R.string.background_location_permission_title),
                             isGranted = backgroundLocationState?.status?.isGranted ?: false,
                             onClick = { backgroundLocationState?.launchPermissionRequest() }
                         )
@@ -267,7 +258,7 @@ fun SettingsScreen(
                         PermissionItem(
                             icon = Icons.Default.Notifications,
                             iconColor = SuccessGreen,
-                            title = "Notifications",
+                            title = stringResource(R.string.notifications),
                             isGranted = notificationPermissionState?.status?.isGranted ?: false,
                             onClick = { notificationPermissionState?.launchPermissionRequest() }
                         )
@@ -282,19 +273,22 @@ fun SettingsScreen(
                 visible = isVisible,
                 enter = fadeIn(tween(800))
             ) {
-                SettingsSection(title = "ABOUT") {
+                SettingsSection(title = stringResource(R.string.settings_section_about)) {
                     SettingsItem(
                         icon = Icons.Default.Info,
                         iconColor = Gray400,
-                        title = "WFO Days",
-                        subtitle = "Version ${context.packageManager.getPackageInfo(context.packageName, 0).versionName}",
+                        title = stringResource(R.string.wfo_days),
+                        subtitle = context.getString(
+                            R.string.version_format,
+                            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                        ),
                         showArrow = false,
                         onClick = { }
                     )
                     SettingsItem(
                         icon = Icons.Default.NewReleases,
                         iconColor = Gray400,
-                        title = "What's New",
+                        title = stringResource(R.string.whats_new),
                         subtitle = null,
                         onClick = {
                             val intent = android.content.Intent(
@@ -307,8 +301,8 @@ fun SettingsScreen(
                     SettingsItem(
                         icon = Icons.Default.Security,
                         iconColor = Gray400,
-                        title = "Privacy (Local Only)",
-                        subtitle = "All data is stored on this device only.",
+                        title = stringResource(R.string.privacy_local_only),
+                        subtitle = stringResource(R.string.privacy_local_only_desc),
                         showArrow = false,
                         onClick = { }
                     )
@@ -360,14 +354,14 @@ private fun PercentageDialog(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "WFO Target",
+                        text = stringResource(R.string.wfo_target),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = TextPrimary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Set your monthly WFO target percentage",
+                        text = stringResource(R.string.set_wfo_target_percentage),
                         style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary
                     )
@@ -378,7 +372,7 @@ private fun PercentageDialog(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
                     Text(
-                        text = "${sliderValue.toInt()}%",
+                        text = stringResource(R.string.percentage_format, sliderValue.toInt()),
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryBlue,
@@ -404,8 +398,8 @@ private fun PercentageDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("10%", style = MaterialTheme.typography.bodySmall, color = Gray400)
-                        Text("100%", style = MaterialTheme.typography.bodySmall, color = Gray400)
+                        Text(stringResource(R.string.slider_min_value), style = MaterialTheme.typography.bodySmall, color = Gray400)
+                        Text(stringResource(R.string.slider_max_value), style = MaterialTheme.typography.bodySmall, color = Gray400)
                     }
                 }
 
@@ -425,7 +419,7 @@ private fun PercentageDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.cancel),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Medium,
                             color = TextSecondary
@@ -445,7 +439,7 @@ private fun PercentageDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.save),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = PrimaryBlue
@@ -490,19 +484,19 @@ private fun TargetPercentageItem(
                 .padding(start = 12.dp)
         ) {
             Text(
-                text = "WFO Target",
+                text = stringResource(R.string.wfo_target),
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextPrimary
             )
             Text(
-                text = "Monthly office attendance goal",
+                text = stringResource(R.string.monthly_office_attendance_goal),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
         }
 
         Text(
-            text = "${percentage.toInt()}%",
+            text = stringResource(R.string.percentage_format, percentage.toInt()),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = PrimaryBlue
@@ -649,7 +643,7 @@ private fun PermissionItem(
         }
 
         Text(
-            text = if (isGranted) "Allowed" else "Not Allowed",
+            text = if (isGranted) stringResource(R.string.allowed) else stringResource(R.string.not_allowed),
             style = MaterialTheme.typography.bodySmall,
             color = if (isGranted) SuccessGreen else WarningOrange
         )

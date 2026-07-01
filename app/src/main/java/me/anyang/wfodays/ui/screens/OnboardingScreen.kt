@@ -36,7 +36,6 @@ import me.anyang.wfodays.location.DailyCheckScheduler
 import me.anyang.wfodays.location.NativeLocationManager
 import me.anyang.wfodays.ui.components.PermissionGuideCard
 import me.anyang.wfodays.ui.theme.*
-import me.anyang.wfodays.utils.LanguageManager
 import android.Manifest
 import android.os.Build
 import androidx.compose.ui.res.stringResource

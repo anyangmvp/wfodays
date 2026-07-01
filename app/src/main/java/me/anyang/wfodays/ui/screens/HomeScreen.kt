@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,6 @@ import me.anyang.wfodays.ui.components.DonutChartWithTarget
 import me.anyang.wfodays.ui.components.MultiSegmentDonutChart
 import me.anyang.wfodays.ui.theme.*
 import me.anyang.wfodays.ui.viewmodel.HomeViewModel
-import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -71,7 +71,7 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "WFO Days",
+                        text = stringResource(R.string.wfo_days),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryBlue
@@ -200,7 +200,7 @@ private fun TodaySection(
     Column {
         // Date
         Text(
-            text = "Today",
+            text = stringResource(R.string.today),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = TextPrimary
@@ -228,7 +228,7 @@ private fun TodaySection(
                 .padding(12.dp)
         ) {
             Text(
-                text = "Today Status",
+                text = stringResource(R.string.today_status),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
@@ -241,7 +241,7 @@ private fun TodaySection(
             ) {
                 Column {
                     Text(
-                        text = todayRecord?.workMode?.name ?: "No Status",
+                        text = todayRecord?.workMode?.name ?: stringResource(R.string.no_status),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (todayRecord != null) TextPrimary else Gray400
@@ -256,13 +256,13 @@ private fun TodaySection(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Tap to change",
+                                text = stringResource(R.string.tap_to_change),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
                         } else {
                             Text(
-                                text = "Tap to set status",
+                                text = stringResource(R.string.tap_to_set_status),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
@@ -320,14 +320,14 @@ private fun TodaySection(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Change Status",
+                                text = stringResource(R.string.change_status),
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = TextPrimary
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Select your status for today",
+                                text = stringResource(R.string.select_status_for_today),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
@@ -339,8 +339,8 @@ private fun TodaySection(
                         ) {
                             // WFO option
                             DialogOption(
-                                label = "WFO",
-                                subtitle = "Working From Office",
+                                label = stringResource(R.string.wfo),
+                                subtitle = stringResource(R.string.work_from_office),
                                 icon = Icons.Default.Business,
                                 color = PrimaryBlue,
                                 onClick = {
@@ -358,8 +358,8 @@ private fun TodaySection(
 
                             // WFH option
                             DialogOption(
-                                label = "WFH",
-                                subtitle = "Working From Home",
+                                label = stringResource(R.string.wfh),
+                                subtitle = stringResource(R.string.work_from_home),
                                 icon = Icons.Default.HomeWork,
                                 color = SuccessGreen,
                                 onClick = {
@@ -377,8 +377,8 @@ private fun TodaySection(
 
                             // Leave option
                             DialogOption(
-                                label = "Leave",
-                                subtitle = "On Leave",
+                                label = stringResource(R.string.leave),
+                                subtitle = stringResource(R.string.on_leave),
                                 icon = Icons.Default.BeachAccess,
                                 color = WarningOrange,
                                 onClick = {
@@ -403,7 +403,7 @@ private fun TodaySection(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = PrimaryBlue
@@ -531,14 +531,14 @@ private fun MonthlyComplianceCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Monthly Office Compliance",
+                text = stringResource(R.string.monthly_office_compliance),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
             )
             Icon(
                 imageVector = Icons.Default.Info,
-                contentDescription = "Info",
+                contentDescription = stringResource(R.string.info),
                 tint = Gray400,
                 modifier = Modifier
                     .size(16.dp)
@@ -578,21 +578,21 @@ private fun StatsRow(
     ) {
         StatCard(
             value = wfoDays,
-            label = "WFO Days",
+            label = stringResource(R.string.wfo_days),
             icon = Icons.Default.Business,
             color = PrimaryBlue,
             modifier = Modifier.weight(1f)
         )
         StatCard(
             value = wfhDays,
-            label = "WFH Days",
+            label = stringResource(R.string.wfh_days),
             icon = Icons.Default.HomeWork,
             color = SuccessGreen,
             modifier = Modifier.weight(1f)
         )
         StatCard(
             value = remainingDays,
-            label = "Remaining",
+            label = stringResource(R.string.remaining_days_label),
             icon = Icons.AutoMirrored.Filled.TrendingUp,
             color = WarningOrange,
             modifier = Modifier.weight(1f)
@@ -684,7 +684,7 @@ private fun InsightCard(
             }
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "Insight",
+                text = stringResource(R.string.insight),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
@@ -695,9 +695,14 @@ private fun InsightCard(
 
         Text(
             text = if (remainingWfoDays > 0) {
-                "You need $remainingWfoDays more WFO day${if (remainingWfoDays > 1) "s" else ""} to meet your ${targetPercentage.toInt()}% office target."
+                pluralStringResource(
+                    R.plurals.wfo_days_needed_format,
+                    remainingWfoDays,
+                    remainingWfoDays,
+                    targetPercentage.toInt()
+                )
             } else {
-                "Great job! You've met your office target."
+                stringResource(R.string.goal_reached_office_target)
             },
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary,
@@ -707,7 +712,7 @@ private fun InsightCard(
         if (remainingWfoDays > 0 && remainingWorkdays > 0) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "$remainingWorkdays working days left this month",
+                text = stringResource(R.string.working_days_left_format, remainingWorkdays),
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray400
             )

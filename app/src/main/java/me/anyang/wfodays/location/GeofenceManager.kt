@@ -11,7 +11,6 @@ import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.data.repository.AttendanceRepository
 import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.utils.Constants
-import me.anyang.wfodays.utils.LanguageManager
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,22 +66,19 @@ class GeofenceManager @Inject constructor(
                 
                 // Only auto-record if no record exists or not already WFO
                 if (existingRecord == null || existingRecord.workMode != WorkMode.WFO) {
-                    // 获取配置好语言的 Context，确保通知显示正确的语言
-                    val localizedContext = LanguageManager.getLocalizedContext(context)
-                    
                     repository.recordAttendance(
                         date = today,
                         isPresent = true,
                         workMode = WorkMode.WFO,
                         type = RecordType.AUTO,
-                        note = localizedContext.getString(R.string.gps_location_format, OFFICE_NAME, distance.toInt())
+                        note = context.getString(R.string.gps_location_format, OFFICE_NAME, distance.toInt())
                     )
                     
                     NotificationHelper.showAttendanceNotification(
-                        localizedContext,
+                        context,
                         today,
-                        localizedContext.getString(R.string.notification_title_auto_record_wfo),
-                        localizedContext.getString(R.string.notification_message_auto_record_wfo, OFFICE_NAME)
+                        context.getString(R.string.notification_title_auto_record_wfo),
+                        context.getString(R.string.notification_message_auto_record_wfo, OFFICE_NAME)
                     )
                 }
             }

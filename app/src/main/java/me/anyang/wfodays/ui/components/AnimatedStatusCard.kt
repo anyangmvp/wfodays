@@ -40,8 +40,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.anyang.wfodays.R
 import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
 import me.anyang.wfodays.ui.theme.PrimaryBlue
@@ -69,26 +71,26 @@ fun AnimatedStatusCard(
         WorkMode.WFO -> Quad(
             Brush.verticalGradient(colors = listOf(PrimaryBlue.copy(alpha = 0.9f), PrimaryBlue)),
             Icons.Default.Home,
-            "Today WFO",
-            "Working From Office"
+            stringResource(R.string.today_wfo),
+            stringResource(R.string.work_from_office)
         )
         WorkMode.WFH -> Quad(
             Brush.verticalGradient(colors = listOf(SuccessGreen.copy(alpha = 0.9f), SuccessGreen)),
             Icons.Default.LocationOn,
-            "Today WFH",
-            "Working From Home"
+            stringResource(R.string.today_wfh),
+            stringResource(R.string.work_from_home)
         )
         WorkMode.LEAVE -> Quad(
             Brush.verticalGradient(colors = listOf(Color(0xFFFFB800).copy(alpha = 0.9f), Color(0xFFFFB800))),
             Icons.Default.BeachAccess,
-            "Today Leave",
-            "Enjoy Holiday"
+            stringResource(R.string.today_leave),
+            stringResource(R.string.enjoy_holiday)
         )
         else -> Quad(
             Brush.verticalGradient(colors = listOf(PrimaryBlueLight.copy(alpha = 0.9f), PrimaryBlueLight)),
             Icons.Default.Home,
-            "Not Recorded",
-            "Select Work Mode"
+            stringResource(R.string.not_recorded),
+            stringResource(R.string.select_work_mode)
         )
     }
 
@@ -145,8 +147,8 @@ fun AnimatedStatusCard(
                 if (recordType != null && workMode != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     val typeText = when (recordType) {
-                        RecordType.AUTO -> "Auto Detected"
-                        RecordType.MANUAL -> "Manually Recorded"
+                        RecordType.AUTO -> stringResource(R.string.auto_detected)
+                        RecordType.MANUAL -> stringResource(R.string.manually_recorded)
                     }
 
                     Row(
@@ -168,7 +170,7 @@ fun AnimatedStatusCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Long press to change status",
+                        text = stringResource(R.string.long_press_to_change_status),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.6f)
                     )
@@ -183,17 +185,17 @@ fun AnimatedStatusCard(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ActionButton(
-                            text = "WFO",
+                            text = stringResource(R.string.wfo),
                             onClick = onWFOClick,
                             color = PrimaryBlue
                         )
                         ActionButton(
-                            text = "WFH",
+                            text = stringResource(R.string.wfh),
                             onClick = onWFHClick,
                             color = SuccessGreen
                         )
                         ActionButton(
-                            text = "Leave",
+                            text = stringResource(R.string.leave),
                             onClick = onLeaveClick,
                             color = Color(0xFFFFB800)
                         )

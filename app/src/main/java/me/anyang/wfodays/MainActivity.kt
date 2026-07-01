@@ -30,7 +30,6 @@ import me.anyang.wfodays.ui.screens.OnboardingScreen
 import me.anyang.wfodays.ui.screens.SettingsScreen
 import me.anyang.wfodays.ui.screens.StatsScreen
 import me.anyang.wfodays.ui.theme.WFODaysTheme
-import me.anyang.wfodays.utils.LanguageManager
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,12 +42,7 @@ class MainActivity : ComponentActivity() {
     lateinit var locationManager: NativeLocationManager
 
     override fun attachBaseContext(newBase: Context?) {
-        val context = newBase?.let {
-            val language = LanguageManager.getCurrentLanguage(it)
-            LanguageManager.setLanguage(it, language)
-            it
-        }
-        super.attachBaseContext(context)
+        super.attachBaseContext(newBase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +75,6 @@ fun WFOApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Routes that show bottom navigation
     val bottomBarRoutes = bottomNavItems.map { it.route }
     val showBottomBar = currentRoute in bottomBarRoutes
 

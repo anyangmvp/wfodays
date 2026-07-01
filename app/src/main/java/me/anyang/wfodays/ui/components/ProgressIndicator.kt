@@ -124,7 +124,7 @@ fun TargetProgressCard(
         }
         
         Text(
-            text = "$presentDays / $requiredDays days (${(progress * 100).toInt()}%)",
+            text = stringResource(R.string.progress_format, presentDays, requiredDays, (progress * 100).toInt()),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

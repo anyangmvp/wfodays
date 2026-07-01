@@ -71,7 +71,7 @@ fun StatsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Trends",
+                        text = stringResource(R.string.title_trends),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
@@ -169,7 +169,7 @@ private fun OfficeComplianceSection(stats: MonthlyStatistics, targetPercentage: 
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Office Compliance",
+                text = stringResource(R.string.office_compliance),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
@@ -204,7 +204,7 @@ private fun OfficeComplianceSection(stats: MonthlyStatistics, targetPercentage: 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "${stats.wfoDays} / ${stats.effectiveWorkdays} days",
+                text = stringResource(R.string.days_count_format, stats.wfoDays, stats.effectiveWorkdays),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextPrimary
             )
@@ -212,7 +212,7 @@ private fun OfficeComplianceSection(stats: MonthlyStatistics, targetPercentage: 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Target: ${targetPercentage.toInt()}%",
+                text = stringResource(R.string.target_percentage_format, targetPercentage.toInt()),
                 style = MaterialTheme.typography.bodySmall,
                 color = WarningOrange
             )
@@ -248,7 +248,7 @@ private fun MonthlyTrendChart(stats: List<MonthlyStatistics>) {
             .padding(12.dp)
     ) {
         Text(
-            text = "Monthly Trend",
+            text = stringResource(R.string.monthly_trend),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             color = TextPrimary
@@ -271,7 +271,7 @@ private fun MonthlyTrendChart(stats: List<MonthlyStatistics>) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "$percentage%",
+                            text = stringResource(R.string.percentage_format, percentage),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             color = PrimaryBlue
@@ -353,7 +353,7 @@ private fun HistorySection(
             .padding(16.dp)
     ) {
         Text(
-            text = "History",
+            text = stringResource(R.string.history),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = TextPrimary
@@ -369,7 +369,7 @@ private fun HistorySection(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No history data yet",
+                    text = stringResource(R.string.no_history_data_yet),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray400
                 )
@@ -413,14 +413,14 @@ private fun HistoryItem(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "$percentage%",
+                text = stringResource(R.string.percentage_format, percentage),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isGoalReached) SuccessGreen else PrimaryBlue
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "${stats.wfoDays} / ${stats.effectiveWorkdays}",
+                text = stringResource(R.string.days_count_format, stats.wfoDays, stats.effectiveWorkdays),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
@@ -435,18 +435,25 @@ private fun HistoryItem(
     }
 }
 
+@Composable
 private fun formatMonth(yearMonth: YearMonth): String {
-    val monthNames = listOf(
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+    val monthResIds = listOf(
+        R.string.month_full_jan, R.string.month_full_feb, R.string.month_full_mar,
+        R.string.month_full_apr, R.string.month_full_may, R.string.month_full_jun,
+        R.string.month_full_jul, R.string.month_full_aug, R.string.month_full_sep,
+        R.string.month_full_oct, R.string.month_full_nov, R.string.month_full_dec
     )
-    return "${monthNames[yearMonth.monthValue - 1]} ${yearMonth.year}"
+    val monthName = stringResource(monthResIds[yearMonth.monthValue - 1])
+    return stringResource(R.string.month_year_format, monthName, yearMonth.year)
 }
 
+@Composable
 private fun formatMonthShort(yearMonth: YearMonth): String {
-    val monthAbbrevs = listOf(
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    val monthResIds = listOf(
+        R.string.month_abbr_jan, R.string.month_abbr_feb, R.string.month_abbr_mar,
+        R.string.month_abbr_apr, R.string.month_abbr_may, R.string.month_abbr_jun,
+        R.string.month_abbr_jul, R.string.month_abbr_aug, R.string.month_abbr_sep,
+        R.string.month_abbr_oct, R.string.month_abbr_nov, R.string.month_abbr_dec
     )
-    return monthAbbrevs[yearMonth.monthValue - 1]
+    return stringResource(monthResIds[yearMonth.monthValue - 1])
 }

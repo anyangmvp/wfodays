@@ -16,10 +16,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.anyang.wfodays.R
 import me.anyang.wfodays.ui.theme.*
 
 @Composable
@@ -70,14 +72,14 @@ fun DonutChart(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${percentage.toInt()}%",
+                text = stringResource(R.string.percentage_format, percentage.toInt()),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "$daysCompleted / $totalDays days",
+                text = stringResource(R.string.days_count_format, daysCompleted, totalDays),
                 fontSize = 12.sp,
                 color = TextSecondary
             )
@@ -183,14 +185,14 @@ fun MultiSegmentDonutChart(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${percentage.toInt()}%",
+                    text = stringResource(R.string.percentage_format, percentage.toInt()),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "$wfoDays / $totalDays days",
+                    text = stringResource(R.string.days_count_format, wfoDays, totalDays),
                     fontSize = 14.sp,
                     color = TextSecondary
                 )
@@ -271,20 +273,20 @@ fun DonutChartWithTarget(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${percentage.toInt()}%",
+                text = stringResource(R.string.percentage_format, percentage.toInt()),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "$daysCompleted / $totalDays days",
+                text = stringResource(R.string.days_count_format, daysCompleted, totalDays),
                 fontSize = 12.sp,
                 color = TextSecondary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Target: ${targetPercentage.toInt()}%",
+                text = stringResource(R.string.target_percentage_format, targetPercentage.toInt()),
                 fontSize = 10.sp,
                 color = targetIndicatorColor
             )

@@ -106,7 +106,7 @@
     <string name="daily_reminder_desc">Location recording reminder at 10 AM</string>
     
     <!-- Permission Guide -->
-    <string name="grant_permission_button">Grant</string>
+    <string name="grant_permission_button">Grant Permission</string>
     <string name="permission_granted">Granted</string>
     <string name="go_to_settings_button">Go to Settings</string>
     <string name="auto_start_permission_title">Auto Start Permission</string>
@@ -336,4 +336,189 @@
     <string name="custom_interval">Custom</string>
     <string name="input_hint">Input</string>
     <string name="minutes_unit">min</string>
+
+    <!-- Extracted hardcoded strings -->
+
+    <!-- Navigation titles -->
+    <string name="title_summary">Summary</string>
+    <string name="title_trends">Trends</string>
+    <string name="title_location">Location</string>
+
+    <!-- AnimatedStatusCard -->
+    <string name="not_recorded">Not Recorded</string>
+    <string name="select_work_mode">Select Work Mode</string>
+    <string name="auto_detected">Auto Detected</string>
+    <string name="long_press_to_change_status">Long press to change status</string>
+
+    <!-- HomeScreen -->
+    <string name="today">Today</string>
+    <string name="no_status">No Status</string>
+    <string name="tap_to_change">Tap to change</string>
+    <string name="tap_to_set_status">Tap to set status</string>
+    <string name="change_status">Change Status</string>
+    <string name="select_status_for_today">Select your status for today</string>
+    <string name="monthly_office_compliance">Monthly Office Compliance</string>
+    <string name="info">Info</string>
+    <string name="insight">Insight</string>
+    <string name="goal_reached_office_target">Great job! You\'ve met your office target.</string>
+    <string name="working_days_left_format">%1$d working days left this month</string>
+    <plurals name="wfo_days_needed_format">
+        <item quantity="one">You need %1$d more WFO day to meet your %2$d%% office target.</item>
+        <item quantity="other">You need %1$d more WFO days to meet your %2$d%% office target.</item>
+    </plurals>
+
+    <!-- CalendarScreen -->
+    <string name="no_record">No Record</string>
+    <string name="checked_in_at_time">Checked in at %s</string>
+    <string name="checked_in_default_time">09:03</string>
+
+    <!-- LocationScreen -->
+    <string name="updated_now">Updated now</string>
+    <string name="inside_office_area">Inside Office Area</string>
+    <string name="outside_office_area">Outside Office Area</string>
+    <string name="tap_refresh_to_get_location">Tap refresh to get location</string>
+    <string name="office_center">Office Center</string>
+    <string name="office_radius">Office Radius</string>
+    <string name="detection_range_for_auto_checkin">Detection range for auto check-in</string>
+    <string name="meters_format">%d m</string>
+    <string name="meter_unit_short">\u0020m</string>
+    <string name="min_radius_label">100 m</string>
+    <string name="max_radius_label">2000 m</string>
+    <string name="coordinates_format">%1$.4f° N, %2$.4f° E</string>
+
+    <!-- SettingsScreen -->
+    <string name="settings_section_target">TARGET</string>
+    <string name="settings_section_location">LOCATION</string>
+    <string name="settings_section_notifications">NOTIFICATIONS</string>
+    <string name="settings_section_permissions">PERMISSIONS</string>
+    <string name="settings_section_about">ABOUT</string>
+    <string name="wfo_target">WFO Target</string>
+    <string name="monthly_office_attendance_goal">Monthly office attendance goal</string>
+    <string name="office_location">Office Location</string>
+    <string name="calibrate_office_location">Calibrate Office Location</string>
+    <string name="test_notification_subtitle">Simulate a check-in to test notifications</string>
+    <string name="test_check_in">Test Check-in</string>
+    <string name="test_check_in_wfo">Test Check-in: WFO</string>
+    <string name="test_check_in_wfh">Test Check-in: WFH</string>
+    <string name="test_checkin_permission_required">Location permission required to test check-in notifications.</string>
+    <string name="distance_to_office_format">Distance to office: %s</string>
+    <string name="unable_to_get_location">Unable to get current location. Please try again.</string>
+    <string name="notifications">Notifications</string>
+    <string name="whats_new">What\'s New</string>
+    <string name="privacy_local_only">Privacy (Local Only)</string>
+    <string name="privacy_local_only_desc">All data is stored on this device only.</string>
+    <string name="set_wfo_target_percentage">Set your monthly WFO target percentage</string>
+    <string name="allowed">Allowed</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="allow">Allow</string>
+    <string name="slider_min_value">10%</string>
+    <string name="slider_max_value">100%</string>
+
+    <!-- StatsScreen -->
+    <string name="office_compliance">Office Compliance</string>
+    <string name="monthly_trend">Monthly Trend</string>
+    <string name="no_history_data_yet">No history data yet</string>
+    <string name="target_percentage_format">Target: %1$d%%</string>
+    <string name="days_count_format">%1$d / %2$d days</string>
+    <string name="percentage_format">%1$d%%</string>
+    <string name="month_full_jan">January</string>
+    <string name="month_full_feb">February</string>
+    <string name="month_full_mar">March</string>
+    <string name="month_full_apr">April</string>
+    <string name="month_full_may">May</string>
+    <string name="month_full_jun">June</string>
+    <string name="month_full_jul">July</string>
+    <string name="month_full_aug">August</string>
+    <string name="month_full_sep">September</string>
+    <string name="month_full_oct">October</string>
+    <string name="month_full_nov">November</string>
+    <string name="month_full_dec">December</string>
+    <string name="month_year_format">%1$s %2$d</string>
+
+    <!-- Location error messages -->
+    <string name="error_location_permission_not_granted">Location permission not granted</string>
+
+    <!-- Greetings - Morning -->
+    <string-array name="greetings_morning">
+        <item>Good morning! Start your day with energy.</item>
+        <item>Rise and shine! Make today productive.</item>
+        <item>Morning! Fresh start, fresh goals.</item>
+        <item>Good morning! Ready to tackle the day?</item>
+        <item>A new day begins. Let\'s make it count.</item>
+        <item>Good morning! Embrace the opportunities ahead.</item>
+        <item>Rise and grind! Success awaits.</item>
+        <item>Morning! Today is full of possibilities.</item>
+        <item>Good morning! Stay positive and focused.</item>
+        <item>A fresh morning brings fresh chances.</item>
+    </string-array>
+
+    <!-- Greetings - Noon -->
+    <string-array name="greetings_noon">
+        <item>Good afternoon! Take a break.</item>
+        <item>Lunch time! Recharge your energy.</item>
+        <item>Midday check-in. Keep going strong.</item>
+        <item>Pause and refresh. You\'ve got this.</item>
+        <item>Afternoon! Stay focused and balanced.</item>
+        <item>Good afternoon! Halfway through the day.</item>
+        <item>Take a breath. You\'re doing great.</item>
+        <item>Lunch break! Fuel up for later.</item>
+        <item>Midday moment. Reflect and continue.</item>
+        <item>Good afternoon! Keep the momentum.</item>
+    </string-array>
+
+    <!-- Greetings - Afternoon -->
+    <string-array name="greetings_afternoon">
+        <item>Good afternoon! Maintain your momentum.</item>
+        <item>Stay productive. The day\'s in full swing.</item>
+        <item>Afternoon! Keep pushing forward.</item>
+        <item>You\'re doing great. Finish strong.</item>
+        <item>Productive afternoon ahead!</item>
+        <item>Good afternoon! Stay on track.</item>
+        <item>The day\'s not over. Keep shining.</item>
+        <item>Afternoon energy! Let\'s get things done.</item>
+        <item>Stay focused. Success is near.</item>
+        <item>Good afternoon! Make every minute count.</item>
+    </string-array>
+
+    <!-- Greetings - Evening -->
+    <string-array name="greetings_evening">
+        <item>Good evening! Time to unwind.</item>
+        <item>Great work today. Enjoy your evening.</item>
+        <item>Evening! Relax and recharge.</item>
+        <item>Well done today. Rest well.</item>
+        <item>Good evening! You earned this break.</item>
+        <item>The day is done. Be proud of yourself.</item>
+        <item>Evening! Time for yourself now.</item>
+        <item>Good evening! Reflect on today\'s wins.</item>
+        <item>Relax and enjoy. Tomorrow\'s a new day.</item>
+        <item>Evening! Peaceful moments ahead.</item>
+    </string-array>
+
+    <!-- Greetings - Night -->
+    <string-array name="greetings_night">
+        <item>Late night! Get some rest.</item>
+        <item>Time to sleep. Tomorrow awaits.</item>
+        <item>Rest up. Big day ahead.</item>
+        <item>Night owl mode. Don\'t overdo it.</item>
+        <item>Quiet hours. Recharge now.</item>
+        <item>Good night! Sweet dreams.</item>
+        <item>Rest well. You deserve it.</item>
+        <item>Night time. Let go of today\'s stress.</item>
+        <item>Sleep tight. See you tomorrow.</item>
+        <item>Late hours. Prioritize your rest.</item>
+    </string-array>
+
+    <!-- Greetings - Weekend -->
+    <string-array name="greetings_weekend">
+        <item>Happy weekend! Enjoy your time off.</item>
+        <item>Weekend vibes! Do what you love.</item>
+        <item>It\'s the weekend! Relax and recharge.</item>
+        <item>Weekend mode on. Make it memorable.</item>
+        <item>Enjoy your weekend! You\'ve earned it.</item>
+        <item>Happy weekend! Adventure awaits.</item>
+        <item>Weekend! Time for fun and rest.</item>
+        <item>It\'s the weekend. Live in the moment.</item>
+        <item>Happy weekend! Create great memories.</item>
+        <item>Weekend joy! Embrace the freedom.</item>
+    </string-array>
 </resources>

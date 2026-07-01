@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import me.anyang.wfodays.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -55,7 +56,7 @@ class NativeLocationManager @Inject constructor(
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            _locationState.value = LocationState.Error("定位权限未授权")
+            _locationState.value = LocationState.Error(context.getString(R.string.error_location_permission_not_granted))
             return
         }
 
