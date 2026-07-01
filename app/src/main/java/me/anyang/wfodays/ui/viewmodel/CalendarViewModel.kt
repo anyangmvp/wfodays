@@ -3,6 +3,7 @@ package me.anyang.wfodays.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,8 +23,11 @@ class CalendarViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalendarUiState())
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
+    private var loadJob: Job? = null
+
     fun loadMonthData(yearMonth: YearMonth) {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 currentMonth = yearMonth,
                 isLoading = true

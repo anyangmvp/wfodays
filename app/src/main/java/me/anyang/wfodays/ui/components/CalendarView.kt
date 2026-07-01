@@ -8,7 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -128,7 +128,7 @@ fun CalendarView(
                 columns = GridCells.Fixed(7),
                 modifier = Modifier.height(280.dp)
             ) {
-                items(days) { dayDate ->
+                itemsIndexed(days, key = { index, dayDate -> dayDate?.toEpochDay() ?: -index.toLong() - 1 }) { _, dayDate ->
                     if (dayDate != null) {
                         val record = records.find {
                             java.time.Instant.ofEpochMilli(it.date)
@@ -223,7 +223,7 @@ private fun CalendarDayCell(
                     )
                 } else Modifier
             )
-            .pointerInput(Unit) {
+            .pointerInput(date) {
                 detectTapGestures(
                     onTap = {
                         isPressed = true
