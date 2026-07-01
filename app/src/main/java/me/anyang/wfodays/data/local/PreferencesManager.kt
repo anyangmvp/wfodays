@@ -21,6 +21,7 @@ class PreferencesManager(private val context: Context) {
         val DEBUG_NOTIFICATION_MODE = booleanPreferencesKey("debug_notification_mode")
         val DEBUG_NOTIFICATION_INTERVAL = intPreferencesKey("debug_notification_interval")
         val WFO_TARGET_PERCENTAGE = floatPreferencesKey("wfo_target_percentage")
+        val OFFICE_RADIUS = floatPreferencesKey("office_radius")
     }
 
     val isFirstLaunch: Flow<Boolean> = context.dataStore.data
@@ -41,6 +42,11 @@ class PreferencesManager(private val context: Context) {
     val wfoTargetPercentage: Flow<Float> = context.dataStore.data
         .map { preferences ->
             preferences[WFO_TARGET_PERCENTAGE] ?: 30f  // 默认30%
+        }
+
+    val officeRadius: Flow<Float> = context.dataStore.data
+        .map { preferences ->
+            preferences[OFFICE_RADIUS] ?: 500f  // 默认500米
         }
 
     suspend fun setFirstLaunchComplete() {
@@ -64,6 +70,12 @@ class PreferencesManager(private val context: Context) {
     suspend fun setWfoTargetPercentage(percentage: Float) {
         context.dataStore.edit { preferences ->
             preferences[WFO_TARGET_PERCENTAGE] = percentage
+        }
+    }
+
+    suspend fun setOfficeRadius(radius: Float) {
+        context.dataStore.edit { preferences ->
+            preferences[OFFICE_RADIUS] = radius
         }
     }
 }

@@ -25,8 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.anyang.wfodays.R
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.HSBCRedLight
+import me.anyang.wfodays.ui.theme.PrimaryBlue
+import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 
 @Composable
 fun AnimatedProgressIndicator(
@@ -64,7 +64,7 @@ fun AnimatedProgressIndicator(
                     .height(12.dp)
                     .background(
                         Brush.horizontalGradient(
-                            colors = listOf(HSBCRed, HSBCRedLight)
+                            colors = listOf(PrimaryBlue, PrimaryBlueLight)
                         )
                     )
             )
@@ -83,9 +83,9 @@ fun TargetProgressCard(
     val progress = if (requiredDays > 0) {
         (presentDays.toFloat() / requiredDays).coerceIn(0f, 1f)
     } else 0f
-    
+
     val animatedProgress = remember { Animatable(0f) }
-    
+
     LaunchedEffect(progress) {
         animatedProgress.animateTo(
             targetValue = progress,
@@ -99,7 +99,7 @@ fun TargetProgressCard(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
         )
-        
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,8 +115,8 @@ fun TargetProgressCard(
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(
-                                if (remainingDays <= 0) Color(0xFF4CAF50) else HSBCRed,
-                                if (remainingDays <= 0) Color(0xFF81C784) else HSBCRedLight
+                                if (remainingDays <= 0) Color(0xFF4CAF50) else PrimaryBlue,
+                                if (remainingDays <= 0) Color(0xFF81C784) else PrimaryBlueLight
                             )
                         )
                     )
@@ -124,7 +124,7 @@ fun TargetProgressCard(
         }
         
         Text(
-            text = "$presentDays / $requiredDays 天 (${(progress * 100).toInt()}%)",
+            text = "$presentDays / $requiredDays days (${(progress * 100).toInt()}%)",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

@@ -239,60 +239,67 @@ private fun MonthlyTrendChart(stats: List<MonthlyStatistics>) {
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color.Black.copy(alpha = 0.05f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(BackgroundWhite)
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         Text(
             text = "Monthly Trend",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             color = TextPrimary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Simple trend visualization using Canvas
         if (stats.isNotEmpty()) {
             val maxPercentage = 100f
 
+            // Month labels with percentages
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                stats.takeLast(6).forEach { stat ->
+                    val percentage = (stat.currentRate * 100).toInt()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "$percentage%",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium,
+                            color = PrimaryBlue
+                        )
+                        Text(
+                            text = formatMonthShort(stat.yearMonth),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Gray400
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(80.dp)
             ) {
-                val strokeWidthPx = with(density) { 3.dp.toPx() }
-                val paddingPx = with(density) { 8.dp.toPx() }
+                val strokeWidthPx = with(density) { 2.dp.toPx() }
+                val paddingPx = with(density) { 4.dp.toPx() }
                 val width = size.width - paddingPx * 2
                 val height = size.height - paddingPx * 2
                 val stepX = if (stats.size > 1) width / (stats.size - 1) else width
 
-                // Draw grid lines
-                drawLine(
-                    color = Color(0xFFE2E8F0),
-                    start = Offset(paddingPx, paddingPx + height * 0.25f),
-                    end = Offset(size.width - paddingPx, paddingPx + height * 0.25f),
-                    strokeWidth = with(density) { 1.dp.toPx() }
-                )
-                drawLine(
-                    color = Color(0xFFE2E8F0),
-                    start = Offset(paddingPx, paddingPx + height * 0.5f),
-                    end = Offset(size.width - paddingPx, paddingPx + height * 0.5f),
-                    strokeWidth = with(density) { 1.dp.toPx() }
-                )
-                drawLine(
-                    color = Color(0xFFE2E8F0),
-                    start = Offset(paddingPx, paddingPx + height * 0.75f),
-                    end = Offset(size.width - paddingPx, paddingPx + height * 0.75f),
-                    strokeWidth = with(density) { 1.dp.toPx() }
-                )
-
                 // Draw line chart
-                val points = stats.mapIndexed { index, stat ->
+                val points = stats.takeLast(6).mapIndexed { index, stat ->
                     val x = paddingPx + index * stepX
                     val percentage = (stat.currentRate * 100).coerceIn(0f, maxPercentage)
                     val y = paddingPx + height - (percentage / maxPercentage * height)
@@ -314,27 +321,13 @@ private fun MonthlyTrendChart(stats: List<MonthlyStatistics>) {
                 points.forEach { point ->
                     drawCircle(
                         color = PrimaryBlue,
-                        radius = with(density) { 5.dp.toPx() },
+                        radius = with(density) { 4.dp.toPx() },
                         center = point
                     )
                     drawCircle(
                         color = Color.White,
-                        radius = with(density) { 3.dp.toPx() },
+                        radius = with(density) { 2.dp.toPx() },
                         center = point
-                    )
-                }
-            }
-
-            // Month labels
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                stats.takeLast(6).forEach { stat ->
-                    Text(
-                        text = formatMonthShort(stat.yearMonth),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray400
                     )
                 }
             }

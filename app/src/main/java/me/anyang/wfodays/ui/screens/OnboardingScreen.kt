@@ -101,7 +101,7 @@ fun OnboardingScreen(
         ) {
             val pulseScale by rememberInfiniteTransition(label = "pulse").animateFloat(
                 initialValue = 1f,
-                targetValue = 1.05f,
+                targetValue = 1.03f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(1500, easing = EaseInOutSine),
                     repeatMode = RepeatMode.Reverse
@@ -111,31 +111,22 @@ fun OnboardingScreen(
 
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(100.dp)
                     .scale(pulseScale)
-                    .shadow(
-                        elevation = 16.dp,
-                        shape = CircleShape,
-                        spotColor = PrimaryBlue.copy(alpha = 0.4f)
-                    )
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(PrimaryBlueDark, PrimaryBlue, PrimaryBlueLight)
-                        ),
-                        CircleShape
-                    ),
+                    .clip(CircleShape)
+                    .background(PrimaryBlue.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = null,
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.White
+                    modifier = Modifier.size(48.dp),
+                    tint = PrimaryBlue
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // 欢迎标题
         AnimatedVisibility(
@@ -174,10 +165,8 @@ fun OnboardingScreen(
                 animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
             )
         ) {
-            LanguageSelectorCard()
+            Spacer(modifier = Modifier.height(8.dp))
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         // 功能说明卡片
         AnimatedVisibility(
@@ -266,7 +255,7 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 开始按钮
+        // Start button
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(tween(1000, delayMillis = 600)) + slideInVertically(
@@ -284,34 +273,19 @@ fun OnboardingScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(16.dp),
-                            spotColor = if (locationPermissionState.status.isGranted) {
-                                PrimaryBlue.copy(alpha = 0.4f)
-                            } else Color.Gray.copy(alpha = 0.2f)
-                        ),
+                        .height(52.dp),
                     enabled = locationPermissionState.status.isGranted,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PrimaryBlue,
-                        disabledContainerColor = Color.LightGray
+                        disabledContainerColor = Gray300
                     )
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.RocketLaunch,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.start_using_button),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.start_using_button),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
 
                 if (!locationPermissionState.status.isGranted) {
@@ -320,7 +294,7 @@ fun OnboardingScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(WarningYellow.copy(alpha = 0.1f))
+                            .background(WarningOrange.copy(alpha = 0.1f))
                             .padding(12.dp)
                     ) {
                         Row(
@@ -331,14 +305,14 @@ fun OnboardingScreen(
                             Icon(
                                 imageVector = Icons.Default.Info,
                                 contentDescription = null,
-                                tint = WarningYellow,
+                                tint = WarningOrange,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.location_permission_required),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = WarningYellow
+                                color = WarningOrange
                             )
                         }
                     }
@@ -355,17 +329,12 @@ private fun FeatureCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
-            )
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
-            .padding(20.dp)
+            .padding(16.dp)
     ) {
         Column {
-            // 标题
+            // Title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -376,20 +345,19 @@ private fun FeatureCard() {
                         .background(PrimaryBlue, RoundedCornerShape(2.dp))
                 )
                 Text(
-                            text = stringResource(R.string.main_features_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 12.dp),
-                            color = PrimaryBlueDark
-                        )
+                    text = stringResource(R.string.main_features_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp),
+                    color = TextPrimary
+                )
             }
 
-            // 功能项
+            // Feature items
             FeatureItem(
                 icon = Icons.Default.LocationOn,
                 iconColor = PrimaryBlue,
-                title = stringResource(R.string.auto_detection_title),
-                description = stringResource(R.string.auto_detection_desc, NativeLocationManager.OFFICE_NAME)
+                title = stringResource(R.string.auto_detection_title)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -397,17 +365,15 @@ private fun FeatureCard() {
             FeatureItem(
                 icon = Icons.Default.EditCalendar,
                 iconColor = SuccessGreen,
-                title = stringResource(R.string.manual_recording_title),
-                description = stringResource(R.string.manual_recording_desc)
+                title = stringResource(R.string.manual_recording_title)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             FeatureItem(
                 icon = Icons.Default.Notifications,
-                iconColor = WarningYellow,
-                title = stringResource(R.string.daily_reminder_title),
-                description = stringResource(R.string.daily_reminder_desc)
+                iconColor = WarningOrange,
+                title = stringResource(R.string.daily_reminder_title)
             )
         }
     }
@@ -417,8 +383,7 @@ private fun FeatureCard() {
 private fun FeatureItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     iconColor: Color,
-    title: String,
-    description: String
+    title: String
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -426,170 +391,26 @@ private fun FeatureItem(
     ) {
         Box(
             modifier = Modifier
-                .size(44.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = CircleShape,
-                    spotColor = iconColor.copy(alpha = 0.3f)
-                )
-                .background(iconColor.copy(alpha = 0.15f), CircleShape),
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(iconColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = iconColor,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-        Column {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = PrimaryBlueDark
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-        }
-    }
-}
-
-/**
- * 语言选择卡片组件
- * 允许用户在引导页面选择应用语言
- */
-@Composable
-private fun LanguageSelectorCard() {
-    val context = LocalContext.current
-    val activity = context as? android.app.Activity
-    
-    // 使用 remember 保存当前语言状态，从 SharedPreferences 读取
-    var currentLanguage by remember { 
-        mutableStateOf(LanguageManager.getCurrentLanguage(context)) 
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = PrimaryBlue.copy(alpha = 0.2f)
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            // 标题
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Language,
-                    contentDescription = null,
-                    tint = PrimaryBlue,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.language_setting_title),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = PrimaryBlueDark
-                )
-            }
-
-            // 语言选项
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // 中文选项
-                LanguageOptionButton(
-                    languageCode = LanguageManager.LANG_ZH,
-                    displayName = stringResource(R.string.chinese_language),
-                    isSelected = currentLanguage == LanguageManager.LANG_ZH,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        if (currentLanguage != LanguageManager.LANG_ZH) {
-                            // 先保存语言设置
-                            LanguageManager.setLanguage(context, LanguageManager.LANG_ZH)
-                            // 更新本地状态
-                            currentLanguage = LanguageManager.LANG_ZH
-                            // 重启 Activity 应用更改
-                            activity?.let {
-                                LanguageManager.restartActivitySafely(it)
-                            }
-                        }
-                    }
-                )
-
-                // 英文选项
-                LanguageOptionButton(
-                    languageCode = LanguageManager.LANG_EN,
-                    displayName = "English",
-                    isSelected = currentLanguage == LanguageManager.LANG_EN,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        if (currentLanguage != LanguageManager.LANG_EN) {
-                            // 先保存语言设置
-                            LanguageManager.setLanguage(context, LanguageManager.LANG_EN)
-                            // 更新本地状态
-                            currentLanguage = LanguageManager.LANG_EN
-                            // 重启 Activity 应用更改
-                            activity?.let {
-                                LanguageManager.restartActivitySafely(it)
-                            }
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
-
-/**
- * 语言选项按钮
- */
-@Composable
-private fun LanguageOptionButton(
-    languageCode: String,
-    displayName: String,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val backgroundColor = if (isSelected) PrimaryBlue else PrimaryBlue.copy(alpha = 0.1f)
-    val textColor = if (isSelected) Color.White else PrimaryBlueDark
-
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(40.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            contentColor = textColor
-        ),
-        elevation = if (isSelected) {
-            ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-        } else {
-            ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-        }
-    ) {
         Text(
-            text = displayName,
+            text = title,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = TextPrimary
         )
     }
 }

@@ -44,8 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.anyang.wfodays.data.entity.RecordType
 import me.anyang.wfodays.data.entity.WorkMode
-import me.anyang.wfodays.ui.theme.HSBCRed
-import me.anyang.wfodays.ui.theme.HSBCRedLight
+import me.anyang.wfodays.ui.theme.PrimaryBlue
+import me.anyang.wfodays.ui.theme.PrimaryBlueLight
 import me.anyang.wfodays.ui.theme.SuccessGreen
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -67,28 +67,28 @@ fun AnimatedStatusCard(
 
     val (backgroundBrush, icon, title, subtitle) = when (workMode) {
         WorkMode.WFO -> Quad(
-            Brush.verticalGradient(colors = listOf(HSBCRed.copy(alpha = 0.9f), HSBCRed)),
+            Brush.verticalGradient(colors = listOf(PrimaryBlue.copy(alpha = 0.9f), PrimaryBlue)),
             Icons.Default.Home,
-            "今日 WFO",
-            "在公司办公"
+            "Today WFO",
+            "Working From Office"
         )
         WorkMode.WFH -> Quad(
             Brush.verticalGradient(colors = listOf(SuccessGreen.copy(alpha = 0.9f), SuccessGreen)),
             Icons.Default.LocationOn,
-            "今日 WFH",
-            "在家办公"
+            "Today WFH",
+            "Working From Home"
         )
         WorkMode.LEAVE -> Quad(
             Brush.verticalGradient(colors = listOf(Color(0xFFFFB800).copy(alpha = 0.9f), Color(0xFFFFB800))),
             Icons.Default.BeachAccess,
-            "今日休假",
-            "享受假期"
+            "Today Leave",
+            "Enjoy Holiday"
         )
         else -> Quad(
-            Brush.verticalGradient(colors = listOf(HSBCRedLight.copy(alpha = 0.9f), HSBCRedLight)),
+            Brush.verticalGradient(colors = listOf(PrimaryBlueLight.copy(alpha = 0.9f), PrimaryBlueLight)),
             Icons.Default.Home,
-            "今日未记录",
-            "请选择工作模式"
+            "Not Recorded",
+            "Select Work Mode"
         )
     }
 
@@ -145,8 +145,8 @@ fun AnimatedStatusCard(
                 if (recordType != null && workMode != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     val typeText = when (recordType) {
-                        RecordType.AUTO -> "自动检测"
-                        RecordType.MANUAL -> "手动记录"
+                        RecordType.AUTO -> "Auto Detected"
+                        RecordType.MANUAL -> "Manually Recorded"
                     }
 
                     Row(
@@ -166,10 +166,9 @@ fun AnimatedStatusCard(
                         )
                     }
 
-                    // 长按提示
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "长按可切换状态",
+                        text = "Long press to change status",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.6f)
                     )
@@ -177,7 +176,7 @@ fun AnimatedStatusCard(
 
                 if (workMode == null) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
                     // Three buttons for WFO, WFH, LEAVE
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -186,7 +185,7 @@ fun AnimatedStatusCard(
                         ActionButton(
                             text = "WFO",
                             onClick = onWFOClick,
-                            color = HSBCRed
+                            color = PrimaryBlue
                         )
                         ActionButton(
                             text = "WFH",
@@ -194,7 +193,7 @@ fun AnimatedStatusCard(
                             color = SuccessGreen
                         )
                         ActionButton(
-                            text = "休假",
+                            text = "Leave",
                             onClick = onLeaveClick,
                             color = Color(0xFFFFB800)
                         )

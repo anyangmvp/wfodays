@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.BeachAccess
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
+import androidx.compose.ui.window.Dialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -175,7 +176,8 @@ fun HomeScreen(
             ) {
                 uiState.currentMonthStats?.let { stats ->
                     InsightCard(
-                        remainingDays = stats.remainingDays,
+                        remainingWfoDays = stats.remainingDays,
+                        remainingWorkdays = stats.remainingWorkdays,
                         targetPercentage = uiState.targetPercentage
                     )
                 }
@@ -193,6 +195,8 @@ private fun TodaySection(
     onWFHClick: () -> Unit,
     onLeaveClick: () -> Unit
 ) {
+    var showStatusDialog by remember { mutableStateOf(false) }
+
     Column {
         // Date
         Text(
@@ -207,27 +211,28 @@ private fun TodaySection(
             color = TextSecondary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Today Status Card
+        // Today Status Card - Click to change status
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
+                    elevation = 2.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    spotColor = Color.Black.copy(alpha = 0.05f)
                 )
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(BackgroundWhite)
-                .padding(16.dp)
+                .clickable { showStatusDialog = true }
+                .padding(12.dp)
         ) {
             Text(
                 text = "Today Status",
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -236,22 +241,28 @@ private fun TodaySection(
             ) {
                 Column {
                     Text(
-                        text = todayRecord?.workMode?.name ?: "No Record",
-                        fontSize = 20.sp,
+                        text = todayRecord?.workMode?.name ?: "No Status",
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = if (todayRecord != null) TextPrimary else Gray400
                     )
-                    if (todayRecord != null) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (todayRecord != null) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 tint = SuccessGreen,
-                                modifier = Modifier.size(14.dp)
+                                modifier = Modifier.size(12.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Checked in",
+                                text = "Tap to change",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                        } else {
+                            Text(
+                                text = "Tap to set status",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
@@ -264,7 +275,7 @@ private fun TodaySection(
                     WorkMode.WFO -> PrimaryBlue
                     WorkMode.WFH -> SuccessGreen
                     WorkMode.LEAVE -> WarningOrange
-                    null -> Gray400
+                    null -> Gray300
                 }
                 val icon = when (todayRecord?.workMode) {
                     WorkMode.WFO -> Icons.Default.Business
@@ -275,7 +286,7 @@ private fun TodaySection(
 
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(iconColor),
                     contentAlignment = Alignment.Center
@@ -284,47 +295,171 @@ private fun TodaySection(
                         imageVector = icon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
+        }
 
-            // Manual Check-in Buttons
-            if (todayRecord == null) {
-                Spacer(modifier = Modifier.height(16.dp))
+        // Status Selection Dialog - iOS Style
+        if (showStatusDialog) {
+            Dialog(onDismissRequest = { showStatusDialog = false }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(BackgroundWhite)
+                ) {
+                    Column {
+                        // Title
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp, bottom = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Change Status",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Select your status for today",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                        }
+
+                        // Options
+                        Column(
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                        ) {
+                            // WFO option
+                            DialogOption(
+                                label = "WFO",
+                                subtitle = "Working From Office",
+                                icon = Icons.Default.Business,
+                                color = PrimaryBlue,
+                                onClick = {
+                                    onWFOClick()
+                                    showStatusDialog = false
+                                }
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(0.5.dp)
+                                    .background(Gray200)
+                            )
+
+                            // WFH option
+                            DialogOption(
+                                label = "WFH",
+                                subtitle = "Working From Home",
+                                icon = Icons.Default.HomeWork,
+                                color = SuccessGreen,
+                                onClick = {
+                                    onWFHClick()
+                                    showStatusDialog = false
+                                }
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(0.5.dp)
+                                    .background(Gray200)
+                            )
+
+                            // Leave option
+                            DialogOption(
+                                label = "Leave",
+                                subtitle = "On Leave",
+                                icon = Icons.Default.BeachAccess,
+                                color = WarningOrange,
+                                onClick = {
+                                    onLeaveClick()
+                                    showStatusDialog = false
+                                }
+                            )
+                        }
+
+                        // Cancel button
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(0.5.dp)
+                                .background(Gray200)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showStatusDialog = false }
+                                .padding(vertical = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = PrimaryBlue
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogOption(
+    label: String,
+    subtitle: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 12.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
                 Text(
-                    text = "Quick Record",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    text = label,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
                     color = TextPrimary
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    QuickActionChip(
-                        label = "WFO",
-                        icon = Icons.Default.Business,
-                        color = PrimaryBlue,
-                        onClick = onWFOClick,
-                        modifier = Modifier.weight(1f)
-                    )
-                    QuickActionChip(
-                        label = "WFH",
-                        icon = Icons.Default.HomeWork,
-                        color = SuccessGreen,
-                        onClick = onWFHClick,
-                        modifier = Modifier.weight(1f)
-                    )
-                    QuickActionChip(
-                        label = "Leave",
-                        icon = Icons.Default.BeachAccess,
-                        color = WarningOrange,
-                        onClick = onLeaveClick,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary
+                )
             }
         }
     }
@@ -381,13 +516,13 @@ private fun MonthlyComplianceCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color.Black.copy(alpha = 0.05f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(BackgroundWhite)
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         // Title row with info icon
         Row(
@@ -397,7 +532,7 @@ private fun MonthlyComplianceCard(
         ) {
             Text(
                 text = "Monthly Office Compliance",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
             )
@@ -406,12 +541,12 @@ private fun MonthlyComplianceCard(
                 contentDescription = "Info",
                 tint = Gray400,
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(16.dp)
                     .clickable { onInfoClick() }
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Multi-segment donut chart
         Box(
@@ -423,8 +558,8 @@ private fun MonthlyComplianceCard(
                 wfhDays = wfhDays,
                 leaveDays = leaveDays,
                 totalDays = totalDays,
-                size = 180.dp,
-                strokeWidth = 18f,
+                size = 140.dp,
+                strokeWidth = 14f,
                 showText = true
             )
         }
@@ -476,18 +611,18 @@ private fun StatCard(
     Column(
         modifier = modifier
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color.Black.copy(alpha = 0.05f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(BackgroundWhite)
-            .padding(16.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(32.dp)
                 .clip(CircleShape)
                 .background(color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
@@ -496,13 +631,13 @@ private fun StatCard(
                 imageVector = icon,
                 contentDescription = null,
                 tint = color,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(16.dp)
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value.toString(),
-            fontSize = 24.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = TextPrimary
         )
@@ -516,7 +651,8 @@ private fun StatCard(
 
 @Composable
 private fun InsightCard(
-    remainingDays: Int,
+    remainingWfoDays: Int,
+    remainingWorkdays: Int,
     targetPercentage: Float
 ) {
     Column(
@@ -558,8 +694,8 @@ private fun InsightCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = if (remainingDays > 0) {
-                "You need $remainingDays more WFO day${if (remainingDays > 1) "s" else ""} to meet your ${targetPercentage.toInt()}% office target."
+            text = if (remainingWfoDays > 0) {
+                "You need $remainingWfoDays more WFO day${if (remainingWfoDays > 1) "s" else ""} to meet your ${targetPercentage.toInt()}% office target."
             } else {
                 "Great job! You've met your office target."
             },
@@ -568,10 +704,10 @@ private fun InsightCard(
             lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.3
         )
 
-        if (remainingDays > 0) {
+        if (remainingWfoDays > 0 && remainingWorkdays > 0) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "7 working days left this month",
+                text = "$remainingWorkdays working days left this month",
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray400
             )

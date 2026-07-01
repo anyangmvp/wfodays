@@ -65,15 +65,6 @@ fun CalendarScreen(
                         color = TextPrimary
                     )
                 },
-                actions = {
-                    IconButton(onClick = { /* Calendar icon action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "Calendar",
-                            tint = PrimaryBlue
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = BackgroundWhite
                 )

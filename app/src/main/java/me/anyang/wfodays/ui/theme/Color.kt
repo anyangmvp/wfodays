@@ -3,21 +3,21 @@ package me.anyang.wfodays.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ========================================
-// WFO Days - Clean iOS-style Theme
+// WFO Days - Clean, Soft, Neutral Theme
 // ========================================
 
-// Primary Colors - Bright Blue
-val PrimaryBlue = Color(0xFF2563EB)        // Main blue
-val PrimaryBlueDark = Color(0xFF1D4ED8)    // Darker blue
-val PrimaryBlueLight = Color(0xFF60A5FA)   // Lighter blue
+// Primary Colors - Soft Blue
+val PrimaryBlue = Color(0xFF2563EB)
+val PrimaryBlueDark = Color(0xFF1D4ED8)
+val PrimaryBlueLight = Color(0xFF60A5FA)
 
-// Status Colors - Matching target design
-val WFOBlue = Color(0xFF2563EB)            // WFO - Blue
-val WFOBlueLight = Color(0xFF93C5FD)       // WFO light
-val WFHGreen = Color(0xFF22C55E)           // WFH - Green
-val WFHGreenLight = Color(0xFF86EFAC)      // WFH light
-val LeaveOrange = Color(0xFFF97316)        // Leave - Orange
-val LeaveOrangeLight = Color(0xFFFDBA74)   // Leave light
+// Status Colors
+val WFOBlue = Color(0xFF2563EB)
+val WFOBlueLight = Color(0xFF93C5FD)
+val WFHGreen = Color(0xFF22C55E)
+val WFHGreenLight = Color(0xFF86EFAC)
+val LeaveOrange = Color(0xFFF97316)
+val LeaveOrangeLight = Color(0xFFFDBA74)
 
 // Semantic Colors
 val SuccessGreen = Color(0xFF22C55E)
@@ -27,24 +27,24 @@ val WarningOrangeLight = Color(0xFFFDBA74)
 val ErrorRed = Color(0xFFEF4444)
 val InfoBlue = Color(0xFF2563EB)
 
-// Background Colors
+// Background Colors - Soft neutrals
 val BackgroundWhite = Color(0xFFFFFFFF)
-val BackgroundLight = Color(0xFFF8FAFC)    // Very light gray
-val BackgroundCard = Color(0xFFFFFFFF)     // White cards
+val BackgroundLight = Color(0xFFF8FAFC)
+val BackgroundCard = Color(0xFFFFFFFF)
 
 // Surface Colors
 val SurfaceWhite = Color(0xFFFFFFFF)
-val SurfaceLight = Color(0xFFF1F5F9)       // Light surface
-val SurfaceVariant = Color(0xFFE2E8F0)     // Variant surface
+val SurfaceLight = Color(0xFFF1F5F9)
+val SurfaceVariant = Color(0xFFE2E8F0)
 
 // Text Colors
-val TextPrimary = Color(0xFF1E293B)        // Dark text
-val TextSecondary = Color(0xFF64748B)      // Gray text
-val TextTertiary = Color(0xFF94A3B8)       // Lighter gray
-val TextOnPrimary = Color(0xFFFFFFFF)      // White on primary
-val TextOnDark = Color(0xFFFFFFFF)         // White on dark
+val TextPrimary = Color(0xFF1E293B)
+val TextSecondary = Color(0xFF64748B)
+val TextTertiary = Color(0xFF94A3B8)
+val TextOnPrimary = Color(0xFFFFFFFF)
+val TextOnDark = Color(0xFFFFFFFF)
 
-// Neutral Gray Scale (Cool tones)
+// Neutral Gray Scale
 val Gray50 = Color(0xFFF8FAFC)
 val Gray100 = Color(0xFFF1F5F9)
 val Gray200 = Color(0xFFE2E8F0)
@@ -64,59 +64,3 @@ val ChartBlue = Color(0xFF2563EB)
 val ChartGreen = Color(0xFF22C55E)
 val ChartOrange = Color(0xFFF97316)
 val ChartGray = Color(0xFFCBD5E1)
-
-// ========================================
-// Legacy aliases for backward compatibility
-// ========================================
-val JoyOrange = PrimaryBlue
-val JoyCoral = PrimaryBlueLight
-val JoyMint = WFHGreen
-val JoySuccess = SuccessGreen
-val JoyWarning = WarningOrange
-val JoyError = ErrorRed
-
-val WFOOrange = WFOBlue
-val WFOOrangeLight = WFOBlueLight
-val WFOOrangeDark = PrimaryBlueDark
-
-val WFHMint = WFHGreen
-val WFHMintLight = WFHGreenLight
-
-val LeaveYellow = LeaveOrange
-val LeaveYellowLight = LeaveOrangeLight
-
-val JoyBackground = BackgroundLight
-val JoySurface = SurfaceWhite
-val JoyOnBackground = TextPrimary
-val JoyOnSurface = TextPrimary
-val JoyOnSurfaceVariant = TextSecondary
-val JoyOnPrimary = TextOnPrimary
-
-val JoyGray50 = Gray50
-val JoyGray100 = Gray100
-val JoyGray200 = Gray200
-val JoyGray300 = Gray300
-val JoyGray400 = Gray400
-val JoyGray500 = Gray500
-val JoyGray600 = Gray600
-val JoyGray700 = Gray700
-val JoyGray800 = Gray800
-val JoyGray900 = Gray900
-
-val WarningYellow = WarningOrange
-
-// Legacy HSBC aliases
-val HSBCRed = PrimaryBlue
-val HSBCRedDark = PrimaryBlueDark
-val HSBCRedLight = PrimaryBlueLight
-val HSBCWhite = Color.White
-val HSBCGray = Gray100
-val HSBCGrayDark = Gray800
-val HSBCGrayMedium = Gray500
-
-val NeutralGray200 = Gray200
-val NeutralGray400 = Gray400
-val NeutralGray500 = Gray500
-val NeutralGray600 = Gray600
-val NeutralGray700 = Gray700
-val NeutralGray900 = Gray900

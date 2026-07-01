@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +56,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     var isVisible by remember { mutableStateOf(false) }
     var targetPercentage by remember { mutableFloatStateOf(30f) }
+    var officeRadius by remember { mutableFloatStateOf(500f) }
     var showPercentageDialog by remember { mutableStateOf(false) }
 
     val locationPermissionState = rememberPermissionState(
@@ -73,6 +75,13 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         preferencesManager.wfoTargetPercentage.collect { percentage ->
             targetPercentage = percentage
+        }
+    }
+
+    // Load office radius from preferences
+    LaunchedEffect(Unit) {
+        preferencesManager.officeRadius.collect { radius ->
+            officeRadius = radius
         }
     }
 
@@ -141,7 +150,7 @@ fun SettingsScreen(
                         icon = Icons.Default.MyLocation,
                         iconColor = PrimaryBlue,
                         title = "Office Radius",
-                        subtitle = "${NativeLocationManager.OFFICE_RADIUS_METERS.toInt()} m",
+                        subtitle = "${officeRadius.toInt()} m",
                         showArrow = false,
                         onClick = { }
                     )
@@ -285,67 +294,118 @@ private fun PercentageDialog(
 ) {
     var sliderValue by remember { mutableFloatStateOf(currentPercentage) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "WFO Target",
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(BackgroundWhite)
+        ) {
             Column {
-                Text(
-                    text = "Set your monthly WFO target percentage",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "${sliderValue.toInt()}%",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Slider(
-                    value = sliderValue,
-                    onValueChange = { sliderValue = it },
-                    valueRange = 10f..100f,
-                    steps = 8,
-                    colors = SliderDefaults.colors(
-                        thumbColor = PrimaryBlue,
-                        activeTrackColor = PrimaryBlue,
-                        inactiveTrackColor = Gray300
-                    )
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // Title
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("10%", style = MaterialTheme.typography.bodySmall, color = Gray400)
-                    Text("100%", style = MaterialTheme.typography.bodySmall, color = Gray400)
+                    Text(
+                        text = "WFO Target",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Set your monthly WFO target percentage",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary
+                    )
+                }
+
+                // Slider content
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Text(
+                        text = "${sliderValue.toInt()}%",
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Slider(
+                        value = sliderValue,
+                        onValueChange = { sliderValue = it },
+                        valueRange = 10f..100f,
+                        steps = 8,
+                        colors = SliderDefaults.colors(
+                            thumbColor = PrimaryBlue,
+                            activeTrackColor = PrimaryBlue,
+                            inactiveTrackColor = Gray200
+                        )
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("10%", style = MaterialTheme.typography.bodySmall, color = Gray400)
+                        Text("100%", style = MaterialTheme.typography.bodySmall, color = Gray400)
+                    }
+                }
+
+                // Buttons
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(0.5.dp)
+                        .background(Gray200)
+                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onDismiss() }
+                            .padding(vertical = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = TextSecondary
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .width(0.5.dp)
+                            .height(44.dp)
+                            .background(Gray200)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onConfirm(sliderValue) }
+                            .padding(vertical = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Save",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = PrimaryBlue
+                        )
+                    }
                 }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(sliderValue) },
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        },
-        shape = RoundedCornerShape(16.dp)
-    )
+        }
+    }
 }
 
 @Composable

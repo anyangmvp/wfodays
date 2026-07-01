@@ -1,5 +1,6 @@
 package me.anyang.wfodays.ui.screens
 
+import android.content.Context
 import android.Manifest
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -56,6 +57,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,13 +71,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import me.anyang.wfodays.R
+import me.anyang.wfodays.data.local.PreferencesManager
 import me.anyang.wfodays.location.NativeLocationManager
+import me.anyang.wfodays.notification.NotificationHelper
 import me.anyang.wfodays.ui.theme.BackgroundLight
 import me.anyang.wfodays.ui.theme.BackgroundWhite
+import me.anyang.wfodays.ui.theme.Gray100
+import me.anyang.wfodays.ui.theme.Gray200
 import me.anyang.wfodays.ui.theme.Gray400
 import me.anyang.wfodays.ui.theme.Gray500
 import me.anyang.wfodays.ui.theme.PrimaryBlue
@@ -208,7 +215,10 @@ fun LocationScreen(
                 )
             ) {
                 TestCheckinCard(
-                    isInRange = distanceToOffice <= NativeLocationManager.OFFICE_RADIUS_METERS
+                    isInRange = distanceToOffice <= NativeLocationManager.OFFICE_RADIUS_METERS,
+                    distance = distanceToOffice,
+                    context = context,
+                    locationManager = locationManager
                 )
             }
 
@@ -428,96 +438,160 @@ private fun OfficeCenterCard() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun OfficeRadiusCard() {
-    var selectedRadius by remember { mutableFloatStateOf(NativeLocationManager.OFFICE_RADIUS_METERS) }
+    val context = LocalContext.current
+    val preferencesManager = remember { PreferencesManager(context) }
+    val scope = rememberCoroutineScope()
+    var selectedRadius by remember { mutableFloatStateOf(500f) }
     val radiusOptions = listOf(300f, 500f, 800f, 1000f)
+
+    // Load saved radius
+    LaunchedEffect(Unit) {
+        preferencesManager.officeRadius.collect { radius ->
+            selectedRadius = radius
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color.Black.copy(alpha = 0.05f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(BackgroundWhite)
-            .padding(16.dp)
     ) {
-        Text(
-            text = "Office Radius",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = TextPrimary
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = "${selectedRadius.toInt()} m",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = PrimaryBlue
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Radius Preset Buttons
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            radiusOptions.forEach { radius ->
-                FilterChip(
-                    selected = selectedRadius == radius,
-                    onClick = { selectedRadius = radius },
-                    label = {
-                        Text("${radius.toInt()} m")
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = PrimaryBlue.copy(alpha = 0.1f),
-                        selectedLabelColor = PrimaryBlue
-                    )
+            Column {
+                Text(
+                    text = "Office Radius",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "Detection range for auto check-in",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary
                 )
             }
+            Text(
+                text = "${selectedRadius.toInt()} m",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = PrimaryBlue
+            )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        // Divider
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.5.dp)
+                .background(Gray200)
+        )
+
+        // Radius Options
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                radiusOptions.forEach { radius ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(
+                                if (selectedRadius == radius) PrimaryBlue
+                                else Gray100
+                            )
+                            .clickable {
+                                selectedRadius = radius
+                                scope.launch {
+                                    preferencesManager.setOfficeRadius(radius)
+                                }
+                            }
+                            .padding(vertical = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${radius.toInt()} m",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = if (selectedRadius == radius) Color.White else TextSecondary
+                        )
+                    }
+                }
+            }
+        }
 
         // Slider
         Slider(
             value = selectedRadius,
             onValueChange = { selectedRadius = it },
+            onValueChangeFinished = {
+                scope.launch {
+                    preferencesManager.setOfficeRadius(selectedRadius)
+                }
+            },
             valueRange = 100f..2000f,
             steps = 18,
+            modifier = Modifier.padding(horizontal = 16.dp),
             colors = SliderDefaults.colors(
                 thumbColor = PrimaryBlue,
                 activeTrackColor = PrimaryBlue,
-                inactiveTrackColor = Gray400
+                inactiveTrackColor = Gray200
             )
         )
+
+        // Range labels
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("100 m", style = MaterialTheme.typography.labelSmall, color = Gray400)
+            Text("2000 m", style = MaterialTheme.typography.labelSmall, color = Gray400)
+        }
     }
 }
 
 @Composable
 private fun TestCheckinCard(
-    isInRange: Boolean
+    isInRange: Boolean,
+    distance: Float,
+    context: Context,
+    locationManager: NativeLocationManager
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color.Black.copy(alpha = 0.05f)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(BackgroundWhite)
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
                     .background(PrimaryBlue.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -525,14 +599,14 @@ private fun TestCheckinCard(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = null,
                     tint = PrimaryBlue,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Test Check-in",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary
                 )
@@ -544,10 +618,32 @@ private fun TestCheckinCard(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedButton(
-            onClick = { /* Test check-in */ },
+            onClick = {
+                val distanceDisplay = if (distance <= NativeLocationManager.OFFICE_RADIUS_METERS) {
+                    "${distance.toInt()} m"
+                } else {
+                    String.format("%.1f km", distance / 1000)
+                }
+
+                if (isInRange) {
+                    NotificationHelper.showAttendanceNotification(
+                        context,
+                        java.time.LocalDate.now(),
+                        "Office Check-in Successful",
+                        "Distance to office: $distanceDisplay - WFO"
+                    )
+                } else {
+                    NotificationHelper.showAttendanceNotification(
+                        context,
+                        java.time.LocalDate.now(),
+                        "Remote Work Recorded",
+                        "Distance to office: $distanceDisplay - WFH"
+                    )
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.outlinedButtonColors(
