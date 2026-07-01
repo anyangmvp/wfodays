@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Android-26%2B-brightgreen.svg" alt="Android 26+">
-  <img src="https://img.shields.io/badge/Kotlin-2.0-blue.svg" alt="Kotlin 2.0">
-  <img src="https://img.shields.io/badge/Jetpack%20Compose-2.0-purple.svg" alt="Jetpack Compose">
+  <img src="https://img.shields.io/badge/Android-28%2B-brightgreen.svg" alt="Android 28+">
+  <img src="https://img.shields.io/badge/Kotlin-2.3-blue.svg" alt="Kotlin 2.3">
+  <img src="https://img.shields.io/badge/Jetpack%20Compose-2.3-purple.svg" alt="Jetpack Compose">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
 </p>
 
@@ -31,19 +31,23 @@
 
 ### 📊 出勤统计
 - **实时统计**：本月 WFO/WFH/休假天数实时统计
-- **目标追踪**：自动计算 60% WFO 达标进度
+- **目标追踪**：自动计算 WFO 达标进度，达标百分比可在设置中自定义（默认 60%）
 - **历史记录**：查看历史月份出勤统计
 
 ### 🔔 智能提醒
 - **每日提醒**：上午自动检测并记录位置
 - **通知推送**：位置更新时推送通知提醒
 
+### ⚙️ 个性化设置
+- **出勤率配置**：在设置页面通过滑块调整 WFO 目标百分比（1%-100%），所有达标计算、进度显示和目标公式将自动同步使用新值
+- **多语言问候**：根据时段（早/中/下午/晚/凌晨/周末）和语言（中/英）随机展示问候语
+
 ---
 
 ## 🚀 快速开始
 
 ### 系统要求
-- Android 8.0 (API 26) 或更高版本
+- Android 9.0 (API 28) 或更高版本
 - 位置权限（精确定位）
 - 后台位置权限（可选，用于自动检测）
 
@@ -86,11 +90,11 @@ cd wfodays
 
 ## 🛠 技术栈
 
-- **语言**: Kotlin 2.0
-- **UI 框架**: Jetpack Compose 2.0
+- **语言**: Kotlin 2.3
+- **UI 框架**: Jetpack Compose 2.3
 - **架构**: MVVM + Repository 模式
 - **依赖注入**: Hilt
-- **本地存储**: Room 数据库
+- **本地存储**: Room 数据库 + DataStore（用户偏好设置）
 - **后台任务**: WorkManager
 - **位置服务**: Android 原生 LocationManager
 
@@ -131,6 +135,24 @@ companion object {
     const val OFFICE_LONGITUDE = 108.834240
     const val OFFICE_RADIUS_METERS = 800f
     const val OFFICE_NAME = "环普产业园"
+}
+```
+
+### 出勤率配置
+WFO 达标百分比默认为 60%，支持两种修改方式：
+
+**方式一：应用内设置（推荐，运行时生效）**
+
+进入「设置」→「出勤设置」→「WFO 出勤率」，通过滑块调整 1%-100% 之间的任意值。修改后所有达标计算、进度条、目标公式和达成提示会自动同步使用新值，无需重启应用。
+
+**方式二：修改默认值（影响首次安装的初始值）**
+
+在 `Constants.kt` 中修改默认百分比：
+
+```kotlin
+companion object {
+    // 出勤率要求（默认百分比，用户可在设置中修改）
+    const val DEFAULT_REQUIRED_ATTENDANCE_RATE_PERCENT = 60
 }
 ```
 
